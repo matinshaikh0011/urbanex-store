@@ -74,8 +74,27 @@ app.get('/api/products/featured', async (req, res) => {
       where: { is_featured: true },
       include: { brand: true },
     });
-    res.json(products);
+
+    const formatted = products.map(p => ({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      description: p.description,
+      price: Number(p.price),
+      originalPrice: Number(p.original_price),
+      images: p.images,
+      sizes: p.sizes,
+      colors: p.colors,
+      category: p.category,
+      isFeatured: p.is_featured,
+      inStock: p.in_stock,
+      brand: p.brand,
+      brandId: p.brand_id,
+    }));
+
+    res.json(formatted);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Failed to fetch featured products' });
   }
 });
