@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(npx prisma *)",
+      "Bash(node src/index.js)",
+      "Bash(curl -s http://localhost:3001/api/health)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:3002/)",
+      "Bash(curl *)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill *)",
+      "Bash(powershell -Command \"Stop-Process -Id 3252 -Force -ErrorAction SilentlyContinue\")",
+      "Bash(powershell *)",
+      "Bash(Start-Sleep *)"
+    ]
+  }
+}

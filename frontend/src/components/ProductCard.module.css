@@ -1,0 +1,213 @@
+/* ================================================================
+   PRODUCT CARD — Graffiti Sticker Style
+   White fill cards with thick marker outlines, like sticker art
+   ================================================================ */
+
+.card {
+  display: block;
+  background: var(--bg-secondary);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  position: relative;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.14s var(--ease-spring),
+    box-shadow 0.14s ease;
+}
+
+/* Hover: sticker lifts up and shifts */
+.card:hover {
+  transform: translate(-4px, -4px) rotate(-0.5deg);
+  box-shadow: var(--shadow-lift);
+  border-color: var(--accent-primary);
+}
+
+/* Holographic shimmer sweep on hover */
+@keyframes cardShimmer {
+  0%   { transform: translateX(-150%) skewX(-20deg); }
+  100% { transform: translateX(250%) skewX(-20deg); }
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255,255,255,0.03) 35%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.03) 65%,
+    transparent 100%
+  );
+  transform: translateX(-150%) skewX(-20deg);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.card:hover::after {
+  animation: cardShimmer 0.8s ease;
+}
+
+/* Orange spray corner accent on hover */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 0; height: 0;
+  border-top: 40px solid var(--accent-primary);
+  border-right: 40px solid transparent;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 3;
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+/* ---- Image container ---- */
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--bg-tertiary);
+  overflow: hidden;
+  border-bottom: var(--border);
+}
+
+.image {
+  object-fit: cover;
+  transition: transform 0.5s var(--ease-out);
+}
+
+.card:hover .image {
+  transform: scale(1.07);
+}
+
+/* ---- SALE sticker tag ---- */
+.saleTag {
+  position: absolute;
+  top: 12px;
+  left: -4px;
+  background: var(--accent-primary);
+  color: #fff;
+  font-family: 'Permanent Marker', cursive;
+  font-size: 13px;
+  padding: 5px 14px 5px 10px;
+  z-index: 2;
+  border: 2px solid var(--border-color);
+  box-shadow: 3px 3px 0 var(--border-color);
+  transform: rotate(-3deg);
+  /* Ribbon tail */
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
+}
+
+/* ---- Overlay on hover (quick-add) ---- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.overlay.visible {
+  opacity: 1;
+}
+
+.quickAdd {
+  background: var(--accent-primary);
+  color: #fff;
+  border: var(--border);
+  padding: 14px 28px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 17px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 var(--border-color);
+  transform: translateY(16px) scale(0.95);
+  transition: transform 0.2s var(--ease-spring), box-shadow 0.15s ease;
+}
+
+.overlay.visible .quickAdd {
+  transform: translateY(0) scale(1);
+}
+
+.quickAdd:hover {
+  transform: translate(3px, 3px) scale(1);
+  box-shadow: 1px 1px 0 var(--border-color);
+}
+
+.quickAdd.added {
+  background: var(--success);
+}
+
+/* ---- Card Info ---- */
+.info {
+  padding: 16px;
+}
+
+.brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.name {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.price {
+  font-family: 'Oswald', sans-serif;
+  font-size: 20px;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+}
+
+.originalPrice {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 600px) {
+  .quickAdd {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+
+  .price { font-size: 17px; }
+  .name { font-size: 13px; }
+  .info { padding: 12px; }
+}

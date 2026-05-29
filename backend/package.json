@@ -1,0 +1,23 @@
+{
+  "name": "urbanex-backend",
+  "version": "1.0.0",
+  "description": "UrbanEx Express Backend API",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate",
+    "db:seed": "node prisma/seed.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.10.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "dotenv": "^16.4.1"
+  },
+  "devDependencies": {
+    "prisma": "^5.10.0"
+  }
+}

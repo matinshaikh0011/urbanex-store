@@ -1,0 +1,192 @@
+.main {
+  min-height: calc(100vh - 80px);
+}
+
+.hero {
+  background: var(--bg-secondary);
+  padding: 60px 24px;
+  text-align: center;
+}
+
+.title {
+  font-size: 48px;
+  letter-spacing: 4px;
+  margin-bottom: 12px;
+}
+
+.accent {
+  color: var(--accent-primary);
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.successMessage {
+  text-align: center;
+  padding: 60px 24px;
+  background: var(--bg-secondary);
+  border-radius: 16px;
+}
+
+.successIcon {
+  width: 80px;
+  height: 80px;
+  background: var(--success);
+  color: white;
+  font-size: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+}
+
+.successMessage h2 {
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.successMessage p {
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.whatsappBtn {
+  display: inline-block;
+  background: #25D366;
+  color: white;
+  padding: 16px 32px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 2px;
+  border-radius: 8px;
+}
+
+.formSection {
+  display: grid;
+  gap: 32px;
+}
+
+.policy {
+  background: var(--bg-secondary);
+  padding: 28px;
+  border-radius: 12px;
+}
+
+.policy h3 {
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.policy ul {
+  list-style: none;
+}
+
+.policy li {
+  padding: 10px 0;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.policy li:last-child {
+  border-bottom: none;
+}
+
+.form {
+  background: var(--bg-secondary);
+  padding: 32px;
+  border-radius: 16px;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 16px;
+  background: var(--bg-primary);
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+  border-color: var(--accent-primary);
+  outline: none;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .formRow { grid-template-columns: 1fr; }
+}
+
+.submitBtn {
+  width: 100%;
+  background: var(--gradient);
+  color: white;
+  border: none;
+  padding: 18px;
+  font-size: 20px;
+  letter-spacing: 2px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.submitBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.contactSection {
+  text-align: center;
+  margin-top: 40px;
+  padding: 32px;
+  background: var(--bg-secondary);
+  border-radius: 16px;
+}
+
+.contactSection h3 {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.contactSection p {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.whatsappLink {
+  display: inline-block;
+  background: #25D366;
+  color: white;
+  padding: 14px 28px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 8px;
+}

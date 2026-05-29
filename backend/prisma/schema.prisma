@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Brand {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  slug      String    @unique
+  logoUrl   String?   @map("logo_url")
+  products  Product[]
+  createdAt DateTime  @default(now()) @map("created_at")
+}
+
+model Product {
+  id          Int        @id @default(autoincrement())
+  name        String
+  slug        String     @unique
+  brand       Brand      @relation(fields: [brandId], references: [id])
+  brandId     Int        @map("brand_id")
+  description String?
+  price       Decimal    @db.Decimal(10, 2)
+  originalPrice Decimal?  @map("original_price") @db.Decimal(10, 2)
+  images      String[]
+  sizes       Json
+  colors      Json
+  category    String?
+  inStock     Boolean    @default(true) @map("in_stock")
+  isFeatured  Boolean    @default(false) @map("is_featured")
+  orders      Order[]
+  createdAt   DateTime   @default(now()) @map("created_at")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String?  @unique
+  phone     String?
+  name      String?
+  address   String?
+  orders    Order[]
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model Order {
+  id                 Int       @id @default(autoincrement())
+  orderId            String    @unique @map("order_id")
+  user               User?     @relation(fields: [userId], references: [id])
+  userId             Int?      @map("user_id")
+  product            Product?  @relation(fields: [productId], references: [id])
+  productId          Int?      @map("product_id")
+  size               String?
+  color              String?
+  quantity           Int       @default(1)
+  totalAmount        Decimal   @map("total_amount") @db.Decimal(10, 2)
+  status             String    @default("Pending Advance")
+  advancePaid        Boolean   @default(false) @map("advance_paid")
+  whatsappLeadSent   Boolean   @default(false) @map("whatsapp_lead_sent")
+  shippingName       String    @map("shipping_name")
+  shippingAddress    String    @map("shipping_address")
+  shippingEmail      String    @map("shipping_email")
+  shippingPhone      String    @map("shipping_phone")
+  notes              String?
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+}

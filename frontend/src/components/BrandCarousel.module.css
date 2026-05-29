@@ -1,0 +1,176 @@
+/* ================================================================
+   BRAND CAROUSEL — Concrete Tile Brand Panels
+   Each brand card = a sticker tile on a concrete wall
+   ================================================================ */
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.section {
+  padding: 80px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.title {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(26px, 4vw, 44px);
+  letter-spacing: 4px;
+  color: var(--text-primary);
+  -webkit-text-stroke: 1px var(--border-color);
+  text-shadow: 4px 4px 0 var(--border-color);
+  margin-bottom: 10px;
+}
+
+.accent {
+  color: var(--accent-primary);
+}
+
+.subtitle {
+  font-family: 'Permanent Marker', cursive;
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+}
+
+/* ---- Brand card = concrete sticker tile ---- */
+.brandCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  padding: 28px 16px;
+  cursor: pointer;
+  transition:
+    transform 0.14s var(--ease-spring),
+    box-shadow 0.14s ease;
+  overflow: hidden;
+  animation: slideUp 0.4s var(--ease-out) backwards;
+}
+
+.brandCard:nth-child(1)  { animation-delay: 0.05s; }
+.brandCard:nth-child(2)  { animation-delay: 0.08s; }
+.brandCard:nth-child(3)  { animation-delay: 0.11s; }
+.brandCard:nth-child(4)  { animation-delay: 0.14s; }
+.brandCard:nth-child(5)  { animation-delay: 0.17s; }
+.brandCard:nth-child(6)  { animation-delay: 0.20s; }
+.brandCard:nth-child(7)  { animation-delay: 0.23s; }
+.brandCard:nth-child(8)  { animation-delay: 0.26s; }
+.brandCard:nth-child(9)  { animation-delay: 0.29s; }
+.brandCard:nth-child(10) { animation-delay: 0.32s; }
+.brandCard:nth-child(11) { animation-delay: 0.35s; }
+.brandCard:nth-child(12) { animation-delay: 0.38s; }
+
+/* Top spray accent line */
+.brandCard::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--accent-primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s var(--ease-out);
+}
+
+.brandCard:hover::before {
+  transform: scaleX(1);
+}
+
+/* Sticker peel hover */
+.brandCard:hover {
+  transform: translate(-4px, -4px) rotate(-1deg);
+  box-shadow: var(--shadow-lift);
+  background: var(--bg-secondary);
+}
+
+.logoWrapper {
+  width: 90px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  background: #ffffff; /* crisp white backing for brand logos */
+  border: var(--border-thin);
+  box-shadow: 3px 3px 0 var(--border-color);
+  overflow: hidden;
+  transition: transform 0.2s var(--ease-spring);
+  padding: 6px;
+}
+
+.brandCard:hover .logoWrapper {
+  transform: scale(1.06) rotate(1deg);
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: grayscale(1) contrast(1.2);
+  opacity: 0.85;
+  transition: all 0.2s ease;
+}
+
+.brandCard:hover .logo {
+  filter: grayscale(0) contrast(1);
+  opacity: 1;
+}
+
+.logoText {
+  font-family: 'Oswald', sans-serif;
+  font-size: 26px;
+  color: var(--accent-primary);
+}
+
+
+.brandName {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--text-secondary);
+  text-align: center;
+  transition: color 0.15s ease;
+}
+
+.brandCard:hover .brandName {
+  color: var(--text-primary);
+}
+
+.hoverEffect { display: none; }
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 1000px) {
+  .grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .section { padding: 48px 12px; }
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .title { font-size: 26px; }
+  .brandCard { padding: 20px 10px; }
+  .logoWrapper { width: 48px; height: 48px; }
+  .logo { width: 34px; height: 34px; }
+  .brandName { font-size: 11px; }
+}

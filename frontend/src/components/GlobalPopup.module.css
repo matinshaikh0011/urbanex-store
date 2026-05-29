@@ -1,0 +1,226 @@
+/* ================================================================
+   GLOBAL POPUP — Street Flyer / Pasted Wall Notice
+   Looks like a printed flyer plastered on a concrete wall
+   ================================================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes flyerPost {
+  0%   { opacity: 0; transform: scale(0.85) rotate(-3deg) translateY(-30px); }
+  60%  { transform: scale(1.02) rotate(0.5deg) translateY(0); }
+  100% { opacity: 1; transform: scale(1) rotate(0) translateY(0); }
+}
+
+@keyframes tagWobble {
+  0%   { transform: rotate(0deg); }
+  25%  { transform: rotate(-2.5deg); }
+  75%  { transform: rotate(2.5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.88);
+  z-index: 9998;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.popupWrapper {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  padding: 16px;
+}
+
+.popupWrapper.visible {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+/* The popup = a flyer posted on a wall */
+.popup {
+  background: var(--bg-secondary);
+  border: var(--border);
+  box-shadow: var(--shadow-lift);
+  max-width: 460px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  animation: flyerPost 0.5s var(--ease-spring) forwards;
+  transform-origin: top center;
+}
+
+@keyframes flyerPost {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) rotate(-3deg) translateY(-30px);
+  }
+  60% {
+    transform: scale(1.02) rotate(0.5deg) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0) translateY(0);
+  }
+}
+
+/* Hazard tape header */
+.glow {
+  height: 8px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--accent-primary)  0px,
+    var(--accent-primary)  20px,
+    var(--border-color)    20px,
+    var(--border-color)    24px
+  );
+}
+
+/* Large warning icon behind content */
+.popup::after {
+  content: '⚠';
+  position: absolute;
+  top: 40px;
+  right: -10px;
+  font-size: 140px;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+  line-height: 1;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  padding: 28px 24px 24px;
+  text-align: center;
+}
+
+.icon {
+  font-size: 44px;
+  margin-bottom: 12px;
+  display: block;
+  animation: tagWobble 2s ease-in-out infinite;
+}
+
+.headline {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(22px, 5vw, 32px);
+  letter-spacing: 3px;
+  color: var(--text-primary);
+  -webkit-text-stroke: 0.5px var(--border-color);
+  text-shadow: 3px 3px 0 rgba(0,0,0,0.15);
+  margin-bottom: 12px;
+  line-height: 1.1;
+}
+
+.body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+
+.highlight {
+  color: var(--accent-primary);
+  font-weight: 700;
+  font-size: 15px;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 2px;
+}
+
+/* Code badge = a sticker label */
+.badge {
+  display: inline-block;
+  background: var(--accent-tag);
+  border: var(--border);
+  color: var(--text-primary);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 15px;
+  letter-spacing: 2px;
+  padding: 8px 20px;
+  margin: 12px 0;
+  box-shadow: var(--shadow);
+  transform: rotate(-1.5deg);
+}
+
+/* Feature list = handwritten notes */
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+  text-align: left;
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg-primary);
+  border: var(--border-thin);
+  box-shadow: 2px 2px 0 var(--border-color);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.featureItem span {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--accent-primary);
+}
+
+/* CTA button = big marker painted block */
+.closeBtn {
+  width: 100%;
+  margin-top: 16px;
+  padding: 18px 24px;
+  background: var(--accent-primary);
+  color: #fff;
+  border: var(--border);
+  font-family: 'Oswald', sans-serif;
+  font-size: 20px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.12s var(--ease-spring), box-shadow 0.12s ease;
+  -webkit-text-stroke: 0.5px rgba(255,255,255,0.3);
+}
+
+.closeBtn:hover {
+  transform: translate(4px, 4px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 480px) {
+  .popup { max-width: 100%; }
+  .content { padding: 20px 16px; }
+  .headline { font-size: 24px; }
+  .icon { font-size: 36px; }
+  .body { font-size: 13px; }
+  .closeBtn { font-size: 17px; padding: 15px 20px; }
+  .badge { font-size: 13px; }
+  .featureItem { font-size: 12px; }
+}

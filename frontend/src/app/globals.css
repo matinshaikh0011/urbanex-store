@@ -1,0 +1,327 @@
+/* ================================================================
+   URBANEX — GRAFFITI CONCRETE DESIGN SYSTEM v2
+   Palette: Aged concrete + bold crimson spray + clean typography
+   ================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Permanent+Marker&family=Bebas+Neue&display=swap');
+
+:root {
+  /* ---- CONCRETE PALETTE ---- */
+  --bg-primary:    #DEDAD3;   /* raw aged concrete */
+  --bg-secondary:  #F2EFE9;   /* lighter concrete / paper */
+  --bg-tertiary:   #C8C3BB;   /* shadowed concrete */
+  --bg-dark:       #151515;   /* near-black panel */
+
+  /* ---- ACCENT: Bold crimson red spray paint ---- */
+  --accent-primary:   #CC0000;
+  --accent-secondary: #AA0000;
+  --accent-tag:       #F5C400;   /* golden sticker yellow */
+
+  /* ---- TEXT ---- */
+  --text-primary:   #111111;
+  --text-secondary: #4A4A4A;
+  --text-muted:     #888888;
+  --text-light:     #F0EDE6;
+
+  /* ---- BORDERS & SHADOWS ---- */
+  --border-color:   #111111;
+  --border:         3px solid #111111;
+  --border-thin:    2px solid #111111;
+  --shadow:         5px 5px 0px #111111;
+  --shadow-lg:      8px 8px 0px #111111;
+  --shadow-hover:   2px 2px 0px #111111;
+  --shadow-lift:    10px 10px 0px #111111;
+
+  /* ---- STATUS ---- */
+  --success:  #009960;
+  --error:    #CC2200;
+  --warning:  #F5C400;
+
+  /* ---- TRANSITIONS ---- */
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ================================================================
+   RESET
+   ================================================================ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ================================================================
+   CONCRETE CANVAS BACKGROUND
+   ================================================================ */
+html, body {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+}
+
+/* Concrete grain texture */
+body {
+  position: relative;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E"),
+    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 400px 400px, 80px 80px, 80px 80px;
+}
+
+/* Subtle spray corner vignette */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 0% 0%, rgba(204, 0, 0, 0.03) 0%, transparent 40%),
+    radial-gradient(ellipse at 100% 100%, rgba(0, 0, 0, 0.04) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ================================================================
+   TYPOGRAPHY
+   ================================================================ */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 1px;
+  line-height: 1.1;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+h1 { font-size: clamp(40px, 8vw, 80px); }
+h2 { font-size: clamp(28px, 5vw, 48px); }
+h3 { font-size: clamp(20px, 3vw, 28px); }
+h4 { font-size: 20px; }
+
+/* ================================================================
+   LINKS
+   ================================================================ */
+a {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+a:hover { color: var(--accent-primary); }
+
+/* ================================================================
+   BUTTONS
+   ================================================================ */
+button {
+  font-family: 'Oswald', sans-serif;
+  font-size: 17px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent-primary);
+  color: #fff;
+  border: var(--border);
+  padding: 14px 32px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  box-shadow: var(--shadow);
+  transition: transform 0.12s var(--ease-spring), box-shadow 0.12s ease;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  transform: translate(3px, 3px);
+  box-shadow: var(--shadow-hover);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  color: var(--text-primary);
+  border: var(--border);
+  padding: 12px 28px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  box-shadow: var(--shadow);
+  transition: transform 0.12s var(--ease-spring), box-shadow 0.12s ease, background 0.15s ease;
+  cursor: pointer;
+}
+.btn-outline:hover {
+  background: var(--text-primary);
+  color: var(--bg-secondary);
+  transform: translate(3px, 3px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* ================================================================
+   CARDS
+   ================================================================ */
+.card {
+  background: var(--bg-secondary);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  transition: transform 0.15s var(--ease-spring), box-shadow 0.15s ease;
+}
+.card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--shadow-lift);
+}
+
+/* ================================================================
+   INPUTS
+   ================================================================ */
+input, textarea, select {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+textarea {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg-secondary);
+  border: var(--border);
+  color: var(--text-primary);
+  outline: none;
+  box-shadow: 3px 3px 0px var(--border-color);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+input:focus, textarea:focus {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px var(--accent-primary);
+}
+input::placeholder, textarea::placeholder { color: var(--text-muted); }
+
+/* ================================================================
+   SCROLLBAR
+   ================================================================ */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-tertiary); }
+::-webkit-scrollbar-thumb { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+
+/* ================================================================
+   TEXT SELECTION
+   ================================================================ */
+::selection { background: var(--accent-primary); color: #fff; }
+
+/* ================================================================
+   CONTAINER
+   ================================================================ */
+.container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+
+/* ================================================================
+   UTILITY CLASSES
+   ================================================================ */
+.accent-text { color: var(--accent-primary); }
+.marker-text { font-family: 'Permanent Marker', cursive; }
+
+.sticker-tag {
+  display: inline-block;
+  background: var(--accent-tag);
+  color: var(--text-primary);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 13px;
+  padding: 4px 12px;
+  border: 2px solid var(--border-color);
+  box-shadow: 3px 3px 0 var(--border-color);
+  transform: rotate(-2deg);
+}
+
+/* ================================================================
+   ANIMATIONS
+   ================================================================ */
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tagWobble {
+  0%   { transform: rotate(-2deg); }
+  50%  { transform: rotate(2deg);  }
+  100% { transform: rotate(-2deg); }
+}
+
+@keyframes pulseBeat {
+  0%, 100% { transform: scale(1);   opacity: 1;   }
+  50%       { transform: scale(1.4); opacity: 0.7; }
+}
+
+@keyframes floatBob {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%       { transform: translateY(-12px) rotate(0.8deg); }
+}
+
+@keyframes marqueeScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes wordFadeIn {
+  0%   { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes wordFadeOut {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-12px); }
+}
+
+@keyframes rotate3D {
+  from { transform: perspective(800px) rotateY(0deg) rotateX(2deg); }
+  to   { transform: perspective(800px) rotateY(360deg) rotateX(2deg); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes arrowBounce {
+  0%, 100% { transform: rotate(45deg) translateY(0); }
+  50%       { transform: rotate(45deg) translateY(6px); }
+}
+
+/* ================================================================
+   CUSTOM CURSOR
+   ================================================================ */
+body.custom-cursor-active,
+body.custom-cursor-active *:not(input):not(textarea):not(select) {
+  cursor: none !important;
+}
+
+/* ================================================================
+   RESPONSIVE BASE
+   ================================================================ */
+@media (max-width: 768px) {
+  .container { padding: 0 14px; }
+  h1 { font-size: 36px; }
+  h2 { font-size: 28px; }
+  h3 { font-size: 20px; }
+}

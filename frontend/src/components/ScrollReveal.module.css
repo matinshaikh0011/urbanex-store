@@ -1,0 +1,33 @@
+.reveal {
+  opacity: 0;
+  will-change: transform, opacity;
+  transition-property: transform, opacity;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1); /* Out-expo easing */
+}
+
+.fadeIn {
+  transform: none;
+}
+
+.slideUp {
+  transform: translateY(50px);
+}
+
+.scaleIn {
+  transform: scale(0.92);
+}
+
+.slideLeft {
+  transform: translateX(60px);
+}
+
+.slideRight {
+  transform: translateX(-60px);
+}
+
+/* Activated state when in viewport */
+.reveal.visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+

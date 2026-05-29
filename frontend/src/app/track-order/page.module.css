@@ -1,0 +1,232 @@
+.main {
+  min-height: calc(100vh - 80px);
+}
+
+.hero {
+  background: var(--bg-secondary);
+  padding: 60px 24px;
+  text-align: center;
+}
+
+.title {
+  font-size: 48px;
+  letter-spacing: 4px;
+  margin-bottom: 12px;
+}
+
+.accent {
+  color: var(--accent-primary);
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.searchBox {
+  background: var(--bg-secondary);
+  padding: 32px;
+  border-radius: 16px;
+  margin-bottom: 32px;
+}
+
+.form {
+  display: flex;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .form { flex-direction: column; }
+}
+
+.input {
+  flex: 1;
+  padding: 16px 20px;
+  font-size: 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.input:focus {
+  border-color: var(--accent-primary);
+  outline: none;
+}
+
+.trackBtn {
+  background: var(--gradient);
+  color: white;
+  border: none;
+  padding: 16px 32px;
+  font-size: 16px;
+  letter-spacing: 2px;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.trackBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.trackBtn:disabled {
+  opacity: 0.7;
+}
+
+.error {
+  color: var(--error);
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.orderInfo {
+  background: var(--bg-secondary);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.orderHeader h2 {
+  font-size: 24px;
+}
+
+.orderId {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  color: var(--accent-primary);
+}
+
+.status {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 768px) {
+  .status { grid-template-columns: repeat(2, 1fr); }
+}
+
+.statusItem {
+  text-align: center;
+  padding: 16px;
+}
+
+.statusIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  font-size: 20px;
+}
+
+.statusIcon.pending {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+}
+
+.statusIcon.completed {
+  background: var(--success);
+  color: white;
+}
+
+.statusItem h4 {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.statusItem p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.orderDetails {
+  background: var(--bg-primary);
+  padding: 24px;
+  border-radius: 12px;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.detailRow:last-child {
+  border-bottom: none;
+}
+
+.detailRow span:first-child {
+  color: var(--text-muted);
+}
+
+.detailRow span:last-child {
+  font-weight: 600;
+}
+
+.statusBadge {
+  background: var(--warning);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.whatsappNote {
+  margin-top: 24px;
+  text-align: center;
+  padding: 16px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+}
+
+.whatsappNote p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.whatsappNote a {
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.helpSection {
+  background: var(--bg-secondary);
+  padding: 32px;
+  border-radius: 16px;
+}
+
+.helpSection h3 {
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.helpSection ol {
+  padding-left: 24px;
+}
+
+.helpSection li {
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
