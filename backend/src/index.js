@@ -120,8 +120,11 @@ app.get('/api/products/:slug', async (req, res) => {
 
 app.post('/api/orders', async (req, res) => {
   try {
-    const { totalAmount, shippingName, shippingAddress, shippingEmail, shippingPhone, items } = req.body;
+    const { productId, size, color, quantity, totalAmount, shippingName, shippingAddress, shippingEmail, shippingPhone, items } = req.body;
     const orderId = generateOrderId();
+
+    // Handle both single product and cart checkout
+    const firstItem = items && items.length > 0 ? items[0] : null;
 
     const order = await prisma.order.create({
       data: {
@@ -132,10 +135,19 @@ app.post('/api/orders', async (req, res) => {
         shippingAddress,
         shippingEmail,
         shippingPhone,
-        items: items || [],
+        productId: firstItem ? parseInt(firstItem.productId) : (productId ? parseInt(productId) : null),
+        size: firstItem ? firstItem.size : (size || null),
+        color: firstItem ? firstItem.color : (color || null),
+        quantity: firstItem ? (firstItem.quantity || 1) : (quantity || 1),
       },
     });
 
+    res.status(201).json(order);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create order' });
+  }
+});
     res.status(201).json(order);
   } catch (error) {
     console.error(error);
