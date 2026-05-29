@@ -36,7 +36,7 @@ app.get('/api/products', async (req, res) => {
     const { brand, category, featured } = req.query;
     const where = {};
     if (category) where.category = category;
-    if (featured === 'true') where.is_featured = true;
+    if (featured === 'true') where.isFeatured = true;
     if (brand) where.brand = { slug: brand };
 
     const products = await prisma.product.findMany({
@@ -50,15 +50,15 @@ app.get('/api/products', async (req, res) => {
       slug: p.slug,
       description: p.description,
       price: Number(p.price),
-      originalPrice: Number(p.original_price),
+      originalPrice: Number(p.originalPrice),
       images: p.images,
       sizes: p.sizes,
       colors: p.colors,
       category: p.category,
-      isFeatured: p.is_featured,
-      inStock: p.in_stock,
+      isFeatured: p.isFeatured,
+      inStock: p.inStock,
       brand: p.brand,
-      brandId: p.brand_id,
+      brandId: p.brandId,
     }));
 
     res.json(formatted);
@@ -71,7 +71,7 @@ app.get('/api/products', async (req, res) => {
 app.get('/api/products/featured', async (req, res) => {
   try {
     const products = await prisma.product.findMany({
-      where: { is_featured: true },
+      where: { isFeatured: true },
       include: { brand: true },
     });
 
@@ -81,15 +81,15 @@ app.get('/api/products/featured', async (req, res) => {
       slug: p.slug,
       description: p.description,
       price: Number(p.price),
-      originalPrice: Number(p.original_price),
+      originalPrice: Number(p.originalPrice),
       images: p.images,
       sizes: p.sizes,
       colors: p.colors,
       category: p.category,
-      isFeatured: p.is_featured,
-      inStock: p.in_stock,
+      isFeatured: p.isFeatured,
+      inStock: p.inStock,
       brand: p.brand,
-      brandId: p.brand_id,
+      brandId: p.brandId,
     }));
 
     res.json(formatted);
@@ -109,9 +109,9 @@ app.get('/api/products/:slug', async (req, res) => {
     res.json({
       ...product,
       price: Number(product.price),
-      originalPrice: Number(product.original_price),
-      isFeatured: product.is_featured,
-      inStock: product.in_stock,
+      originalPrice: Number(product.originalPrice),
+      isFeatured: product.isFeatured,
+      inStock: product.inStock,
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch product' });
