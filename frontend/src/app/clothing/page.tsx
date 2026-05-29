@@ -6,7 +6,7 @@ import styles from '../products/page.module.css';
 
 async function getClothing() {
   try {
-    const res = await fetch('http://localhost:3001/api/products?category=clothing', { cache: 'no-store' });
+    const res = await fetch('https://urbanex-store.onrender.com/api/products?category=clothing', { cache: 'no-store' });
     if (!res.ok) return [];
     return res.json();
   } catch {
@@ -16,7 +16,7 @@ async function getClothing() {
 
 async function getBrands() {
   try {
-    const res = await fetch('http://localhost:3001/api/brands', { cache: 'no-store' });
+    const res = await fetch('https://urbanex-store.onrender.com/api/brands', { cache: 'no-store' });
     if (!res.ok) return [];
     return res.json();
   } catch {
