@@ -21,7 +21,6 @@ function generateOrderId() {
   return result;
 }
 
-// API Routes
 app.get('/api/brands', async (req, res) => {
   try {
     const brands = await prisma.brand.findMany();
@@ -38,12 +37,10 @@ app.get('/api/products', async (req, res) => {
     if (category) where.category = category;
     if (featured === 'true') where.isFeatured = true;
     if (brand) where.brand = { slug: brand };
-
     const products = await prisma.product.findMany({
       where,
       include: { brand: true },
     });
-
     const formatted = products.map(p => ({
       id: p.id,
       name: p.name,
@@ -60,7 +57,6 @@ app.get('/api/products', async (req, res) => {
       brand: p.brand,
       brandId: p.brandId,
     }));
-
     res.json(formatted);
   } catch (error) {
     console.error(error);
@@ -74,7 +70,6 @@ app.get('/api/products/featured', async (req, res) => {
       where: { isFeatured: true },
       include: { brand: true },
     });
-
     const formatted = products.map(p => ({
       id: p.id,
       name: p.name,
@@ -91,7 +86,6 @@ app.get('/api/products/featured', async (req, res) => {
       brand: p.brand,
       brandId: p.brandId,
     }));
-
     res.json(formatted);
   } catch (error) {
     console.error(error);
@@ -122,10 +116,7 @@ app.post('/api/orders', async (req, res) => {
   try {
     const { productId, size, color, quantity, totalAmount, shippingName, shippingAddress, shippingEmail, shippingPhone, items } = req.body;
     const orderId = generateOrderId();
-
-    // Handle both single product and cart checkout
     const firstItem = items && items.length > 0 ? items[0] : null;
-
     const order = await prisma.order.create({
       data: {
         orderId,
@@ -141,13 +132,6 @@ app.post('/api/orders', async (req, res) => {
         quantity: firstItem ? (firstItem.quantity || 1) : (quantity || 1),
       },
     });
-
-    res.status(201).json(order);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to create order' });
-  }
-});
     res.status(201).json(order);
   } catch (error) {
     console.error(error);
