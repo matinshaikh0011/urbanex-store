@@ -20,11 +20,12 @@ import * as cheerio from 'cheerio';
 
 const BASE = 'https://urbanex.cartpe.in';
 const LOADMORE_URL = `${BASE}/allproductoadmore`;
-const UA = 'Mozilla/5.0 (compatible; UrbanExSync/1.0; +https://shopurbanex.com)';
+// Use a real browser UA — CartPe's AJAX endpoint checks this
+const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 const MAX_IMAGES = 20;
-const DEFAULT_DELAY = 300; // faster default — listing pages are cheap
-// web_token is embedded in every CartPe page — required for the AJAX Load More endpoint
-const WEB_TOKEN = '7d7a244423cfeb4ada709faeaaa457dda9022be990fefe9918440cfbd4f0ed169d156e331c366d37018f06f98ae835b6df047cc72526d3a49e5d030d07652d9c';
+const DEFAULT_DELAY = 300;
+// web_token is NOT hardcoded — it rotates and must be fetched fresh from the page before each scan.
+// See fetchWebToken() below.
 
 // ── Helpers ──────────────────────────────────────────────────────
 
@@ -53,11 +54,13 @@ function clampDelay(ms) {
  * Does NOT retry on 404.
  */
 async function fetchWithRetry(url, opts = {}) {
-  const { retries = 3, baseDelay = 600, timeout = 15000 } = opts;
+  const { retries = 3, baseDelay = 600, timeout = 15000, cookie = '' } = opts;
   let lastErr;
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      return await axios.get(url, { headers: { 'User-Agent': UA }, timeout });
+      const headers = { 'User-Agent': UA, 'Accept': 'text/html,application/xhtml+xml', 'Accept-Language': 'en-US,en;q=0.9' };
+      if (cookie) headers['Cookie'] = cookie;
+      return await axios.get(url, { headers, timeout });
     } catch (err) {
       lastErr = err;
       if (err.response?.status === 404) throw err;
@@ -75,19 +78,21 @@ async function fetchWithRetry(url, opts = {}) {
  * POST with automatic retries on transient failures.
  */
 async function postWithRetry(url, body, opts = {}) {
-  const { retries = 3, baseDelay = 600, timeout = 15000, referer = BASE } = opts;
+  const { retries = 3, baseDelay = 600, timeout = 15000, referer = BASE, cookie = '' } = opts;
   let lastErr;
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      return await axios.post(url, body, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': UA,
-          'Referer': referer,
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-        timeout,
-      });
+      const headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': UA,
+        'Referer': referer,
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': '*/*',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Origin': BASE,
+      };
+      if (cookie) headers['Cookie'] = cookie;
+      return await axios.post(url, body, { headers, timeout });
     } catch (err) {
       lastErr = err;
       if (err.response?.status === 404) throw err;
@@ -99,6 +104,32 @@ async function postWithRetry(url, body, opts = {}) {
     }
   }
   throw lastErr;
+}
+
+/**
+ * Fetches the current web_token and session cookie from a CartPe page.
+ * The token rotates — must be fetched fresh before each scan session.
+ * @param {string} pageUrl - The CartPe page to fetch the token from
+ * @returns {{ token: string, cookie: string }}
+ */
+async function fetchWebToken(pageUrl) {
+  const { data: html, headers: resHeaders } = await axios.get(pageUrl, {
+    headers: { 'User-Agent': UA, 'Accept': 'text/html,application/xhtml+xml', 'Accept-Language': 'en-US,en;q=0.9' },
+    timeout: 15000,
+  });
+
+  // Extract web_token from the page's inline JS
+  const tokenMatch = html.match(/web_token\s*=\s*["']([a-f0-9]{40,})["']/i)
+    || html.match(/["']web_token["']\s*:\s*["']([a-f0-9]{40,})["']/i);
+  if (!tokenMatch) throw new Error('Could not extract web_token from CartPe page');
+  const token = tokenMatch[1];
+
+  // Extract session cookie (AWSALB or similar)
+  const setCookie = resHeaders['set-cookie'] || [];
+  const cookie = setCookie.map(c => c.split(';')[0]).join('; ');
+
+  console.log(`[CartPe] Fetched fresh web_token: ${token.slice(0, 16)}… cookie: ${cookie ? 'yes' : 'none'}`);
+  return { token, cookie };
 }
 
 // ── Brand detection ───────────────────────────────────────────────
@@ -240,7 +271,7 @@ function parseListingCard($, el) {
 //   web_token   = hardcoded token embedded in every CartPe page
 
 async function scanListings(options = {}) {
-  const { delayMs = DEFAULT_DELAY, pageUrl = null, searchKey = '' } = options;
+  const { delayMs = DEFAULT_DELAY, pageUrl = null, searchKey = '', webToken, cookie = '' } = options;
   const delay = clampDelay(delayMs);
   const seen = new Set();
   const products = [];
@@ -258,7 +289,7 @@ async function scanListings(options = {}) {
       const params = new URLSearchParams({
         getresult:      String(rowNo),
         searchkey:      searchKey,
-        web_token:      WEB_TOKEN,
+        web_token:      webToken,
         orderby:        '',
         cat_ids:        '',
         min_price:      '0',
@@ -268,7 +299,7 @@ async function scanListings(options = {}) {
       });
 
       const { data: html } = await postWithRetry(LOADMORE_URL, params.toString(), {
-        retries: 3, timeout: 15000, referer: pageUrl || BASE,
+        retries: 3, timeout: 15000, referer: pageUrl || BASE, cookie,
       });
 
       pagesFetched++;
@@ -413,15 +444,27 @@ async function scrape(url, scope, options = {}) {
     searchKey = parsed.searchParams.get('searchkeyword') || parsed.searchParams.get('search') || '';
   } catch { /* ignore */ }
 
+  // Fetch fresh web_token and session cookie from the page before scanning.
+  // The token rotates — hardcoding it causes 403s after it changes.
+  let webToken = '';
+  let cookie = '';
+  try {
+    const tokenData = await fetchWebToken(url);
+    webToken = tokenData.token;
+    cookie = tokenData.cookie;
+  } catch (err) {
+    console.error(`[CartPe] Failed to fetch web_token: ${err.message}. Scan may fail with 403.`);
+  }
+
   const { products, pagesFetched, pageErrors } = await scanListings({
-    delayMs: delay, pageUrl: url, searchKey,
+    delayMs: delay, pageUrl: url, searchKey, webToken, cookie,
   });
 
   // Fallback: if AJAX returned nothing, parse the page directly
   if (products.length === 0) {
     console.log('[CartPe] AJAX returned 0 products, falling back to direct page parse…');
     try {
-      const { data: html } = await fetchWithRetry(url, { retries: 2, timeout: 15000 });
+      const { data: html } = await fetchWithRetry(url, { retries: 2, timeout: 15000, cookie });
       const $ = cheerio.load(html);
       const seen = new Set();
       $('div.product-disp, div.product-details').each((_, el) => {
