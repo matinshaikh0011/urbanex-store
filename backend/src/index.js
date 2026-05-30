@@ -200,6 +200,19 @@ app.put('/api/orders/:orderId/status', async (req, res) => {
   }
 });
 
+// Delete an order permanently (admin — remove fake/spam orders)
+app.delete('/api/orders/:orderId', async (req, res) => {
+  try {
+    await prisma.order.delete({
+      where: { orderId: req.params.orderId },
+    });
+    res.json({ success: true, orderId: req.params.orderId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to delete order' });
+  }
+});
+
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 app.listen(PORT, () => console.log(`🚀 UrbanEx API running on port ${PORT}`));

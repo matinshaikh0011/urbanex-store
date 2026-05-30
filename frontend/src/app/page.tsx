@@ -8,6 +8,7 @@ import BrandCarousel from '@/components/BrandCarousel';
 import ScrollReveal from '@/components/ScrollReveal';
 import HeroBanner from '@/components/HeroBanner';
 import FeaturedRow from '@/components/FeaturedRow';
+import Loader from '@/components/Loader';
 import styles from './page.module.css';
 
 // ——————————————————————————————————————
@@ -225,7 +226,7 @@ export default function Home() {
         <GlobalPopup />
         <Header />
         <main className={styles.main}>
-          <div className={styles.loading}>Loading...</div>
+          <Loader label="LOADING DROPS" />
         </main>
       </>
     );

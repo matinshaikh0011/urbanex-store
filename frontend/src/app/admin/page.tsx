@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
@@ -12,12 +12,16 @@ interface Order {
   orderId: string;
   shippingName: string;
   shippingPhone: string;
+  shippingAddress?: string;
   totalAmount: number;
+  amountPaid?: number | null;
   status: string;
   createdAt: string;
-  utrNumber?: string;
-  paymentMethod?: string;
+  utrNumber?: string | null;
+  paymentMethod?: string | null;
 }
+
+const FILTERS = ['All', 'Pending', 'Verified', 'Shipped', 'Delivered', 'Cancelled'];
 
 export default function AdminPage() {
   const router = useRouter();
@@ -27,13 +31,14 @@ export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [productCount, setProductCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [filter, setFilter] = useState('All');
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     if (sessionStorage.getItem(AUTH_KEY) === '1') setAuthed(true);
   }, []);
 
-  useEffect(() => {
-    if (!authed) return;
+  const loadData = () => {
     setLoading(true);
     Promise.all([
       fetch('/api/orders').then(r => r.json()).catch(() => []),
@@ -43,6 +48,10 @@ export default function AdminPage() {
       setProductCount(Array.isArray(productsData) ? productsData.length : 0);
       setLoading(false);
     });
+  };
+
+  useEffect(() => {
+    if (authed) loadData();
   }, [authed]);
 
   const handleLogin = (e: React.FormEvent) => {
@@ -69,24 +78,67 @@ export default function AdminPage() {
     new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
   const updateStatus = async (orderId: string, status: string) => {
+    // optimistic update
+    setOrders(prev => prev.map(o => o.orderId === orderId ? { ...o, status } : o));
     try {
       const res = await fetch(`/api/orders/${orderId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       });
-      if (res.ok) {
-        setOrders(prev => prev.map(o => o.orderId === orderId ? { ...o, status } : o));
-      } else {
-        alert('Failed to update status');
-      }
+      if (!res.ok) { alert('Failed to update status'); loadData(); }
     } catch {
       alert('Failed to update status. Is the backend running?');
+      loadData();
     }
   };
 
-  const totalRevenue = orders.reduce((s, o) => s + Number(o.totalAmount || 0), 0);
+  const deleteOrder = async (orderId: string) => {
+    if (!confirm(`Delete order ${orderId}? This permanently removes it (use for fake/spam orders).`)) return;
+    try {
+      const res = await fetch(`/api/orders/${orderId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setOrders(prev => prev.filter(o => o.orderId !== orderId));
+      } else {
+        alert(
+          `Couldn't delete order ${orderId} (server returned ${res.status}).\n\n` +
+          `This usually means the live backend hasn't been updated with the delete feature yet. ` +
+          `Redeploy the backend, then try again. Meanwhile you can use "Cancel" to mark it as cancelled.`
+        );
+      }
+    } catch {
+      alert('Failed to reach the server. Make sure the backend is running, then try again.');
+    }
+  };
+
+  const totalRevenue = orders
+    .filter(o => !/cancelled/i.test(o.status))
+    .reduce((s, o) => s + Number(o.totalAmount || 0), 0);
   const pendingCount = orders.filter(o => /pending/i.test(o.status)).length;
+
+  // Heuristic: flag possibly-fake orders (no UTR, or UTR not 12 digits)
+  const isSuspicious = (o: Order) => {
+    const utr = (o.utrNumber || '').trim();
+    return !/^\d{12}$/.test(utr);
+  };
+  const suspiciousCount = orders.filter(o => isSuspicious(o) && /pending/i.test(o.status)).length;
+
+  const filteredOrders = useMemo(() => {
+    let list = [...orders];
+    if (filter !== 'All') {
+      list = list.filter(o => o.status.toLowerCase().includes(filter.toLowerCase()));
+    }
+    const q = search.trim().toLowerCase();
+    if (q) {
+      list = list.filter(o =>
+        o.orderId.toLowerCase().includes(q) ||
+        (o.shippingName || '').toLowerCase().includes(q) ||
+        (o.shippingPhone || '').includes(q) ||
+        (o.utrNumber || '').includes(q)
+      );
+    }
+    return list;
+  }, [orders, filter, search]);
 
   // ── Login gate ──
   if (!authed) {
@@ -114,7 +166,10 @@ export default function AdminPage() {
     <main className={styles.main}>
       <div className={styles.topbar}>
         <h1 className={styles.dashTitle}>URBANEX <span className={styles.accent}>ADMIN</span></h1>
-        <button className={styles.logoutBtn} onClick={logout}>LOGOUT</button>
+        <div className={styles.topActions}>
+          <button className={styles.refreshBtn} onClick={loadData}>↻ REFRESH</button>
+          <button className={styles.logoutBtn} onClick={logout}>LOGOUT</button>
+        </div>
       </div>
 
       <div className={styles.container}>
@@ -133,8 +188,8 @@ export default function AdminPage() {
             <span className={styles.cardValue}>{formatPrice(totalRevenue)}</span>
           </div>
           <div className={styles.card}>
-            <span className={styles.cardLabel}>TOTAL PRODUCTS</span>
-            <span className={styles.cardValue}>{productCount}</span>
+            <span className={styles.cardLabel}>NEEDS REVIEW</span>
+            <span className={styles.cardValue}>{suspiciousCount}</span>
           </div>
         </div>
 
@@ -145,13 +200,35 @@ export default function AdminPage() {
           <a className={styles.qaBtn} href="https://wa.me/919265110277" target="_blank" rel="noopener noreferrer">💬 WHATSAPP</a>
         </div>
 
-        {/* SECTION B — Recent orders table */}
+        {/* SECTION B — Order management */}
         <div className={styles.tableWrap}>
-          <h2 className={styles.sectionHeading}>RECENT ORDERS</h2>
+          <div className={styles.manageHead}>
+            <h2 className={styles.sectionHeading}>MANAGE ORDERS</h2>
+            <input
+              className={styles.searchInput}
+              placeholder="Search by ID, name, phone, UTR…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          {/* Filter tabs */}
+          <div className={styles.filterTabs}>
+            {FILTERS.map(f => (
+              <button
+                key={f}
+                className={`${styles.filterTab} ${filter === f ? styles.filterTabActive : ''}`}
+                onClick={() => setFilter(f)}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+
           {loading ? (
             <p className={styles.tableMsg}>Loading orders…</p>
-          ) : orders.length === 0 ? (
-            <p className={styles.tableMsg}>No orders yet.</p>
+          ) : filteredOrders.length === 0 ? (
+            <p className={styles.tableMsg}>No orders match this view.</p>
           ) : (
             <div className={styles.tableScroll}>
               <table className={styles.table}>
@@ -161,34 +238,49 @@ export default function AdminPage() {
                     <th>Customer</th>
                     <th>Phone</th>
                     <th>Amount</th>
+                    <th>Payment / UTR</th>
                     <th>Status</th>
                     <th>Date</th>
-                    <th>Actions</th>
+                    <th>Manage</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map(o => (
-                    <tr key={o.id}>
-                      <td className={styles.mono}>{o.orderId}</td>
-                      <td>{o.shippingName}</td>
-                      <td>{o.shippingPhone}</td>
-                      <td>{formatPrice(Number(o.totalAmount))}</td>
-                      <td><span className={styles.statusBadge}>{o.status}</span></td>
-                      <td>{formatDate(o.createdAt)}</td>
-                      <td>
-                        <div className={styles.rowActions}>
-                          <button className={styles.shipBtn} onClick={() => updateStatus(o.orderId, 'Shipped')}>Ship</button>
-                          <button className={styles.deliverBtn} onClick={() => updateStatus(o.orderId, 'Delivered')}>Deliver</button>
-                          <a
-                            className={styles.waBtn}
-                            href={`https://wa.me/91${(o.shippingPhone || '').replace(/\D/g, '').slice(-10)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >WA</a>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredOrders.map(o => {
+                    const suspicious = isSuspicious(o);
+                    const cancelled = /cancelled/i.test(o.status);
+                    return (
+                      <tr key={o.id} className={suspicious && !cancelled ? styles.suspiciousRow : ''}>
+                        <td className={styles.mono}>
+                          {o.orderId}
+                          {suspicious && !cancelled && <span className={styles.flag} title="No valid 12-digit UTR — possibly fake">⚠ CHECK</span>}
+                        </td>
+                        <td>{o.shippingName}</td>
+                        <td>{o.shippingPhone}</td>
+                        <td>{formatPrice(Number(o.totalAmount))}</td>
+                        <td>
+                          <span className={styles.payMethod}>{(o.paymentMethod || 'cod').toUpperCase()}</span>
+                          <span className={styles.utrCell}>{o.utrNumber || '— no UTR —'}</span>
+                        </td>
+                        <td><span className={`${styles.statusBadge} ${cancelled ? styles.statusCancelled : ''}`}>{o.status}</span></td>
+                        <td>{formatDate(o.createdAt)}</td>
+                        <td>
+                          <div className={styles.rowActions}>
+                            <button className={styles.verifyBtn} onClick={() => updateStatus(o.orderId, 'Verified')}>Verify</button>
+                            <button className={styles.shipBtn} onClick={() => updateStatus(o.orderId, 'Shipped')}>Ship</button>
+                            <button className={styles.deliverBtn} onClick={() => updateStatus(o.orderId, 'Delivered')}>Deliver</button>
+                            <button className={styles.cancelBtn} onClick={() => updateStatus(o.orderId, 'Cancelled')}>Cancel</button>
+                            <button className={styles.deleteBtn} onClick={() => deleteOrder(o.orderId)} title="Permanently delete (fake/spam)">🗑</button>
+                            <a
+                              className={styles.waBtn}
+                              href={`https://wa.me/91${(o.shippingPhone || '').replace(/\D/g, '').slice(-10)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >WA</a>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

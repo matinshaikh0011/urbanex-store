@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import QRCode from 'qrcode';
 import Header from '@/components/Header';
 import GlobalPopup from '@/components/GlobalPopup';
 import styles from './page.module.css';
@@ -11,16 +12,9 @@ const UPI_VPA = '9265110277@ptyes';
 const UPI_NAME = 'Mr Shaikh Mohammad Matin';
 const ADVANCE_AMOUNT = 300;
 
-function buildUpiQr(amount: number) {
-  // Format: https://upiqr.in/api/qr?name=...&vpa=...&amount=...
-  const name = UPI_NAME.replace(/\s+/g, '+');
-  return `https://upiqr.in/api/qr?name=${name}&vpa=${encodeURIComponent(UPI_VPA)}&amount=${amount}`;
-}
-
-// Fallback QR (encodes the standard UPI deep-link) in case the primary service is unavailable
-function buildUpiQrFallback(amount: number) {
-  const upiLink = `upi://pay?pa=${UPI_VPA}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&cu=INR`;
-  return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiLink)}`;
+// Standard NPCI UPI deep-link that any UPI app can scan
+function buildUpiLink(amount: number) {
+  return `upi://pay?pa=${UPI_VPA}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent('UrbanEx Order')}`;
 }
 
 const formatINR = (price: number) =>
@@ -45,10 +39,25 @@ function PaymentSection({
   setUtrNumber: (v: string) => void;
 }) {
   const payAmount = paymentMethod === 'prepaid' ? total : ADVANCE_AMOUNT;
-  const qrUrl = buildUpiQr(payAmount);
+  const [qrDataUrl, setQrDataUrl] = useState('');
   const trimmed = utrNumber.trim();
   const utrValid = isValidUtr(trimmed);
   const showUtrError = trimmed.length > 0 && !utrValid;
+
+  // Generate the QR locally in the browser (instant, no network request)
+  useEffect(() => {
+    let active = true;
+    QRCode.toDataURL(buildUpiLink(payAmount), {
+      width: 440,
+      margin: 1,
+      color: { dark: '#000000', light: '#ffffff' },
+      errorCorrectionLevel: 'M',
+    })
+      .then((url) => { if (active) setQrDataUrl(url); })
+      .catch(() => { if (active) setQrDataUrl(''); });
+    return () => { active = false; };
+  }, [payAmount]);
+
   return (
     <div className={styles.paymentSection}>
       <h3 className={styles.sectionTitle}>PAYMENT METHOD</h3>
@@ -90,19 +99,17 @@ function PaymentSection({
 
         <div className={styles.qrInner}>
           <div className={styles.qrImageWrap}>
-            <img
-              key={qrUrl}
-              src={qrUrl}
-              alt={`UPI QR for ${formatINR(payAmount)}`}
-              className={styles.qrImage}
-              width={220}
-              height={220}
-              onError={(e) => {
-                const img = e.currentTarget;
-                const fallback = buildUpiQrFallback(payAmount);
-                if (img.src !== fallback) img.src = fallback;
-              }}
-            />
+            {qrDataUrl ? (
+              <img
+                src={qrDataUrl}
+                alt={`UPI QR for ${formatINR(payAmount)}`}
+                className={styles.qrImage}
+                width={220}
+                height={220}
+              />
+            ) : (
+              <div className={`${styles.qrImage} ${styles.qrLoading}`}>Generating QR…</div>
+            )}
             <span className={styles.qrAmount}>PAY {formatINR(payAmount)}</span>
           </div>
 

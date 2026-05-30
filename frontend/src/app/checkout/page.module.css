@@ -393,6 +393,16 @@
   object-fit: contain;
 }
 
+.qrLoading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+}
+
 .qrAmount {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 18px;

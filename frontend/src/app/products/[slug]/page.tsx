@@ -9,6 +9,7 @@ import Header from '@/components/Header';
 import GlobalPopup from '@/components/GlobalPopup';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import ProductReviews from '@/components/ProductReviews';
+import Loader from '@/components/Loader';
 import { addRecentlyViewed } from '@/lib/recentlyViewed';
 import styles from './page.module.css';
 
@@ -88,7 +89,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
         <GlobalPopup />
         <Header />
         <main className={styles.main}>
-          <div className={styles.loading}>Loading...</div>
+          <Loader label="LOADING" />
         </main>
       </>
     );

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import GlobalPopup from '@/components/GlobalPopup';
 import ProductCard from '@/components/ProductCard';
+import Loader from '@/components/Loader';
 import styles from './page.module.css';
 
 interface Product {
@@ -375,10 +376,7 @@ function ProductsPageContent() {
           {/* Products Content */}
           <div className={styles.content}>
             {loading ? (
-              <div className={styles.loading}>
-                <div className={styles.spinner}></div>
-                <p>Loading products...</p>
-              </div>
+              <Loader label="LOADING PRODUCTS" />
             ) : filteredProducts.length > 0 ? (
               <div className={styles.grid}>
                 {filteredProducts.map((product, idx) => (
@@ -427,7 +425,7 @@ export default function ProductsPage() {
         <Header />
         <main className={styles.main}>
           <div className={styles.container}>
-            <div className={styles.loading}>Loading Products...</div>
+            <Loader label="LOADING PRODUCTS" />
           </div>
         </main>
       </>

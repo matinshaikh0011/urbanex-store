@@ -71,6 +71,20 @@
   letter-spacing: 4px;
   color: var(--text-light);
 }
+.topActions { display: flex; gap: 10px; align-items: center; }
+.refreshBtn {
+  background: transparent;
+  color: var(--text-light);
+  border: 2px solid rgba(255,255,255,0.3);
+  padding: 8px 16px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.refreshBtn:hover { background: var(--accent-tag); border-color: var(--accent-tag); color: #000; }
+
 .logoutBtn {
   background: transparent;
   color: var(--text-light);
@@ -152,6 +166,80 @@
   padding-bottom: 12px;
   border-bottom: 2px solid var(--border-color);
 }
+
+/* Manage head + search */
+.manageHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.manageHead .sectionHeading { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.searchInput {
+  flex: 1;
+  min-width: 220px;
+  max-width: 360px;
+  padding: 10px 14px;
+  border: 2px solid var(--border-color);
+  background: var(--bg-primary);
+  font-size: 14px;
+  outline: none;
+  box-shadow: 2px 2px 0 var(--border-color);
+}
+.searchInput:focus { border-color: var(--accent-primary); }
+
+/* Filter tabs */
+.filterTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--border-color);
+}
+.filterTab {
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  box-shadow: 2px 2px 0 var(--border-color);
+  padding: 7px 16px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease, color 0.15s ease;
+}
+.filterTab:hover { transform: translate(-1px,-1px); }
+.filterTabActive { background: var(--accent-primary); color: #fff; border-color: var(--border-color); }
+
+/* Suspicious / fake order highlighting */
+.suspiciousRow { background: rgba(245, 196, 0, 0.12); }
+.flag {
+  display: inline-block;
+  margin-left: 8px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #000;
+  background: var(--accent-tag);
+  border: 1px solid var(--border-color);
+  padding: 1px 6px;
+}
+.payMethod {
+  display: inline-block;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--accent-primary);
+  margin-right: 6px;
+}
+.utrCell {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.statusCancelled { background: #ddd; color: #777; text-decoration: line-through; }
 .tableMsg { color: var(--text-secondary); padding: 20px 0; }
 .tableScroll { overflow-x: auto; }
 .table { width: 100%; border-collapse: collapse; min-width: 760px; }
@@ -180,8 +268,8 @@
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
 }
-.rowActions { display: flex; gap: 6px; }
-.shipBtn, .deliverBtn, .waBtn {
+.rowActions { display: flex; gap: 6px; flex-wrap: wrap; }
+.verifyBtn, .shipBtn, .deliverBtn, .cancelBtn, .deleteBtn, .waBtn {
   font-family: 'Oswald', sans-serif;
   font-size: 12px;
   font-weight: 600;
@@ -192,10 +280,13 @@
   text-decoration: none;
   transition: transform 0.1s ease;
 }
+.verifyBtn { background: #0a7d34; color: #fff; }
 .shipBtn { background: var(--accent-tag); color: #000; }
 .deliverBtn { background: var(--success); color: #fff; }
+.cancelBtn { background: #fff; color: var(--accent-primary); }
+.deleteBtn { background: var(--accent-primary); color: #fff; }
 .waBtn { background: #25D366; color: #fff; }
-.shipBtn:hover, .deliverBtn:hover, .waBtn:hover { transform: translateY(-2px); }
+.verifyBtn:hover, .shipBtn:hover, .deliverBtn:hover, .cancelBtn:hover, .deleteBtn:hover, .waBtn:hover { transform: translateY(-2px); }
 
 @media (max-width: 900px) {
   .cards { grid-template-columns: repeat(2, 1fr); }
