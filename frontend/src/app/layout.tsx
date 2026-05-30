@@ -9,6 +9,13 @@ import WhatsAppButton from '@/components/WhatsAppButton';
 export const metadata: Metadata = {
   title: 'UrbanEx | Premium Streetwear & Sneakers',
   description: '100% Premium Streetwear - Nike, Adidas, Jordan, and more',
+  icons: {
+    icon: [
+      { url: '/favicon.png', type: 'image/png' },
+    ],
+    apple: '/favicon.png',
+    shortcut: '/favicon.png',
+  },
 };
 
 export default function RootLayout({

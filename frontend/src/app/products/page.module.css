@@ -262,7 +262,7 @@
   padding: 8px 16px;
   background: var(--bg-primary);
   border: var(--border);
-  box-shadow: 3px 3px 0 var(--border-color);
+  box-shadow: var(--shadow-btn);
   font-family: 'Bebas Neue', sans-serif;
   font-size: 13px;
   letter-spacing: 2px;
@@ -293,14 +293,14 @@
   background: var(--bg-secondary);
   color: var(--text-primary);
   transform: translate(-2px, -2px) rotate(-0.5deg);
-  box-shadow: 5px 5px 0 var(--border-color);
+  box-shadow: var(--shadow);
 }
 
 .categoryTag.active {
   background: var(--accent-primary);
   color: #fff;
   border-color: var(--border-color);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-btn);
   transform: translate(-2px, -2px);
   font-style: normal;
 }
@@ -316,7 +316,7 @@
   padding: 8px 16px;
   background: var(--bg-primary);
   border: var(--border);
-  box-shadow: 3px 3px 0 var(--border-color);
+  box-shadow: var(--shadow-btn);
   font-family: 'Bebas Neue', sans-serif;
   font-size: 13px;
   letter-spacing: 2px;
@@ -329,14 +329,14 @@
   background: var(--bg-secondary);
   color: var(--text-primary);
   transform: translate(-2px, -2px);
-  box-shadow: 5px 5px 0 var(--border-color);
+  box-shadow: var(--shadow);
 }
 
 .brandBtn.active {
   background: var(--bg-dark);
   color: var(--text-light);
   border-color: var(--border-color);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-btn);
   transform: translate(-2px, -2px);
 }
 
@@ -535,7 +535,7 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 22px;
 }
 
 /* Staggered scale-in entrance */

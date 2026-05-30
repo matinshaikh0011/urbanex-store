@@ -6,10 +6,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Permanent+Marker&family=Bebas+Neue&display=swap');
 
 :root {
-  /* ---- CONCRETE PALETTE ---- */
-  --bg-primary:    #DEDAD3;   /* raw aged concrete */
-  --bg-secondary:  #F2EFE9;   /* lighter concrete / paper */
-  --bg-tertiary:   #C8C3BB;   /* shadowed concrete */
+  /* ---- OFF-WHITE PREMIUM PALETTE (2026 boutique) ---- */
+  --bg-primary:    #F7F6F3;   /* warm off-white page background (bright, not sterile) */
+  --bg-secondary:  #FFFFFF;   /* crisp white — cards stand out */
+  --bg-tertiary:   #ECEAE4;   /* soft warm grey (image wells, dividers) */
   --bg-dark:       #151515;   /* near-black panel */
 
   /* ---- ACCENT: Bold crimson red spray paint ---- */
@@ -24,13 +24,17 @@
   --text-light:     #F0EDE6;
 
   /* ---- BORDERS & SHADOWS ---- */
+  /* Refined hard-shadow scale (solid black, no blur) — consistent depth site-wide */
   --border-color:   #111111;
   --border:         3px solid #111111;
   --border-thin:    2px solid #111111;
-  --shadow:         5px 5px 0px #111111;
-  --shadow-lg:      8px 8px 0px #111111;
-  --shadow-hover:   2px 2px 0px #111111;
-  --shadow-lift:    10px 10px 0px #111111;
+  --shadow-icon:    2px 2px 0px #111111;   /* icons / small chips */
+  --shadow-sm:      3px 3px 0px #111111;   /* tags, stickers, badges */
+  --shadow-btn:     4px 4px 0px #111111;   /* buttons & category cards */
+  --shadow:         5px 5px 0px #111111;   /* product cards (base) */
+  --shadow-lg:      6px 6px 0px #111111;   /* hero banners / large panels */
+  --shadow-hover:   2px 2px 0px #111111;   /* pressed state */
+  --shadow-lift:    7px 7px 0px #111111;   /* hover lift */
 
   /* ---- STATUS ---- */
   --success:  #009960;
@@ -62,14 +66,14 @@ html, body {
   line-height: 1.6;
 }
 
-/* Concrete grain texture */
+/* Concrete grain texture — kept extremely subtle for a clean boutique feel */
 body {
   position: relative;
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E"),
-    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
-  background-size: 400px 400px, 80px 80px, 80px 80px;
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"),
+    linear-gradient(rgba(0,0,0,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.018) 1px, transparent 1px);
+  background-size: 360px 360px, 90px 90px, 90px 90px;
 }
 
 /* Subtle spray corner vignette */
@@ -78,8 +82,8 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse at 0% 0%, rgba(204, 0, 0, 0.03) 0%, transparent 40%),
-    radial-gradient(ellipse at 100% 100%, rgba(0, 0, 0, 0.04) 0%, transparent 40%);
+    radial-gradient(ellipse at 0% 0%, rgba(204, 0, 0, 0.025) 0%, transparent 42%),
+    radial-gradient(ellipse at 100% 100%, rgba(0, 0, 0, 0.03) 0%, transparent 42%);
   pointer-events: none;
   z-index: 0;
 }
@@ -134,7 +138,7 @@ button {
   font-size: 17px;
   font-weight: 600;
   letter-spacing: 3px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-btn);
   transition: transform 0.12s var(--ease-spring), box-shadow 0.12s ease;
   cursor: pointer;
 }
@@ -155,7 +159,7 @@ button {
   font-size: 17px;
   font-weight: 600;
   letter-spacing: 3px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-btn);
   transition: transform 0.12s var(--ease-spring), box-shadow 0.12s ease, background 0.15s ease;
   cursor: pointer;
 }
@@ -204,7 +208,7 @@ textarea {
 }
 input:focus, textarea:focus {
   transform: translate(-2px, -2px);
-  box-shadow: 5px 5px 0px var(--accent-primary);
+  box-shadow: 4px 4px 0px var(--accent-primary);
 }
 input::placeholder, textarea::placeholder { color: var(--text-muted); }
 

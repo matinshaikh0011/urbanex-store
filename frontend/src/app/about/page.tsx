@@ -85,7 +85,7 @@ export default function AboutPage() {
                 <span className={styles.contactIcon}>📞</span>
                 <div>
                   <h3>Phone / WhatsApp</h3>
-                  <p>+91 9898285850</p>
+                  <p>+91 9265110277</p>
                 </div>
               </div>
               <div className={styles.contactItem}>
@@ -99,7 +99,7 @@ export default function AboutPage() {
                 <span className={styles.contactIcon}>💬</span>
                 <div>
                   <h3>WhatsApp</h3>
-                  <p>Click to chat: <a href="https://wa.me/919898285850" target="_blank" rel="noopener">+91 9898285850</a></p>
+                  <p>Click to chat: <a href="https://wa.me/919265110277" target="_blank" rel="noopener">+91 9265110277</a></p>
                 </div>
               </div>
             </div>

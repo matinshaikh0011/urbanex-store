@@ -430,7 +430,7 @@
   text-transform: uppercase;
   text-decoration: none;
   border: var(--border);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-btn);
   overflow: hidden;
   transition: transform 0.12s var(--ease-spring), box-shadow 0.12s ease;
 }
@@ -460,7 +460,7 @@
   text-transform: uppercase;
   text-decoration: none;
   border: var(--border);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-btn);
   transition: transform 0.12s var(--ease-spring), box-shadow 0.12s ease, background 0.15s ease;
 }
 .ctaSecondary:hover {
@@ -536,8 +536,9 @@
   max-width: 440px;
   background: var(--bg-secondary);
   border: var(--border);
-  box-shadow: var(--shadow-lift);
-  padding: 22px;
+  /* Hard shadow primary + very subtle ambient depth (premium lift) */
+  box-shadow: var(--shadow-lg), 0 16px 30px rgba(0,0,0,0.04);
+  padding: 24px;
   animation: maskUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.4s both;
 }
 

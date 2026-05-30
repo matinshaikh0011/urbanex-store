@@ -267,7 +267,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             </div>
 
             <a 
-              href={`https://wa.me/919898285850?text=Hi, I would like to request a live video call for ${encodeURIComponent(product.name)}`}
+              href={`https://wa.me/919265110277?text=Hi, I would like to request a live video call for ${encodeURIComponent(product.name)}`}
               target="_blank" 
               rel="noopener noreferrer"
               className={styles.videoCallBtn}
@@ -297,7 +297,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             </div>
 
             <div className={styles.contact}>
-              <p>Need help? <a href="https://wa.me/919898285850" target="_blank" rel="noopener">Chat on WhatsApp</a></p>
+              <p>Need help? <a href="https://wa.me/919265110277" target="_blank" rel="noopener">Chat on WhatsApp</a></p>
             </div>
           </div>
         </div>
@@ -350,7 +350,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             <Link href="/about">About Us</Link>
             <Link href="/track-order">Track Order</Link>
             <Link href="/return-exchange">Returns</Link>
-            <p>WhatsApp: +91 9898285850</p>
+            <p>WhatsApp: +91 9265110277</p>
           </div>
         </div>
         <div className={styles.footerBottom}>

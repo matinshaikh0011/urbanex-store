@@ -451,11 +451,11 @@ export default function Home() {
               <h3 className={styles.footerTitle}>CATEGORY</h3>
               <div className={styles.footerLinks}>
                 <Link href="/brands">Brands</Link>
-                <Link href="/luxury-watches">Luxury Watches</Link>
-                <Link href="/sneakers">Sneakers</Link>
-                <Link href="/watches">Premium Watches</Link>
-                <Link href="/glasses">Eyewear</Link>
-                <Link href="/handbags">Luxury Bags</Link>
+                <Link href="/products?category=watches">Luxury Watches</Link>
+                <Link href="/products?category=sneakers">Sneakers</Link>
+                <Link href="/products?category=glasses">Eyewear</Link>
+                <Link href="/products?category=handbags">Luxury Bags</Link>
+                <Link href="/products?category=clothing">Clothing</Link>
               </div>
             </div>
 

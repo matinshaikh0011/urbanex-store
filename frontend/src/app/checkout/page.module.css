@@ -284,7 +284,7 @@
 
 .payCard:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 5px 5px 0 var(--border-color);
+  box-shadow: 4px 4px 0 var(--border-color);
 }
 
 .payCardActive {

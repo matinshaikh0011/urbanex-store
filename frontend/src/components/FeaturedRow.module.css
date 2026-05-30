@@ -2,7 +2,7 @@
    FEATURED ROW — category header + wrapping product grid
    ================================================================ */
 .row {
-  margin-bottom: 56px;
+  margin-bottom: 64px;
 }
 
 /* ---- Header bar ---- */
@@ -44,18 +44,18 @@
   color: #fff;
   background: var(--accent-primary);
   border: 2px solid var(--border-color);
-  box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+  box-shadow: var(--shadow-icon);
   padding: 7px 14px;
   white-space: nowrap;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-.viewAll:hover { transform: translate(2px,2px); box-shadow: 0 0 0 rgba(0,0,0,0.5); color: #fff; }
+.viewAll:hover { transform: translate(2px,2px); box-shadow: none; color: #fff; }
 
 /* ---- Wrapping product grid ---- */
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
+  gap: 22px;
 }
 
 @media (max-width: 1024px) {
