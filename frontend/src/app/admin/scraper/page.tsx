@@ -117,7 +117,7 @@ export default function ScraperPage() {
   const [scanning, setScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [scannedProducts, setScannedProducts] = useState<ScrapedProduct[]>([]);
-  const [scanStats, setScanStats] = useState<{ total: number; failed: number; totalFound?: number; successful?: number; pageErrors?: number } | null>(null);
+  const [scanStats, setScanStats] = useState<{ total: number; failed: number; productsFound?: number; productsReturned?: number; duplicateCount?: number; failedCount?: number; pagesFetched?: number; scanDuration?: number } | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [dupResolutions, setDupResolutions] = useState<Map<string, 'skip' | 'update' | 'import'>>(new Map());
   const [brandResolutions, setBrandResolutions] = useState<Map<string, number | 'skip'>>(new Map());
@@ -206,11 +206,12 @@ export default function ScraperPage() {
                     const d = await r.json();
                     if (!r.ok) { show(d.error || 'Scan failed', 'err'); return; }
                     setScannedProducts(d.products || []);
-                    setScanStats({ total: d.stats?.total || 0, failed: d.stats?.failed || 0, totalFound: d.stats?.totalFound, successful: d.stats?.successful, pageErrors: d.stats?.pageErrors });
+                    setScanStats({ total: d.stats?.productsReturned || d.stats?.total || 0, failed: d.stats?.failedCount || d.stats?.failed || 0, productsFound: d.stats?.productsFound, productsReturned: d.stats?.productsReturned, duplicateCount: d.stats?.duplicateCount, failedCount: d.stats?.failedCount, pagesFetched: d.stats?.pagesFetched, scanDuration: d.stats?.scanDuration });
                     setSelectedIds(new Set((d.products || []).filter((p: ScrapedProduct) => p.duplicateStatus === 'new').map((p: ScrapedProduct) => p.sourceId)));
                     setScanProgress(100);
-                    const failMsg = (d.stats?.failed || 0) > 0 ? ` (${d.stats.failed} failed)` : '';
-                    show(`Found ${d.stats?.total || 0} products${failMsg}`);
+                    const dur = d.stats?.scanDuration ? ` in ${(d.stats.scanDuration / 1000).toFixed(1)}s` : '';
+                    const failMsg = (d.stats?.failedCount || 0) > 0 ? ` (${d.stats.failedCount} failed)` : '';
+                    show(`Found ${d.stats?.productsReturned || d.stats?.total || 0} products${dur}${failMsg}`);
                     setTimeout(() => { setStep(2); setScanProgress(0); }, 500);
                   } catch (e) { show('Scan failed', 'err'); } finally { setScanning(false); }
                 }} />}
@@ -260,7 +261,8 @@ export default function ScraperPage() {
 // ── Step 1: Scanner ───────────────────────────────────────────
 function ScannerStep({ url, setUrl, scope, setScope, delayMs, setDelayMs, scanning, scanProgress, scanStats, providerKey, setProviderKey, onScan }: {
   url: string; setUrl: (v: string) => void; scope: 'full' | 'category' | 'product'; setScope: (v: 'full' | 'category' | 'product') => void;
-  delayMs: number; setDelayMs: (v: number) => void; scanning: boolean; scanProgress: number; scanStats: { total: number; failed: number; totalFound?: number; successful?: number; pageErrors?: number } | null;
+  delayMs: number; setDelayMs: (v: number) => void; scanning: boolean; scanProgress: number;
+  scanStats: { total: number; failed: number; productsFound?: number; productsReturned?: number; duplicateCount?: number; failedCount?: number; pagesFetched?: number; scanDuration?: number } | null;
   providerKey: string; setProviderKey: (v: string) => void; onScan: () => void;
 }) {
   return (
@@ -286,10 +288,12 @@ function ScannerStep({ url, setUrl, scope, setScope, delayMs, setDelayMs, scanni
       {(scanning || scanProgress > 0) && <div className={styles.progressWrap} style={{ marginTop: 16 }}><div className={styles.progressFill} style={{ width: `${scanProgress}%` }} /></div>}
       {scanStats && (
         <div className={styles.scanStats}>
-          <div><strong>{scanStats.totalFound ?? scanStats.total}</strong>Products Found</div>
-          <div><strong style={{ color: '#22C55E' }}>{scanStats.successful ?? scanStats.total}</strong>Successful</div>
-          {scanStats.failed > 0 && <div><strong style={{ color: '#CC0000' }}>{scanStats.failed}</strong>Failed</div>}
-          {(scanStats.pageErrors ?? 0) > 0 && <div><strong style={{ color: '#F5C400' }}>{scanStats.pageErrors}</strong>Page Errors</div>}
+          <div><strong>{scanStats.productsFound ?? scanStats.total}</strong>Products Found</div>
+          <div><strong style={{ color: '#22C55E' }}>{scanStats.productsReturned ?? scanStats.total}</strong>Returned</div>
+          {(scanStats.duplicateCount ?? 0) > 0 && <div><strong style={{ color: '#F5C400' }}>{scanStats.duplicateCount}</strong>Duplicates</div>}
+          {(scanStats.failedCount ?? scanStats.failed ?? 0) > 0 && <div><strong style={{ color: '#CC0000' }}>{scanStats.failedCount ?? scanStats.failed}</strong>Failed</div>}
+          {scanStats.pagesFetched && <div><strong style={{ color: '#888' }}>{scanStats.pagesFetched}</strong>Pages</div>}
+          {scanStats.scanDuration && <div><strong style={{ color: '#888' }}>{(scanStats.scanDuration / 1000).toFixed(1)}s</strong>Duration</div>}
         </div>
       )}
     </div>
@@ -324,7 +328,7 @@ function PreviewStep({ products, selectedIds, setSelectedIds, dupResolutions, se
             {products.map(p => (
               <tr key={p.sourceId}>
                 <td><input type="checkbox" checked={selectedIds.has(p.sourceId)} onChange={() => toggle(p.sourceId)} /></td>
-                <td>{p.images[0] ? <img src={p.images[0]} alt="" className={adminStyles.thumbImg} /> : '—'}</td>
+                <td>{p.images[0] || (p as any).thumbnail ? <img src={(p as any).thumbnail || p.images[0]} alt="" className={adminStyles.thumbImg} /> : '—'}</td>
                 <td style={{ maxWidth: 200 }}>{p.name}</td>
                 <td>{p.sourcePrice > 0 ? fmt(p.sourcePrice) : '—'}</td>
                 <td>{p.originalPrice ? fmt(p.originalPrice) : '—'}</td>

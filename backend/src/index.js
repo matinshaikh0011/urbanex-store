@@ -10,6 +10,7 @@ import { PrismaClient } from '@prisma/client';
 import { subcategories } from './catalog.js';
 import { validateProductData, buildProductData, slugify } from './productUtils.js';
 import { getProvider, detectProvider } from './scrapers/index.js';
+import { fetchProductDetail } from './scrapers/cartpeProvider.js';
 
 dotenv.config();
 
@@ -622,12 +623,16 @@ app.post('/api/admin/scraper/scan', adminAuth, async (req, res) => {
       provider: resolvedKey,
       products: enriched,
       stats: {
+        productsFound: scrapeStats?.productsFound ?? enriched.length,
+        productsReturned: enriched.length,
+        duplicateCount: enriched.filter(p => p.duplicateStatus !== 'new').length,
+        failedCount: (scrapeStats?.failedCount || 0) + (scrapeStats?.pageErrors || 0),
+        pagesFetched: scrapeStats?.pagesFetched || pagesFetched || 0,
+        scanDuration: scrapeStats?.scanDuration || 0,
+        // legacy fields for frontend compatibility
         total: enriched.length,
-        totalFound: scrapeStats?.totalFound ?? enriched.length,
-        successful: scraped.length,
-        failed: (failedUrls?.length || 0),
-        pageErrors: (pageErrors?.length || 0),
-        pagesFetched: pagesFetched || 0,
+        failed: scrapeStats?.failedCount || 0,
+        pageErrors: scrapeStats?.pageErrors || 0,
         failedUrls: failedUrls || [],
       },
     });
@@ -676,25 +681,71 @@ app.post('/api/admin/scraper/import', adminAuth, async (req, res) => {
     validProducts.push(productData);
   }
 
-  // Phase 2 — Image handling (outside transaction)
-  const imageFailures = [];
-  for (const p of validProducts) {
-    if (!Array.isArray(p.images) || p.images.length === 0) continue;
-    if (imageMode === 'cloudinary') {
-      const resolvedImages = [];
-      for (const imgUrl of p.images) {
-        try {
-          const cloudUrl = await uploadToCloudinary(imgUrl);
-          resolvedImages.push(cloudUrl);
-        } catch (err) {
-          imageFailures.push({ sourceId: p.sourceId, url: imgUrl, error: err.message });
-          resolvedImages.push(imgUrl); // fallback to supplier URL
+  // Phase 1.5 — Fetch product detail pages for selected products
+  // Uses controlled concurrency (DETAIL_CONCURRENCY at a time) to avoid
+  // hammering CartPe and triggering rate-limits or cascading 500s.
+  // A failed detail fetch keeps the listing data and never aborts the import.
+  const DETAIL_CONCURRENCY = 8;
+  const provider = (() => { try { return getProvider(source); } catch { return null; } })();
+  if (provider && typeof provider.fetchProductDetail === 'function') {
+    console.log(`[import] Fetching detail pages for ${validProducts.length} products (concurrency=${DETAIL_CONCURRENCY})…`);
+    const detailStart = Date.now();
+
+    for (let i = 0; i < validProducts.length; i += DETAIL_CONCURRENCY) {
+      const batch = validProducts.slice(i, i + DETAIL_CONCURRENCY);
+      const results = await Promise.allSettled(
+        batch.map(p => p.sourceUrl ? provider.fetchProductDetail(p.sourceUrl) : Promise.resolve(null))
+      );
+      results.forEach((result, batchIdx) => {
+        const globalIdx = i + batchIdx;
+        if (result.status === 'fulfilled' && result.value) {
+          const detail = result.value;
+          if (detail.sourcePrice > 0) validProducts[globalIdx].originalPrice = detail.sourcePrice;
+          if (detail.originalPrice) validProducts[globalIdx].price = validProducts[globalIdx].price || detail.originalPrice;
+          if (detail.images && detail.images.length > 0) validProducts[globalIdx].images = detail.images;
+          if (detail.description) validProducts[globalIdx].description = detail.description;
+          validProducts[globalIdx].inStock = detail.inStock;
+        } else if (result.status === 'rejected') {
+          const p = batch[batchIdx];
+          console.warn(`[import] Detail fetch failed for ${p.sourceId} (${p.sourceUrl}): ${result.reason?.message}`);
+          // Keep listing data — don't fail the import for a detail fetch error
         }
-      }
-      p.images = resolvedImages;
+      });
+      console.log(`[import] Detail pages: ${Math.min(i + DETAIL_CONCURRENCY, validProducts.length)}/${validProducts.length} done`);
     }
-    // supplier-url mode: keep as-is
+
+    console.log(`[import] Detail fetch complete in ${((Date.now() - detailStart) / 1000).toFixed(1)}s`);
   }
+
+  // Phase 2 — Image handling (outside transaction)
+  // Cloudinary uploads run in batches of IMAGE_CONCURRENCY to avoid overwhelming
+  // the Cloudinary API and to keep memory usage bounded.
+  const IMAGE_CONCURRENCY = 5;
+  const imageFailures = [];
+
+  if (imageMode === 'cloudinary') {
+    // Collect all (product, imageUrl) pairs that need uploading
+    const uploadTasks = [];
+    for (const p of validProducts) {
+      if (!Array.isArray(p.images) || p.images.length === 0) continue;
+      p.images.forEach((imgUrl, imgIdx) => uploadTasks.push({ p, imgIdx, imgUrl }));
+    }
+
+    for (let i = 0; i < uploadTasks.length; i += IMAGE_CONCURRENCY) {
+      const batch = uploadTasks.slice(i, i + IMAGE_CONCURRENCY);
+      const results = await Promise.allSettled(batch.map(t => uploadToCloudinary(t.imgUrl)));
+      results.forEach((result, batchIdx) => {
+        const { p, imgIdx, imgUrl } = batch[batchIdx];
+        if (result.status === 'fulfilled') {
+          p.images[imgIdx] = result.value;
+        } else {
+          imageFailures.push({ sourceId: p.sourceId, url: imgUrl, error: result.reason?.message });
+          // p.images[imgIdx] stays as the supplier URL (fallback)
+        }
+      });
+    }
+  }
+  // supplier-url mode: images already set from detail fetch, no uploads needed
 
   // Phase 3 — Transaction
   try {
