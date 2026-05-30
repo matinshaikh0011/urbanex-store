@@ -71,3 +71,17 @@ model Order {
   createdAt          DateTime  @default(now()) @map("created_at")
   updatedAt          DateTime  @updatedAt @map("updated_at")
 }
+
+model Coupon {
+  id              Int       @id @default(autoincrement())
+  code            String    @unique
+  type            String
+  value           Decimal   @db.Decimal(10, 2)
+  minimumOrder    Decimal   @default(0) @map("minimum_order") @db.Decimal(10, 2)
+  maximumDiscount Decimal?  @map("maximum_discount") @db.Decimal(10, 2)
+  usageLimit      Int       @default(100) @map("usage_limit")
+  usedCount       Int       @default(0) @map("used_count")
+  isActive        Boolean   @default(true) @map("is_active")
+  expiresAt       DateTime? @map("expires_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+}

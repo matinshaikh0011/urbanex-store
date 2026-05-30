@@ -72,8 +72,8 @@
 .close:hover { color: var(--accent-primary); }
 
 /* keep clear of the WhatsApp FAB on small screens */
-@media (max-width: 600px) {
-  .toast { left: 12px; right: 12px; bottom: 84px; max-width: none; }
+@media (max-width: 768px) {
+  .toast { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
