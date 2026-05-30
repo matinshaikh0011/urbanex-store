@@ -1,0 +1,2254 @@
+<!doctype html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="title" content="">
+<meta name="keywords" content="">
+<meta name="description" content="">
+<!-- The above 3 meta tags *must* call first in the head; any other head content must call *after* these tags -->
+<title>:: urbanex ::</title>
+<meta property="og:image" content="" />
+
+<meta property="og:title" content="Cartpe" />
+
+<meta property="og:description" content="Cartpe" />
+
+<meta property="og:keywords" content="Cartpe" />
+
+  
+<!-- Favicon -->
+<link href="https://cdn.cartpe.in/images/store_logo_sm/698f5cdc9d7dc.jpeg" rel="shortcut icon" type="image/x-icon" />
+
+<!-- Favicon -->
+<link href="https://cdn.cartpe.in/frontend/assets/store_new/25/images/favicon.png" rel="shortcut icon" type="image/x-icon" />
+
+<!-- Bootstrap -->
+<link href="https://cdn.cartpe.in/frontend/assets/store_new/25/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Custom CSS  -->
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+<link href="https://cdn.cartpe.in/frontend/assets/store_new/25/css/style.css" rel="stylesheet">
+<link href="https://cdn.cartpe.in/frontend/assets/store_new/25/css/responsive.css" rel="stylesheet">
+<link href="https://cdn.cartpe.in/frontend/assets/store_new/25/css/jquery-ui.min.css" rel="stylesheet">
+<link href="https://cdn.cartpe.in/frontend/assets/store_new/25/css/animate.css" rel="stylesheet">
+<link href="https://cdn.cartpe.in/frontend/assets/store_new/25/css/bootsnav.css" rel="stylesheet">
+<link href="https://cdn.cartpe.in/frontend/assets/store_new/25/css/magnific-popup.css" rel="stylesheet">
+<link href="https://cdn.cartpe.in/frontend/assets/store_new/25/css/hover.css" rel="stylesheet">
+<link href="https://cdn.cartpe.in/frontend/assets/store_new/25/css/bootstrap-formhelpers.css" rel="stylesheet">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+
+<!-- Owl Stylesheets -->
+<link rel="stylesheet" href="https://cdn.cartpe.in/frontend/assets/store_new/25/css/owl.carousel.min.css">
+<link rel="stylesheet" href="https://cdn.cartpe.in/frontend/assets/store_new/25/css/owl.theme.default.min.css">
+<link rel="stylesheet" href="https://cdn.cartpe.in/frontend/assets/store_new/25/css/pretty-checkbox.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.cartpe.in/frontend/assets/store_new/25/css/slick.min.css" />
+
+<!-- <link href="<?php// echo $this->config->item('s3_shop_url');?>frontend/assets/store_new/25/css/mobile_header.css" rel="stylesheet"> -->
+
+
+
+<!-- <style>
+.dropbtn {
+background-color: #4CAF50;
+color: #ddd;
+padding: 16px;
+font-size: 16px;
+border: none;
+}
+
+.dropdown {
+position: relative;
+display: inline-block;
+}
+
+.dropdown-content {
+display: none;
+position: absolute;
+background-color: white;
+min-width: 160px;
+box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+z-index: 1;
+}
+
+.dropdown-content a {
+color: black;
+padding: 12px 16px;
+text-decoration: none;
+display: block;
+}
+
+.dropdown-content a:hover {
+background-color: blue !important;
+}
+
+.dropdown:hover .dropdown-content {
+display: block;
+}
+
+/*.dropdown:hover .dropbtn {background-color: #1466ef;}*/
+</style> -->
+
+<script src="https://cdn.cartpe.in/frontend/assets/store_new/25/js/jquery.js"></script>
+
+</head>
+
+<body>
+<!-- Start LOADER -->
+<div id="loading" style="top: 0px; height: 100%; width: 100%; background: rgb(255, 255, 255) none repeat scroll 0% 0%; position: fixed; z-index: 10000001; padding-top: 200px; opacity: 0.7; display: none; text-align: center;"><img class="lazy" src="https://cdn.cartpe.in/frontend/images/ticket/ajax-loader.gif"></div>
+<!-- End LOADER -->
+<!-- PREALOADER -->
+<div class="page-preloader"></div>
+
+<!-- HOME SECTION-->
+<section id="home" class="home">
+<header class="wrap-sticky">
+
+<!-- Section content -->
+
+<div class="container-fluid p0">
+
+<!-- Nav -->
+<nav class="navbar navbar-default navbar-sticky navbar-scrollspy bootsnav theme-menu" data-minus-value-desktop="70" data-minus-value-mobile="55" data-speed="1000">
+
+<!-- Nav header -->
+<div class="navbar-header">
+
+<!-- Mobile Menu icon -->
+<!-- Mobile Menu -->
+<a id="menu-open" type="button" class="animated zoomIn"><i class="fa fa-bars"></i></a> <a id="menu-close" type="button" class="animated zoomIn"><i class="fa fa-times"></i></a>
+<!-- Logo -->
+<a class="navbar-brand" href="https://urbanex.cartpe.in/"><img src="https://cdn.cartpe.in/images/store_logo_sm/698f5cdc9d7dc.jpeg" class="logo" alt="logo.png"></a>
+</div>
+<div class="header-button">
+
+
+<div class="signinbutton"> <a id="signin-button-mob" href="https://urbanex.cartpe.in/store_login.html" class="btn-medium btn-bord"><i class="fa fa-user"></i></a> <a id="signin-button" class="btn-medium link-button" href="https://urbanex.cartpe.in/store_login.html"><i class="fa fa-user"></i> Sign In</a> </div>
+
+
+<div class="shoppingbag">
+<a href="https://urbanex.cartpe.in/store_cart.html" class="shopping-bag"><i class="fa fa-cart-plus"></i> Cart <span id="cart-item-popup">0</span>
+<div id="shopping-bag-container">
+<ul class="bag-content">
+<li>
+<h4>Recently added items.</h4>
+<div class="cart-display">
+<li id="cart-empty">
+<div class="error-msg">Your cart is Empty!</div>
+</li>
+</ul>
+</div>
+</a>
+</div>
+
+</div>
+
+<!-- Search -->
+<div class="searchblock">
+<form action="https://urbanex.cartpe.in/allproduct.html" method="get">
+<div class="input-group">
+<input type="text" class="form-control search_keyword" id="search_keyword" placeholder="Search for Store products" name="searchkeyword" value="">
+<div class="input-group-btn">
+<button class="btn btn-default" type="submit"> <i class="glyphicon glyphicon-search"></i> </button>
+</div>
+</div>
+</form>
+</div>
+</nav>
+</div>
+</header>
+
+
+<!-- CATEGORY -->
+<main>
+<section id="category">
+<div class="container">
+<div class="row">
+<div class="col-md-12">
+<ul class="category-nav" id="category-disp">
+<li>
+<a href="https://urbanex.cartpe.in/mens-watch.html">Mens Watch</a>
+</li>
+<li>
+<a href="https://urbanex.cartpe.in/ladies-watch-watches.html">Ladies Watch</a>
+</li>
+<li>
+<a href="https://urbanex.cartpe.in/couple-watches.html">Couple Watches</a>
+</li>
+<li>
+<a href="https://urbanex.cartpe.in/luxury-watch-collection-watches.html">Luxury Watch Collection</a>
+</li>
+<li>
+<a href="https://urbanex.cartpe.in/perfume-1.html">Perfume For Men</a>
+</li>
+<li>
+<a href="https://urbanex.cartpe.in/perfume-for-women-fragrance.html">Perfume For Women</a>
+</li>
+<li>
+<a href="https://urbanex.cartpe.in/socks--.html">socks</a>
+</li>
+<li><a href="https://urbanex.cartpe.in/allproduct.html">All Products</a></li>
+
+<li class="simple-dropdown">
+<a href="https://urbanex.cartpe.in/allcategory.html">All Category</a>
+</ul>
+</div>
+</div>
+</div>
+</section>
+
+<!-- END -->
+
+<!-- PAGE TITLE -->
+<section id="page-title">
+  <div class="page-bg">
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 page-title">
+          <h3>All Products</h3>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <ul class="breadcrumb">
+            <li><a href="https://urbanex.cartpe.in/">Home</a></li>
+            <li><span>All Products</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- END -->
+
+<!-- Latest Products -->
+<section id="page-start">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-2 col-xs-12">
+                  <h3 class="med-title">Showing results of <span class="txt-light" id="total_result_cnt">7651</span> Products
+          </h3>
+              </div>
+
+      <div class="col-md-2 col-xs-6" style="float:right;">
+        <div style="border: 1px solid #d1d1d1;padding-right: 10px;">
+          <select class="md-form form-control" id="orderby">
+            <option value="featured">Featured</option>
+            <option value="price_high">Price - high to low</option>
+            <option value="price_low">Price - low to high</option>
+            <option value="new">Recently added</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+    <div class="row contentarea">
+      <a href="#" id="filter-button-open" title="Filter"><i class="fa fa-filter"></i></a>
+
+      <div class="bg-overlay-filter"></div>
+      <div class="col-md-3" id="categoryFilter">
+
+        <a href="#" id="filter-button-close" title="Filter"><i class="fa fa-times"></i></a>
+        <div class="side-col" style="margin-top: 15px;">
+          <div class="panel-group">
+            <!-- CATEGORY -->
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title ">
+                  <a class="panel-toggle" data-toggle="collapse" href="#filter-size" aria-expanded="true">CATEGORY</a>
+                </h4>
+              </div>
+              <div id="filter-size" class="panel-body collapse in">
+                <div class="panel-inner">
+                  <input type="hidden" id="category_ids_hidden" value="" />
+                  <ul class="filter-list">
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck69" data-id="69" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck69"><a href="javascript:void(0)" class="value">Mens Watch</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck157" data-id="157" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck157"><a href="javascript:void(0)" class="value">Ladies Watch</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck121" data-id="121" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck121"><a href="javascript:void(0)" class="value">Couple Watches</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck363" data-id="363" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck363"><a href="javascript:void(0)" class="value">Luxury Watch Collection</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck840" data-id="840" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck840"><a href="javascript:void(0)" class="value">Perfume For Men</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck838" data-id="838" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck838"><a href="javascript:void(0)" class="value">Perfume For Women</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck1004" data-id="1004" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck1004"><a href="javascript:void(0)" class="value">socks</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck243" data-id="243" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck243"><a href="javascript:void(0)" class="value">Shoes</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck558" data-id="558" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck558"><a href="javascript:void(0)" class="value">Mens's Sneakers</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck832" data-id="832" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck832"><a href="javascript:void(0)" class="value">Men’s Shoe</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck440" data-id="440" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck440"><a href="javascript:void(0)" class="value">Women's Shoes</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck560" data-id="560" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck560"><a href="javascript:void(0)" class="value">Flipflops/Crocs</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck244" data-id="244" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck244"><a href="javascript:void(0)" class="value">Premium Shoes</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck117" data-id="117" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck117"><a href="javascript:void(0)" class="value">Loafers Or Formals</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck5" data-id="5" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck5"><a href="javascript:void(0)" class="value">Men Sports Shoes</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck4" data-id="4" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck4"><a href="javascript:void(0)" class="value">Casual Shoes</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck11" data-id="11" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck11"><a href="javascript:void(0)" class="value">T-Shirts</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck21" data-id="21" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck21"><a href="javascript:void(0)" class="value">Track Pants</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck12" data-id="12" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck12"><a href="javascript:void(0)" class="value">Shirts</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck20" data-id="20" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck20"><a href="javascript:void(0)" class="value">Jeans</a></label>
+                              </div>
+                            </div>
+                          </li>
+                    
+                          <li>
+                            <div class="pretty p-icon p-round p-jelly">
+                              <input type="checkbox" id="customCheck977" data-id="977" class="vendor_category" />
+                              <div class="state p-primary">
+                                <i class="icon fa fa-check"></i>
+                                <label for="customCheck977"><a href="javascript:void(0)" class="value">Premium Track Suits</a></label>
+                              </div>
+                            </div>
+                          </li>
+                                      </ul>
+                  <div class="bg-striped"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Price -->
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title"><a class="panel-toggle" data-toggle="collapse" href="#filter-price" aria-expanded="true">PRICE</a></h4>
+              </div>
+              <div id="filter-price" class="panel-body collapse in">
+                <div class="pricedisplay" id="pricedisplay">
+                  <div id="amount"> <span id="amt1"></span> <span id="amt2"></span> </div>
+                </div>
+                <div id="price-range"></div>
+              </div>
+              <input type="hidden" value="" id="priceMinInput" />
+              <input type="hidden" value="" id="priceMaxInput" />
+            </div>
+
+            <!-- SIZE -->
+                     </div>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="col-xs-8 col-sm-7 col-lg-5 col-left">
+        <div class="input-group">
+          <input type="hidden" class="form-control" placeholder="Search product" id="search_keyword_allproduct" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Search product'">
+          <span class="input-group-btn">
+            <button class="btn btn-default search_btn_allproduct" id="search_btn_allproduct" type="button" style="display:none;"><i class="icon icon-magnify"></i></button>
+          </span>
+        </div>
+      </div>
+      <!-- End Dearch Code -->
+
+      <div class="col-md-9 aside">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="product-block" id="all_rows">
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/balenciagaa-speed-trainer-black-white-5002-npi549885570-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1b11e29298c.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/balenciagaa-speed-trainer-black-white-5002-npi549885570-urbanex.html?color=">Balenciagaa Speed Trainer Black White 5002 </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 3199.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>8999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Balenciagaa Speed Trainer Black White 5002 https%3A%2F%2Furbanex.cartpe.in%2Fbalenciagaa-speed-trainer-black-white-5002-npi549885570-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/gucci-ladies-gold-tt-green-npi549836242-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1afaa7a0c570.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/gucci-ladies-gold-tt-green-npi549836242-urbanex.html?color=">GUCCI_LADIES_GOLD-TT-GREEN </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1750.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>8500.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in GUCCI LADIES GOLD TT GREEN https%3A%2F%2Furbanex.cartpe.in%2Fgucci-ladies-gold-tt-green-npi549836242-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549819715-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1af5f3b4d340.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549819715-urbanex.html?color=">Omeg a Constellation  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1850.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Omeg a Constellation https%3A%2F%2Furbanex.cartpe.in%2Fomeg-a-constellation-npi549819715-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549815785-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1af5d8879360.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549815785-urbanex.html?color=">Omeg a Constellation  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1850.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Omeg a Constellation https%3A%2F%2Furbanex.cartpe.in%2Fomeg-a-constellation-npi549815785-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549813881-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1af5b66c4f70.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549813881-urbanex.html?color=">Omeg a Constellation  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1850.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Omeg a Constellation https%3A%2F%2Furbanex.cartpe.in%2Fomeg-a-constellation-npi549813881-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549811973-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1af59aae0ac0.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549811973-urbanex.html?color=">Omeg a Constellation  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1850.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Omeg a Constellation https%3A%2F%2Furbanex.cartpe.in%2Fomeg-a-constellation-npi549811973-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549810068-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1af5866758a0.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549810068-urbanex.html?color=">Omeg a Constellation  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1850.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Omeg a Constellation https%3A%2F%2Furbanex.cartpe.in%2Fomeg-a-constellation-npi549810068-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549806616-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1af56ab9d3b0.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549806616-urbanex.html?color=">Omeg a Constellation  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1850.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Omeg a Constellation https%3A%2F%2Furbanex.cartpe.in%2Fomeg-a-constellation-npi549806616-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549804710-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1af552c842d0.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549804710-urbanex.html?color=">Omeg a Constellation  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1850.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Omeg a Constellation https%3A%2F%2Furbanex.cartpe.in%2Fomeg-a-constellation-npi549804710-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549802807-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1af53c089cd0.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549802807-urbanex.html?color=">Omeg a Constellation  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1850.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Omeg a Constellation https%3A%2F%2Furbanex.cartpe.in%2Fomeg-a-constellation-npi549802807-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549800899-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1af51b708960.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549800899-urbanex.html?color=">Omeg a Constellation  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1850.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Omeg a Constellation https%3A%2F%2Furbanex.cartpe.in%2Fomeg-a-constellation-npi549800899-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549798996-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1af4fbd423d0.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/omeg-a-constellation-npi549798996-urbanex.html?color=">Omeg a Constellation  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1850.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Omeg a Constellation https%3A%2F%2Furbanex.cartpe.in%2Fomeg-a-constellation-npi549798996-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549792685-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1af383f36ed0.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549792685-urbanex.html?color=">Cartie r  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1750.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Cartie r https%3A%2F%2Furbanex.cartpe.in%2Fcartie-r-npi549792685-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549790779-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1af36065e690.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549790779-urbanex.html?color=">Cartie r  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1750.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Cartie r https%3A%2F%2Furbanex.cartpe.in%2Fcartie-r-npi549790779-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549788875-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1af34235abe0.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549788875-urbanex.html?color=">Cartie r  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1750.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Cartie r https%3A%2F%2Furbanex.cartpe.in%2Fcartie-r-npi549788875-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549786967-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1af314f10b10.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549786967-urbanex.html?color=">Cartie r  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1750.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Cartie r https%3A%2F%2Furbanex.cartpe.in%2Fcartie-r-npi549786967-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549785064-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1af2ef3efd60.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549785064-urbanex.html?color=">Cartie r  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1750.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Cartie r https%3A%2F%2Furbanex.cartpe.in%2Fcartie-r-npi549785064-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549755792-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1aea0f0b9890.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549755792-urbanex.html?color=">Cartie r  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1750.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Cartie r https%3A%2F%2Furbanex.cartpe.in%2Fcartie-r-npi549755792-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549753889-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1ae9f49e1620.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549753889-urbanex.html?color=">Cartie r  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1750.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Cartie r https%3A%2F%2Furbanex.cartpe.in%2Fcartie-r-npi549753889-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549751982-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1ae9aeac8be0.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549751982-urbanex.html?color=">Cartie r  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1750.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>9999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Cartie r https%3A%2F%2Furbanex.cartpe.in%2Fcartie-r-npi549751982-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549750078-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1ae991db7b90.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549750078-urbanex.html?color=">Cartie r  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1750.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Cartie r https%3A%2F%2Furbanex.cartpe.in%2Fcartie-r-npi549750078-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549710651-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1ae0f4ac3380.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549710651-urbanex.html?color=">Cartie r </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1750.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Cartie r https%3A%2F%2Furbanex.cartpe.in%2Fcartie-r-npi549710651-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549708750-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1ae0d7ca8130.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/cartie-r-npi549708750-urbanex.html?color=">Cartie r  </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 1750.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>10999.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Cartie r https%3A%2F%2Furbanex.cartpe.in%2Fcartie-r-npi549708750-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                                <div class="col-xs-6 col-sm-6 col-md-4 product-disp">
+                    <div class="section">
+                      <div class="products">
+                        <div class="product-details">
+                          <div class="slider slider-for">
+                            <div class="product-img-big">
+                              <a target="_blank" href="https://urbanex.cartpe.in/gues-s-jet-multifunction-mens-analog-watch-npi549706939-urbanex.html?color=">
+                                <img class="img-responsive" src="https://cdn.cartpe.in/images/gallery_sm/6a1add5f61f553.jpeg" />
+                              </a>
+                            </div>
+                          </div>
+                          
+                          <h5><a target="_blank" href="https://urbanex.cartpe.in/gues-s-jet-multifunction-mens-analog-watch-npi549706939-urbanex.html?color=">Gues s Jet Multifunction Mens Analog watch </a></h5>
+                          <h4><i class="fa fa-rupee-sign"></i> 2299.00&nbsp;<span class="text-muted old-price"><i class="fa fa-rupee-sign"></i>15000.00</span></h4>
+
+                                                      <div class="clearfix pad15">
+                              <a class="btn-green whatsapp-button" href="https://api.whatsapp.com/send?phone=919898285850&amp;text=I am interested in Gues s Jet Multifunction Mens Analog watch https%3A%2F%2Furbanex.cartpe.in%2Fgues-s-jet-multifunction-mens-analog-watch-npi549706939-urbanex.html%3Fcolor%3D" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                          </div>
+          </div>
+        </div>
+                  <div class="row">
+            <div class="center-block">
+              <span id="loading_image" style="display:none"><img src="https://cdn.cartpe.in/frontend/assets/store_new/3/images/loader.gif" alt="" width="100"></span>
+            </div>
+            <div class="center-block">
+              <input type="hidden" id="row_no" value="24">
+              <a href="javascript:void(0)" id="loadmore_btn_all_product" class="btn-medium btn-bord loadmore_all_product"><i class="fa fa-spinner"></i> Load More</a>
+            </div>
+          </div>
+              </div>
+    </div>
+  </div>
+</section>
+<!-- END -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+  function loadmore_allproduct() {
+    var val = document.getElementById("row_no").value;
+    var searchkeyword = $("#search_keyword_allproduct").val();
+    var orderby = $("#orderby").val();
+    var cat_ids = $('#category_ids_hidden').val();
+    var min_price = $('#priceMinInput').val();
+    var max_price = $('#priceMaxInput').val();
+    var size_ids = $('#size_ids').val();
+    var variant_status = 0;
+    var web_token = "7d7a244423cfeb4ada709faeaaa457dda9022be990fefe9918440cfbd4f0ed169d156e331c366d37018f06f98ae835b6df047cc72526d3a49e5d030d07652d9c";
+
+    $.ajax({
+      type: 'post',
+      url: 'https://urbanex.cartpe.in/allproductoadmore',
+      data: {
+        getresult: val,
+        searchkey: searchkeyword,
+        orderby: orderby,
+        cat_ids: cat_ids,
+        min_price: min_price,
+        max_price: max_price,
+        size_ids: size_ids,
+        variant_status:variant_status,
+        web_token:web_token,
+      },
+      success: function(response) {
+        $('#loading_image').hide();
+        $('#loadmore_btn_all_product').show();
+        document.getElementById("row_no").value = Number(val) + 24;
+        $("#all_rows").append(response);
+        busy = false;
+        var total_count = $("#total_result_cnt").text();
+        var numItems = $('.product-img-big').length;
+        if (total_count == numItems) {
+          $(".loadmore_all_product").hide();
+        }
+      },error: function(jqXHR, textStatus, errorThrown){
+                    if(jqXHR.status == 403){
+                        location.reload();
+                        return false;
+                    }
+        $('#loading_image').hide();
+        $('#loadmore_btn_all_product').show();
+        alert('Please Try Again');
+      }
+    });
+  }
+
+  $("#loadmore_btn_all_product").click(function() {
+    $('#loading_image').show();
+    loadmore_allproduct();
+  });
+
+  $(".search_btn_allproduct").click(function() {
+    var searchkeyword = $("#search_keyword_allproduct").val();
+    // alert(searchkeyword);
+    $('#all_rows').html('');
+    $('#row_no').val(0);
+    $('#loadmore_btn_all_product').click();
+  });
+
+  $("#orderby").change(function() {
+    var searchkeyword = $("#search_keyword_allproduct").val();
+    $('#all_rows').html('');
+    $('#row_no').val(0);
+    $('#loadmore_btn_all_product').click();
+  });
+  $('#search_keyword_allproduct').keypress(function(event) {
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if (keycode == '13') {
+      $('.search_btn_allproduct').click();
+    }
+  });
+  $(document).on('click', '.vendor_category', function() {
+    var category = '';
+    $(this).toggleClass('active');
+    $('.vendor_category').each(function() {
+      if ($(this).hasClass('active')) {
+        var cat_id = $(this).attr('data-id');
+        category += cat_id + ',';
+      }
+    });
+
+    $('#category_ids_hidden').val(category);
+    // alert(1);
+    $('#all_rows').html('');
+    $('#row_no').val(0);
+    $('#loadmore_btn_all_product').click();
+  });
+
+
+  $(document).on('click', '.size_click', function() {
+    var sizes = '';
+    $(this).toggleClass('active');
+    $(".size_click").each(function() {
+      var size_name = $(this).attr('id');
+      // alert(size_name);
+      if ($(this).hasClass('active') == true) {
+        sizes += "'" + size_name + "'" + ',';
+      }
+    });
+
+    $('#size_ids').val(sizes);
+    $('#all_rows').html('');
+    $('#row_no').val(0);
+
+    $('#loadmore_btn_all_product').click();
+
+  });
+
+  </script>
+
+<script>
+  $(function() {
+    $("#price-range").slider({
+      range: true,
+      min: 0,
+      max: 20000,
+      values: [0, 20000],
+      slide: function(event, ui) {
+        $("#amt1").html("<i class='fa fa-rupee-sign'></i>" + ui.values[0]);
+        $("#amt2").html("<i class='fa fa-rupee-sign'></i>" + ui.values[1]);
+        $("#priceMinInput").val(ui.values[0]);
+        $("#priceMaxInput").val(ui.values[1]);
+      },
+      change: function(event, ui) {
+        $('#all_rows').html('');
+        $('#row_no').val(0);
+        $('#loadmore_btn_all_product').click();
+      }
+    });
+    $("#amt1").html("<i class='fa fa-rupee-sign'></i>" + $("#price-range").slider("values", 0));
+    $("#amt2").html("<i class='fa fa-rupee-sign'></i>" + $("#price-range").slider("values", 1));
+    $("#priceMinInput").val($("#price-range").slider("values", 0));
+    $("#priceMaxInput").val($("#price-range").slider("values", 1));
+  });
+</script>
+
+<!-- Div Counts -->
+<script>
+  $(document).ready(function() {
+    var total_count = $("#total_result_cnt").text();
+    var numItems = $('.product-img-big').length;
+    if (total_count == numItems) {
+      $(".loadmore_all_product").hide();
+    }
+  })
+</script>
+<!-- End Div Count -->
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  dataLayer.push({
+    "ecommerce": {
+      "currencyCode": "INR",
+      "impressions": [
+         {
+              'name': "Balenciagaa Speed Trainer Black White 5002", // Name or ID is required.
+              'id': '549885570',
+              'price': '4199.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 1            },
+         {
+              'name': "GUCCI_LADIES_GOLD-TT-GREEN", // Name or ID is required.
+              'id': '549836242',
+              'price': '2750.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 2            },
+         {
+              'name': "Omeg a Constellation ", // Name or ID is required.
+              'id': '549819715',
+              'price': '2850.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 3            },
+         {
+              'name': "Omeg a Constellation ", // Name or ID is required.
+              'id': '549815785',
+              'price': '2850.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 4            },
+         {
+              'name': "Omeg a Constellation ", // Name or ID is required.
+              'id': '549813881',
+              'price': '2850.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 5            },
+         {
+              'name': "Omeg a Constellation ", // Name or ID is required.
+              'id': '549811973',
+              'price': '2850.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 6            },
+         {
+              'name': "Omeg a Constellation ", // Name or ID is required.
+              'id': '549810068',
+              'price': '2850.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 7            },
+         {
+              'name': "Omeg a Constellation ", // Name or ID is required.
+              'id': '549806616',
+              'price': '2850.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 8            },
+         {
+              'name': "Omeg a Constellation ", // Name or ID is required.
+              'id': '549804710',
+              'price': '2850.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 9            },
+         {
+              'name': "Omeg a Constellation ", // Name or ID is required.
+              'id': '549802807',
+              'price': '2850.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 10            },
+         {
+              'name': "Omeg a Constellation ", // Name or ID is required.
+              'id': '549800899',
+              'price': '2850.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 11            },
+         {
+              'name': "Omeg a Constellation ", // Name or ID is required.
+              'id': '549798996',
+              'price': '2850.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 12            },
+         {
+              'name': "Cartie r ", // Name or ID is required.
+              'id': '549792685',
+              'price': '2750.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 13            },
+         {
+              'name': "Cartie r ", // Name or ID is required.
+              'id': '549790779',
+              'price': '2750.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 14            },
+         {
+              'name': "Cartie r ", // Name or ID is required.
+              'id': '549788875',
+              'price': '2750.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 15            },
+         {
+              'name': "Cartie r ", // Name or ID is required.
+              'id': '549786967',
+              'price': '2750.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 16            },
+         {
+              'name': "Cartie r ", // Name or ID is required.
+              'id': '549785064',
+              'price': '2750.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 17            },
+         {
+              'name': "Cartie r ", // Name or ID is required.
+              'id': '549755792',
+              'price': '2750.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 18            },
+         {
+              'name': "Cartie r ", // Name or ID is required.
+              'id': '549753889',
+              'price': '2750.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 19            },
+         {
+              'name': "Cartie r ", // Name or ID is required.
+              'id': '549751982',
+              'price': '2750.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 20            },
+         {
+              'name': "Cartie r ", // Name or ID is required.
+              'id': '549750078',
+              'price': '2750.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 21            },
+         {
+              'name': "Cartie r", // Name or ID is required.
+              'id': '549710651',
+              'price': '2750.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 22            },
+         {
+              'name': "Cartie r ", // Name or ID is required.
+              'id': '549708750',
+              'price': '2750.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 23            },
+         {
+              'name': "Gues s Jet Multifunction Mens Analog watch", // Name or ID is required.
+              'id': '549706939',
+              'price': '3299.00',
+              'brand': '',
+              'category': "",
+              'variant': '',
+              'list': 'All Products',
+              'position': 24            },
+              ]
+    }
+  });
+</script>
+<!-- Google Tag Manager -->
+<script>
+  (function(w, d, s, l, i) {
+    w[l] = w[l] || [];
+    w[l].push({
+      'gtm.start': new Date().getTime(),
+      event: 'gtm.js'
+    });
+    var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s),
+      dl = l != 'dataLayer' ? '&l=' + l : '';
+    j.async = true;
+    j.src =
+      'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+    f.parentNode.insertBefore(j, f);
+  })(window, document, 'script', 'dataLayer', 'GTM-WNPH5WW');
+</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WNPH5WW" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<!-- Need Help -->
+<section id="help-newsletter">
+  <div class="container">
+    <div class="row">
+      <!-- Need Help -->
+      <p>Need help? <a href="https://urbanex.cartpe.in/cms/contact-us">Contact us</a></p>
+
+    </div>
+  </div>
+</section>
+
+<!-- END -->
+
+<!-- FOOTER -->
+<section id="footer">
+  <div class="container-fluid footer-first">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3 col-xs-12 blocks">
+          <h3 class="title">Company Infomation</h3>
+          <ul class="mt30">
+                          <li><a href="https://urbanex.cartpe.in/cms/terms-condition" style="text-decoration:none;">Terms Condition</a></li>
+                      </ul>
+        </div>
+        <div class="col-md-3 col-xs-12 blocks">
+          <h3 class="title">Customer Services</h3>
+          <ul class="mt30">
+                                          <li><a href="https://urbanex.cartpe.in/store_login.html">Login</a></li>
+                                            <li><a href="https://urbanex.cartpe.in/store_create_account.html">Register</a></li>
+                                    </ul>
+        </div>
+        <div class="col-md-3 col-xs-12 blocks">
+          <h3 class="title">SOCIAL MEDIA</h3>
+          <ul>
+
+            
+            
+            
+                      </ul>
+        </div>
+        <div class="col-md-3 col-xs-12 blocks">
+
+          <div class="col-sm-12">
+            <div class="section appdownload">
+              <h3 class="title">Download App</h3>
+              <ul>
+                <li>
+                  <a href="#" class="app"><img src="https://cdn.cartpe.in/frontend/assets/store_new/25/images/android-app.png" /></a>
+                  
+                  <!-- <a href="#" class="app"><img src="https://cdn.cartpe.in/frontend/assets/store_new/25/images/ios-app.png" /></a> -->
+                </li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid footer-second">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="section footer-section">
+            <h3>Payment</h3>
+            <img src="https://cdn.cartpe.in/frontend/assets/store_new/25/images/payment.png" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <p class="copyrights">©2020 <a href="https://urbanex.cartpe.in/"><span class="txt-color">urbanex</span></a> All Rights Reserved.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<!-- END -->
+
+<script src="https://cdn.cartpe.in/frontend/assets/store_new/25/js/jquery-ui.min.js"></script>
+
+<!-- Include all colpiled plugins (below), or include individual files as needed -->
+<script src="https://cdn.cartpe.in/frontend/assets/store_new/25/js/bootstrap.min.js"></script>
+<script src="https://cdn.cartpe.in/frontend/assets/store_new/25/js/bootstrap-formhelpers.js"></script>
+<script src="https://cdn.cartpe.in/frontend/assets/store_new/25/js/bootsnav.js"></script>
+<script src="https://cdn.cartpe.in/frontend/assets/store_new/25/js/jquery-SmoothScroll-min.js"></script>
+<script src="https://cdn.cartpe.in/frontend/assets/store_new/25/js/jquery-scrolltofixed-min.js"></script>
+<script src="https://cdn.cartpe.in/frontend/assets/store_new/25/js/jquery.magnific-popup.min.js"></script>
+<script src="https://cdn.cartpe.in/frontend/assets/store_new/25/js/wow.min.js"></script>
+
+<!-- Google Map Javascript Codes -->
+<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<script src="https://cdn.cartpe.in/frontend/assets/store_new/25/js/owl.carousel.js"></script>
+<!-- Custom Javascript -->
+<script src="https://cdn.cartpe.in/frontend/assets/store_new/25/js/custom.js"></script>
+<script src="https://cdn.cartpe.in/frontend/assets/store_new/25/js/imagezoom.js"></script>
+<script type="text/javascript" src="https://cdn.cartpe.in/frontend/assets/store_new/25/js/slick.min.js"></script>
+
+<div id="token"></div>
+<div id="msg"></div>
+<div id="notis"></div>
+<div id="err"></div>
+
+<script src="https://www.gstatic.com/firebasejs/7.18.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.18.0/firebase-messaging.js"></script>
+<script>
+   MsgElem = document.getElementById("msg")
+   TokenElem = document.getElementById("token")
+   NotisElem = document.getElementById("notis")
+   ErrElem = document.getElementById("err")
+</script>
+
+<!-- <script type="text/javascript">
+  //alert(1);
+    var config = {
+        apiKey: "AIzaSyDJH63DeJ8td0fYRR7_H_JmsFzmsib34bs",
+        authDomain: "testnotification-6743f.firebaseapp.com",
+        projectId: "testnotification-6743f",
+        storageBucket: "testnotification-6743f.appspot.com",
+        messagingSenderId: "577422685242",
+        appId: "1:577422685242:web:53ca3431052db943ccf103",
+        measurementId: "G-8ZDH1XQYTH"
+    };
+
+    firebase.initializeApp(config);
+
+    const messaging = firebase.messaging();
+
+    //alert(messaging.getToken());
+    messaging.requestPermission().then(function () {
+        //MsgElem.innerHTML = "Notification permission granted." 
+        console.log("Notification permission granted.");
+        // get the token in the form of promise
+        return messaging.getToken()
+    }).then(function(token) {
+      //console.log(token);
+      //alert(token);
+        // print the token on the HTML page
+       // TokenElem.innerHTML = "Device token is : <br>" + token
+        storedevicetoken(token);
+    }).catch(function (err) {
+       // ErrElem.innerHTML = ErrElem.innerHTML + "; " + err
+        //console.log("Unable to get permission to notify.", err);
+    });
+
+    function storedevicetoken(token) {
+      //alert(token);
+      var vendor_id = '62345';
+      var user_id = '';
+      var cookie_id = '_urbanex';
+      var url = "https://urbanex.cartpe.in/order/add_token_ajax";
+      //alert(url);
+
+        $.ajax({
+
+            url:url,
+            type:'POST',
+            data:{token:token,vendor_id:vendor_id,cookie_id:cookie_id,user_id:user_id},
+            success: function(data) {
+             // $("#courier_available_list").html(message);
+            }
+
+        });
+
+    }
+
+</script> -->
+
+<script>
+  $('.slider-for').each(function(key) {
+
+    var sliderIdName = 'slider' + key;
+    var sliderNavIdName = 'sliderNav' + key;
+
+    this.id = sliderIdName;
+    $('.slider-nav')[key].id = sliderNavIdName;
+
+    var sliderId = '#' + sliderIdName;
+    var sliderNavId = '#' + sliderNavIdName;
+
+    $(sliderId).slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      arrows: false,
+      fade: true,
+      asNavFor: sliderNavId
+    });
+
+    $(sliderNavId).slick({
+      slidesToShow: 4,
+      slidesToScroll: 1,
+      asNavFor: sliderId,
+      dots: false,
+      arrows: true,
+      centerMode: false,
+      focusOnSelect: true
+    });
+
+  });
+
+$(document).ready(function() {
+document.getElementById("search-btn").addEventListener("click", showhidesearch);
+
+function showhidesearch() {
+  var x = document.getElementById("search-form-id");
+  if (x.style.display === "none") {
+
+    x.style.display = "block";
+  } else {
+
+    x.style.display = "none";
+  }
+}
+document.getElementById("menu_btn").addEventListener("click", showhidenavbar);
+
+function showhidenavbar() {
+  var x = document.getElementById("navbar_mobile");
+  if (x.style.marginRight === "-500px") {
+
+    x.style.marginRight = "0px";
+  } else {
+
+    x.style.marginRight = "-500px";
+  }
+}
+});
+var x = document.getElementById("search-form-id");
+$(window).scroll(function () {
+  if ($(this).scrollTop() > 50) {
+    x.style.display = "none";
+  }
+});
+var y = document.getElementById("navbar_mobile");
+$(window).scroll(function () {
+  if ($(this).scrollTop() > 5) {
+    y.style.marginRight = "-500px";
+  }
+});
+  </script>
+
+
+<script src="https://cdn.cartpe.in/frontend/assets/store_new/2/js/fancybox.js"></script>
+<script src="https://cdn.cartpe.in/frontend/assets/store_new/2/js/main.js"></script>
+
+<!--end carasole product list-->
+
+</body>
+
+</html>
+</script>
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WNPH5WW');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WNPH5WW"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<script>
+     $(document).ready(function () {
+	  
+		$(".mobile_no_vallid").keypress(function (e) {
+			 if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+				   return false;
+			 }
+			 
+			 if($(this).val().length > 9){
+				 return false;
+			 }
+			 
+		});
+		
+		$("#mobile_no_vallid").keypress(function (e) {
+		
+			 if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)){
+				return false;
+			 }
+			 
+			 if($(this).val().length > 9){
+				 return false;
+			 }
+		});    
+	});  	
+ 
+    </script>	
+    
+   
+<script> 
+$( document ).ready(function() {
+	// alert(1);
+    $("#address_id1").val($('.active_address').attr('id'));
+	//$("#cashon_delivery1").load("cashondelivery_msg/"+$('.active_address').attr('id'));
+}); 
+</script>
+
+	
+<script>
+function trimChar(string, char){
+    if(!char) char = ' '; //space by default
+    char = char.replace(/([()[{*+.$^\\|?])/g, '\\$1'); //escape char parameter if needed for regex syntax.
+    var regex_1 = new RegExp("^" + char + "+", "g");
+    var regex_2 = new RegExp(char + "+$", "g");
+    return string.replace(regex_1, '').replace(regex_2, '');
+}
+
+	var getUrlParameter = function getUrlParameter(sParam) {
+    	var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+	    for (i = 0; i < sURLVariables.length; i++) {
+			sParameterName = sURLVariables[i].split('=');
+
+			if (sParameterName[0] === sParam) {
+            	return sParameterName[1] === undefined ? true : sParameterName[1];
+        	}
+    	}
+	};
+	
+	function removeURLParameter(url, parameter) {
+		//prefer to use l.search if you have a location/link object
+		var urlparts= url.split('?');   
+		if (urlparts.length>=2) {
+	
+			var prefix= encodeURIComponent(parameter)+'=';
+			var pars= urlparts[1].split(/[&;]/g);
+	
+			//reverse iteration as may be destructive
+			for (var i= pars.length; i-- > 0;) {    
+				//idiom for string.startsWith
+				if (pars[i].lastIndexOf(prefix, 0) !== -1) {  
+					pars.splice(i, 1);
+				}
+			}
+	
+			url= urlparts[0]+'?'+pars.join('&');
+			return url;
+		} else {
+			return url;
+		}
+	}
+</script>
+<script>
+$(document).ready(function () {
+ $("#popup_submit").click(function () {
+    
+	      if(($('#popup_email').val()=='') && ($('#popup_password').val()==''))
+			{
+				return false;
+			}
+		   var post_data = {
+				'email': $('#popup_email').val(), 
+				'password': $('#popup_password').val(), 
+				//'outside_selling_price': $(this).val(),
+			}; 
+
+			$.ajax({
+				type: "POST",
+				url: "https://cartpe.in/welcome/popup_login/",
+				data: post_data,
+				success: function(message) {
+				  
+				  $(".emai_msg1").html(message);
+				  $('#popup_email').val('');
+				  $('#popup_password').val('');  
+				  
+				}
+			});	 
+	   
+   }); 
+   
+   }); 
+</script> 
+
+<script>
+	$(document).on('keyup','#zip_code,.zip_code', function(){
+		//alert(1);
+		var zipcode1 = $(this).val();
+		var count_len = zipcode1.length;
+		if(count_len==6)
+		{
+			if(zipcode1 == "")
+			{
+				zipcode1 = 0;
+			}	
+		  $.ajax({
+			type: "POST",
+			url: 'https://urbanex.cartpe.in/welcome/zipcodebyalldetails',
+	  
+			data: {  
+				zipcode : zipcode1,
+			},
+			dataType:"json",
+			success : function(data) { 
+	  
+				var country = data[0];
+				var state= data[1];
+				var city= data[2];
+	    
+				$('#country').val(country);      
+				$('#state').val(state);      
+				$('#city').val(city);      
+	    		
+				$('#state_popup').val(state);      
+				$('#city_popup').val(city); 
+				
+				$('.state_popup').val(state);      
+				$('.city_popup').val(city); 
+				
+			}
+
+		});
+		}
+	});
+
+
+</script>
+  
+<script>
+ $(".search_btn").click(function () {
+	  $(".clearall").fadeIn(1000);
+	    var  searchkeyword=$(".search_keyword").val();
+		
+		window.location.href = 'https://urbanex.cartpe.in/allproduct.html?searchkeyword='+searchkeyword;    
+					
+});
+
+$('.search_keyword').keyup(function(event){
+	var keycode = (event.keyCode ? event.keyCode : event.which);
+	if(keycode == '13'){
+		$(".search_btn").click();
+	}
+});
+
+
+</script>
+
+<script>
+  $("#zip_code_check").click(function() {
+	 
+	      var zip_code_val=$('#zip_code_val').val();
+		  if(zip_code_val!='')
+		  {
+		
+		$("#zip_msg").load("https://urbanex.cartpe.in/zip_code_check/?zip_code="+zip_code_val);
+		  }
+  });
+</script>
+<script>
+
+$(".address_click").click(function () {
+	//alert(1); 
+	 $('.section_address').removeClass("active_address");
+     $(this).addClass("active_address");
+	 $('#address_id1').val($(this).attr('id')); 
+	  //$("#cashon_delivery1").load("cashondelivery_msg/"+$(this).attr('id'));
+});	   
+</script>
+<script>
+ $(".color_click").click(function () {
+	$('#color_hidden').val($(this).attr('id'));
+	
+	    var  color=encodeURIComponent($(this).attr('id'));
+	    var  size=$('#size_id_hidden').val();   
+		history.pushState(null, null, "?color="+color);
+		location.reload();  	
+	 		
+});
+
+</script>
+
+
+<script>
+$( ".update_cart_decrease" ).click(function() {
+	 var cart_id=$(this).attr('cart_id');
+	 
+	  var cart_qty=parseInt($('.update_cart_val'+cart_id).val()-1);
+	  if(cart_qty!=0)
+	  { 
+  
+           var post_data = {
+				'cart_id': cart_id, 
+				'qty': cart_qty,
+				
+			}; 
+
+			$.ajax({
+				type: "POST",
+				url: "https://urbanex.cartpe.in/store_update_cart/",
+				data: post_data,
+				success: function(message) {
+				   location.reload();
+				}
+			});
+	  }
+ }); 
+   
+   
+</script> 
+<script>
+$( ".update_cart_increase" ).click(function() {
+	
+	 var cart_id=$(this).attr('cart_id');
+	 var cart_qty=parseInt($('.update_cart_val'+cart_id).val()) + parseInt(1);
+	//  var data_max=$('.update_cart_val'+cart_id).attr('data-max');
+	 
+	//   if(cart_qty <= data_max)
+	//   {
+		  var post_data = {
+				'cart_id': cart_id, 
+				'qty': cart_qty,
+				
+			}; 
+
+			$.ajax({
+				type: "POST",
+				url: "https://urbanex.cartpe.in/store_update_cart/",
+				data: post_data,
+				success: function(message) {
+				   location.reload();
+				}
+			});
+	//   }
+	//   else
+	//   {
+	// 	  return false;
+	//   }
+}); 
+</script>
+<script>
+// code apply
+$("#code_apply").click(function () {
+	
+     if($('#coupen_code').val() =="")
+	 {
+		 return false; 
+	 }
+	  $("#coupen_msg").load(encodeURI("https://urbanex.cartpe.in/store_coupon?coupon_code="+$('#coupen_code').val()));
+	    
+	  setTimeout(function(){
+		$("#coupen_div").load("https://urbanex.cartpe.in/store_coupon_div"); 
+	  }, 1000);
+	   
+});	   
+</script>
+
+
+<script>
+// price slider
+	function priceSlider() {
+
+		var priceSlider = document.getElementById('priceSlider');
+
+		noUiSlider.create(priceSlider, {
+			start: [500, 2000],
+			connect: true,
+			step: 1,
+			range: {
+				'min': 1,
+				'max': 5000
+			}
+		});
+
+		var inputPriceMax = document.getElementById('priceMax');
+		var inputPriceMin = document.getElementById('priceMin');
+
+		priceSlider.noUiSlider.on('update', function (values, handle) {
+
+			var value = values[handle];
+
+			if (handle) {
+				inputPriceMax.innerHTML = value;
+			} else {
+				inputPriceMin.innerHTML = value;
+			}
+			
+						
+		});
+
+	}
+	
+	
+</script>
+
+
+
+<script src="https://cdn.cartpe.in/frontend/assets/js/jquery1.11.js"></script>
+<script>var mjQuery = jQuery.noConflict();</script>
+<script src="https://cdn.cartpe.in/frontend/assets/js/jquery.lazy.js"></script>
+<script>
+mjQuery('.lazyloading').lazy({});
+  </script>
+
+  <!--carasole product list-->
+   <script>
+ (function(){
+  // setup your carousels as you normally would using JS
+  // or via data attributes according to the documentation
+  // https://getbootstrap.com/javascript/#carousel
+  $('#carousel123').carousel({ interval: 2000 });
+  $('#carouselABC').carousel({ interval: 3600 });
+}());
+
+(function(){
+  $('.carousel-showsixmoveone .item').each(function(){
+    var itemToClone = $(this);
+
+    for (var i=1;i<4;i++) {
+      itemToClone = itemToClone.next();
+
+      // wrap around if at end of item collection
+      if (!itemToClone.length) {
+        itemToClone = $(this).siblings(':first');
+      }
+
+      // grab item, clone, add marker class, add to collection
+      itemToClone.children(':first-child').clone()
+        .addClass("cloneditem-"+(i))
+        .appendTo($(this));
+    }
+  });
+}());
+</script>
+
+<script>
+	$(".terms_check").click(function () {
+	    if ($(this).is(':checked'))
+		{ //alert(1);
+			$(".proceed_button").removeAttr('disabled','disabled');
+		}
+		else
+		{ //alert(2);
+			 $(".proceed_button").attr('disabled','disabled');
+		}
+   });
+</script>
+<script type="text/javascript">
+  $(".razorpay_payment").click(function()
+  {
+	  $('#RazorpayId').attr("name", "razorpay"); 
+  });
+  
+  $(".razorpay_semi_payment").click(function()
+  {
+	   $('#RazorpayId').attr("name", "razorpay_semi");
+  });
+</script>
+<script>
+$(".onepage_validate").click(function () {
+	var id=$(this).attr('id');
+	var button_id='rzp-button1';
+	var button_id1='rzp-button2';
+	//alert(id);
+	   var post_data = {
+		'first_name': $('#first_name').val(),
+		'last_name': $('#last_name').val(),
+		'email': $('#email').val(),
+		'mobile_no': $('#mobile_no').val(),
+		'zip_code': $('#zip_code').val(),
+		'state': $('#state').val(),
+		'city': $('#city').val(),
+		'address': $('#address').val(),
+		'landmark': $('#landmark').val(),
+	}; 
+
+	$.ajax({
+		type: "POST",
+		url: "https://urbanex.cartpe.in/validate/onepage_validate",
+		data: post_data, 
+		dataType:"json",
+		success: function(data) {
+			if (data!=undefined && data.length > 0)
+			{
+			  $('#first_name_msg').html(data[0]);	
+			  $('#last_name_msg').html(data[1]);
+			  $('#email_msg').html(data[2]);	
+			  $('#zip_code_msg').html(data[6]);	
+			  $('#state_msg').html(data[4]);	
+			  $('#city_msg').html(data[5]);	
+			  $('#address_msg').html(data[7]);
+			  return false;
+			}
+			else
+			{
+				$('#first_name_msg').html('');	
+			    $('#last_name_msg').html('');
+			    $('#email_msg').html('');	
+			    $('#zip_code_msg').html('');	
+			    $('#state_msg').html('');	
+			    $('#city_msg').html('');	
+			    $('#address_msg').html(''); 
+			       
+				if(id.indexOf(button_id) != -1)
+				{
+					$.ajax({
+						type: "POST",
+						url: "https://urbanex.cartpe.in/order/dummy_order_onepage/62345/1/2/1",
+						data: post_data,
+						success: function(message) {
+						    var response=$.parseJSON(message);
+						   options.notes.invoice_id = response.id;
+						   options.notes.uid = ""+data['uid']+"";
+						   options.notes.address_id = ""+data['address_id']+"";
+						   // console.log(options); 
+						   rzp.open();
+						}
+					});  
+				}
+				else if(id.indexOf(button_id1) != -1)  
+				{
+					$.ajax({
+						type: "POST",
+						url: "https://urbanex.cartpe.in/order/dummy_order_onepage/62345/2/2/1",
+						data: post_data,
+						success: function(message) {
+						   var response=$.parseJSON(message);
+						   options1.notes.invoice_id = response.id; 
+						   options1.notes.uid = ""+data['uid']+"";
+						   options1.notes.address_id = ""+data['address_id']+"";
+						   rzp1.open();
+						}
+					});
+					// rzp1.open();
+				}
+			}
+		   
+		}
+	});
+});
+</script>
+<SCRIPT language=Javascript>
+      <!--
+      function isMobileNo(evt)
+      {
+         var charCode = (evt.which) ? evt.which : event.keyCode
+         if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+         return true;
+		 
+      }
+	  
+	  function isZipCode(evt)
+      {
+         var charCode = (evt.which) ? evt.which : event.keyCode
+         if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+         return true;
+		 
+      }
+      //-->
+   </SCRIPT>
+<script type="text/javascript">
+$(document).on('keypress','.txtboxToFilter',function (e) {	
+// Allow: backspace, delete, tab, escape, enter and .
+	 if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+        //display error message
+        $("#errmsg").html("Digits Only").show().fadeOut("slow");
+               return false;
+    }
+});
+</script>

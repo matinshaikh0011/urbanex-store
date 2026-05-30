@@ -367,21 +367,38 @@ function ProductForm({ brands, initial, onSave, onClose }: { brands: Brand[]; in
     set('sizes', sizeOptions ? { [key]: next } : { oneSize: ['One Size'] });
   };
 
+  // Append safely using a functional update so parallel uploads don't overwrite each other
+  const appendImage = (url: string) => setForm(f => ({ ...f, images: [...f.images, url] }));
+
   const addImageUrl = () => {
-    if (form.imageUrl.trim()) { set('images', [...form.images, form.imageUrl.trim()]); set('imageUrl', ''); }
+    if (form.imageUrl.trim()) { appendImage(form.imageUrl.trim()); set('imageUrl', ''); }
   };
 
   const uploadToCloudinary = async (file: File) => {
     const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     const preset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-    if (!cloud || !preset) { alert('Cloudinary env vars not set. Use URL input instead.'); return; }
+    if (!cloud || !preset) {
+      alert('Image upload isn\'t configured yet. Cloudinary environment variables are missing on this deployment. For now, paste an image URL below instead.');
+      return;
+    }
+    if (!file.type.startsWith('image/')) { alert('Please choose an image file.'); return; }
+    if (file.size > 10 * 1024 * 1024) { alert('Image is too large (max 10MB).'); return; }
     setUploading(true);
     const fd = new FormData(); fd.append('file', file); fd.append('upload_preset', preset);
     try {
       const r = await fetch(`https://api.cloudinary.com/v1_1/${cloud}/image/upload`, { method: 'POST', body: fd });
       const d = await r.json();
-      if (d.secure_url) set('images', [...form.images, d.secure_url]);
-    } catch { alert('Upload failed'); } finally { setUploading(false); }
+      if (d.secure_url) {
+        appendImage(d.secure_url);
+      } else {
+        const msg = d?.error?.message || 'Unknown error';
+        alert(`Upload failed: ${msg}. Check that your upload preset is set to "Unsigned" in Cloudinary.`);
+      }
+    } catch {
+      alert('Upload failed: could not reach Cloudinary. Check your internet connection.');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const submit = async (e: React.FormEvent) => {
