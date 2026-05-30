@@ -558,7 +558,7 @@ app.post('/api/admin/scraper/scan', adminAuth, async (req, res) => {
       throw e;
     }
 
-    const { products: scraped, failedUrls } = scrapeResult;
+    const { products: scraped, failedUrls, pagesFetched } = scrapeResult;
 
     // Duplicate detection
     const enriched = await Promise.all(scraped.map(async (p) => {
@@ -608,7 +608,7 @@ app.post('/api/admin/scraper/scan', adminAuth, async (req, res) => {
     res.json({
       provider: resolvedKey,
       products: enriched,
-      stats: { total: enriched.length, failed: failedUrls.length, failedUrls },
+      stats: { total: enriched.length, failed: failedUrls.length, failedUrls, pagesFetched: pagesFetched || 0 },
     });
   } catch (error) {
     console.error('[scraper/scan]', error);

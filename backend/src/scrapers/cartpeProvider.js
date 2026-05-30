@@ -11,6 +11,8 @@ const LOADMORE_URL = `${BASE}/allproductoadmore`;
 const UA = 'Mozilla/5.0 (compatible; UrbanExSync/1.0; +https://shopurbanex.com)';
 const MAX_IMAGES = 20;
 const DEFAULT_DELAY = 500;
+// web_token is embedded in every CartPe page — required for the AJAX Load More endpoint
+const WEB_TOKEN = '7d7a244423cfeb4ada709faeaaa457dda9022be990fefe9918440cfbd4f0ed169d156e331c366d37018f06f98ae835b6df047cc72526d3a49e5d030d07652d9c';
 
 // ── Helpers ──────────────────────────────────────────────────────
 
@@ -194,57 +196,95 @@ function parseDetail(html, url) {
 }
 
 // ── Product URL collection ────────────────────────────────────────
+// CartPe's Load More AJAX uses these POST params (extracted from page JS):
+//   getresult   = current row_no (starts at 0, increments by 24 per page)
+//   searchkey   = search keyword (empty string for category/full pages)
+//   web_token   = hardcoded token embedded in every CartPe page
+//   orderby     = sort order (empty = default)
+//   cat_ids     = comma-separated category IDs (empty = all)
+//   min_price   = price filter min (0 = no filter)
+//   max_price   = price filter max (0 = no filter)
+//   size_ids    = size filter (empty = all)
+//   variant_status = 0
 
 async function collectProductUrls(options = {}) {
-  const { delayMs = DEFAULT_DELAY, categoryUrl = null } = options;
+  const { delayMs = DEFAULT_DELAY, pageUrl = null, searchKey = '' } = options;
   const delay = clampDelay(delayMs);
   const seen = new Set();
   const urls = [];
-  let offset = 0;
+  let rowNo = 0;
   const pageSize = 24;
+  let pagesFetched = 0;
+  let consecutiveEmpty = 0;
+
+  console.log(`[CartPe] Starting pagination — searchKey="${searchKey}" pageUrl="${pageUrl || 'none'}"`);
 
   while (true) {
     try {
-      const params = new URLSearchParams({ start: offset, end: offset + pageSize });
-      if (categoryUrl) params.set('category_url', categoryUrl);
+      const params = new URLSearchParams({
+        getresult:      String(rowNo),
+        searchkey:      searchKey,
+        web_token:      WEB_TOKEN,
+        orderby:        '',
+        cat_ids:        '',
+        min_price:      '0',
+        max_price:      '0',
+        size_ids:       '',
+        variant_status: '0',
+      });
 
       const { data: html } = await axios.post(LOADMORE_URL, params.toString(), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'User-Agent': UA,
-          'Referer': categoryUrl || BASE,
+          'Referer': pageUrl || BASE,
           'X-Requested-With': 'XMLHttpRequest',
         },
         timeout: 15000,
       });
 
+      pagesFetched++;
+
       // Extract product links from the HTML fragment
       const $ = cheerio.load(html);
-      const links = [];
+      const newLinks = [];
       $('a[href]').each((_, el) => {
-        const href = $(el).attr('href');
-        if (href && /-urbanex\.html/i.test(href)) {
+        const href = $(el).attr('href') || '';
+        if (/-urbanex\.html/i.test(href) && !/whatsapp/i.test(href)) {
           const full = href.startsWith('http') ? href : `${BASE}${href.startsWith('/') ? '' : '/'}${href}`;
-          const sid = idFromUrl(full);
+          // Strip query string for dedup
+          const cleanUrl = full.split('?')[0];
+          const sid = idFromUrl(cleanUrl);
           if (sid && !seen.has(sid)) {
             seen.add(sid);
-            links.push(full);
+            newLinks.push(cleanUrl);
           }
         }
       });
 
-      if (links.length === 0) break; // No more products
+      console.log(`[CartPe] Page ${pagesFetched} (row_no=${rowNo}): ${newLinks.length} new products (total so far: ${urls.length + newLinks.length})`);
 
-      urls.push(...links);
-      offset += pageSize;
+      if (newLinks.length === 0) {
+        consecutiveEmpty++;
+        // Stop after 2 consecutive empty pages to handle edge cases
+        if (consecutiveEmpty >= 2) {
+          console.log(`[CartPe] Pagination complete — ${pagesFetched} AJAX pages fetched, ${urls.length} unique products found`);
+          break;
+        }
+      } else {
+        consecutiveEmpty = 0;
+        urls.push(...newLinks);
+      }
+
+      rowNo += pageSize;
       await sleep(delay);
     } catch (err) {
-      console.error(`[CartPe] collectProductUrls error at offset ${offset}:`, err.message);
+      console.error(`[CartPe] collectProductUrls error at row_no=${rowNo}:`, err.message);
       break;
     }
   }
 
-  return urls;
+  return { urls, pagesFetched };
 }
 
 // ── Main scrape function ──────────────────────────────────────────
@@ -262,34 +302,55 @@ async function scrape(url, scope, options = {}) {
   }
 
   let productUrls = [];
+  let pagesFetched = 0;
 
   if (scope === 'product') {
     productUrls = [url];
+    pagesFetched = 1;
   } else {
-    // full or category — use the Load More AJAX endpoint
-    productUrls = await collectProductUrls({
-      delayMs: delay,
-      categoryUrl: scope === 'category' ? url : null,
-    });
+    // Extract searchKey from URL query string if present
+    let searchKey = '';
+    try {
+      const parsed = new URL(url);
+      searchKey = parsed.searchParams.get('searchkeyword') || parsed.searchParams.get('search') || '';
+    } catch { /* ignore */ }
 
-    // If AJAX returned nothing, try parsing the page directly for product links
+    // Use the AJAX Load More endpoint with correct parameters
+    const result = await collectProductUrls({
+      delayMs: delay,
+      pageUrl: url,
+      searchKey,
+    });
+    productUrls = result.urls;
+    pagesFetched = result.pagesFetched;
+
+    // If AJAX returned nothing, fall back to parsing the page directly
     if (productUrls.length === 0) {
+      console.log('[CartPe] AJAX returned 0 products, falling back to direct page parse…');
       try {
         const { data: html } = await axios.get(url, { headers: { 'User-Agent': UA }, timeout: 15000 });
         const $ = cheerio.load(html);
+        const seen = new Set();
         $('a[href]').each((_, el) => {
-          const href = $(el).attr('href');
-          if (href && /-urbanex\.html/i.test(href)) {
+          const href = $(el).attr('href') || '';
+          if (/-urbanex\.html/i.test(href) && !/whatsapp/i.test(href)) {
             const full = href.startsWith('http') ? href : `${BASE}${href.startsWith('/') ? '' : '/'}${href}`;
-            const sid = idFromUrl(full);
-            if (sid) productUrls.push(full);
+            const cleanUrl = full.split('?')[0];
+            const sid = idFromUrl(cleanUrl);
+            if (sid && !seen.has(sid)) {
+              seen.add(sid);
+              productUrls.push(cleanUrl);
+            }
           }
         });
+        console.log(`[CartPe] Fallback found ${productUrls.length} products from direct page parse`);
       } catch (err) {
         throw new Error(`Failed to parse supplier page: ${url} — ${err.message}`);
       }
     }
   }
+
+  console.log(`[CartPe] Fetching ${productUrls.length} product detail pages (${pagesFetched} AJAX pages fetched)…`);
 
   // Fetch and parse each product detail page
   for (const productUrl of productUrls) {
@@ -329,7 +390,8 @@ async function scrape(url, scope, options = {}) {
     }
   }
 
-  return { products, failedUrls };
+  console.log(`[CartPe] Scrape complete: ${products.length} products, ${failedUrls.length} failures, ${pagesFetched} AJAX pages`);
+  return { products, failedUrls, pagesFetched };
 }
 
 // ── Sync single product ───────────────────────────────────────────
