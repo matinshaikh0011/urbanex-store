@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from './ClientProviders';
+import { useWishlist } from './WishlistProvider';
 import styles from './ProductCard.module.css';
 
 interface Product {
@@ -14,16 +15,57 @@ interface Product {
   originalPrice?: number | null;
   images: string[];
   brand: { name: string; slug: string };
+  category?: string;
 }
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
   const [isHovered, setIsHovered] = useState(false);
   const [added, setAdded] = useState(false);
+  const [revealed, setRevealed] = useState(false);
   const { addToCart } = useCart();
+  const { has, toggle } = useWishlist();
   const cardRef = useRef<HTMLAnchorElement>(null);
+
+  const inWishlist = has(product.id);
+
+  // Scroll-reveal: animate the card in when it enters the viewport
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setRevealed(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setRevealed(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -8% 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(price);
+  };
+
+  const handleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggle({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price: product.price,
+      originalPrice: product.originalPrice ?? null,
+      image: product.images[0],
+      brand: product.brand.name,
+      category: product.category,
+    });
   };
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -42,6 +84,7 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!revealed) return;
     const card = cardRef.current;
     if (!card) return;
     const rect = card.getBoundingClientRect();
@@ -60,6 +103,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
   const handleMouseLeave = () => {
     setIsHovered(false);
+    if (!revealed) return;
     const card = cardRef.current;
     if (!card) return;
     card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)';
@@ -70,7 +114,8 @@ export default function ProductCard({ product }: { product: Product }) {
     <Link
       ref={cardRef}
       href={`/products/${product.slug}`}
-      className={styles.card}
+      className={`${styles.card} ${styles.reveal} ${revealed ? styles.revealed : ''}`}
+      style={{ transitionDelay: `${(index % 4) * 0.12}s` }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
@@ -79,6 +124,14 @@ export default function ProductCard({ product }: { product: Product }) {
       <div className={styles.imageWrapper}>
         <Image src={product.images[0] || '/placeholder.jpg'} alt={product.name} fill className={styles.image} sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw" />
         {product.originalPrice && <span className={styles.saleTag}>SALE</span>}
+        <button
+          className={`${styles.wishlistBtn} ${inWishlist ? styles.wishlisted : ''}`}
+          onClick={handleWishlist}
+          aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+          title={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+        >
+          {inWishlist ? '♥' : '♡'}
+        </button>
         <div className={`${styles.overlay} ${isHovered ? styles.visible : ''}`}>
           <button className={`${styles.quickAdd} ${added ? styles.added : ''}`} onClick={handleAddToCart}>
             {added ? '✓ ADDED' : 'QUICK ADD'}

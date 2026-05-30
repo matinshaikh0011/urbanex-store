@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+import { subcategories } from './catalog.js';
 
 dotenv.config();
 
@@ -32,9 +33,10 @@ app.get('/api/brands', async (req, res) => {
 
 app.get('/api/products', async (req, res) => {
   try {
-    const { brand, category, featured } = req.query;
+    const { brand, category, subcategory, featured } = req.query;
     const where = {};
     if (category) where.category = category;
+    if (subcategory) where.subcategory = subcategory;
     if (featured === 'true') where.isFeatured = true;
     if (brand) where.brand = { slug: brand };
     const products = await prisma.product.findMany({
@@ -47,11 +49,12 @@ app.get('/api/products', async (req, res) => {
       slug: p.slug,
       description: p.description,
       price: Number(p.price),
-      originalPrice: Number(p.originalPrice),
+      originalPrice: p.originalPrice != null ? Number(p.originalPrice) : null,
       images: p.images,
       sizes: p.sizes,
       colors: p.colors,
       category: p.category,
+      subcategory: p.subcategory,
       isFeatured: p.isFeatured,
       inStock: p.inStock,
       brand: p.brand,
@@ -62,6 +65,11 @@ app.get('/api/products', async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch products' });
   }
+});
+
+// Subcategory metadata for storefront filters
+app.get('/api/subcategories', (req, res) => {
+  res.json(subcategories);
 });
 
 app.get('/api/products/featured', async (req, res) => {
@@ -76,11 +84,12 @@ app.get('/api/products/featured', async (req, res) => {
       slug: p.slug,
       description: p.description,
       price: Number(p.price),
-      originalPrice: Number(p.originalPrice),
+      originalPrice: p.originalPrice != null ? Number(p.originalPrice) : null,
       images: p.images,
       sizes: p.sizes,
       colors: p.colors,
       category: p.category,
+      subcategory: p.subcategory,
       isFeatured: p.isFeatured,
       inStock: p.inStock,
       brand: p.brand,
@@ -103,7 +112,7 @@ app.get('/api/products/:slug', async (req, res) => {
     res.json({
       ...product,
       price: Number(product.price),
-      originalPrice: Number(product.originalPrice),
+      originalPrice: product.originalPrice != null ? Number(product.originalPrice) : null,
       isFeatured: product.isFeatured,
       inStock: product.inStock,
     });
@@ -114,14 +123,24 @@ app.get('/api/products/:slug', async (req, res) => {
 
 app.post('/api/orders', async (req, res) => {
   try {
-    const { productId, size, color, quantity, totalAmount, shippingName, shippingAddress, shippingEmail, shippingPhone, items } = req.body;
+    const { productId, size, color, quantity, totalAmount, paymentMethod, utrNumber, amountPaid, shippingName, shippingAddress, shippingEmail, shippingPhone, items } = req.body;
+
+    // Server-side UTR validation — must be exactly 12 digits
+    const cleanUtr = (utrNumber || '').toString().trim();
+    if (!/^\d{12}$/.test(cleanUtr)) {
+      return res.status(400).json({ error: 'A valid 12-digit UTR / Transaction ID is required.' });
+    }
+
     const orderId = generateOrderId();
     const firstItem = items && items.length > 0 ? items[0] : null;
     const order = await prisma.order.create({
       data: {
         orderId,
         totalAmount: parseFloat(totalAmount),
-        status: 'Pending Advance',
+        status: 'Pending Verification',
+        paymentMethod: paymentMethod || 'cod',
+        utrNumber: cleanUtr,
+        amountPaid: amountPaid != null ? parseFloat(amountPaid) : null,
         shippingName,
         shippingAddress,
         shippingEmail,
@@ -148,6 +167,36 @@ app.get('/api/orders/:orderId', async (req, res) => {
     res.json(order);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch order' });
+  }
+});
+
+// All orders (admin)
+app.get('/api/orders', async (req, res) => {
+  try {
+    const orders = await prisma.order.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: { product: { include: { brand: true } } },
+    });
+    res.json(orders);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+});
+
+// Update order status (admin)
+app.put('/api/orders/:orderId/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!status) return res.status(400).json({ error: 'Status is required' });
+    const updated = await prisma.order.update({
+      where: { orderId: req.params.orderId },
+      data: { status },
+    });
+    res.json(updated);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update order status' });
   }
 });
 

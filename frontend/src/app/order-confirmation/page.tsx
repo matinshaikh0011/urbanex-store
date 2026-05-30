@@ -17,37 +17,51 @@ export default function OrderConfirmationPage() {
   const [items, setItems] = useState<OrderItem[]>([]);
   const [orderId, setOrderId] = useState('N/A');
   const [orderTotal, setOrderTotal] = useState('0');
+  const [whatsappUrl, setWhatsappUrl] = useState('https://wa.me/919265110277');
 
   useEffect(() => {
     // Get order info from sessionStorage
     const storedOrderId = sessionStorage.getItem('orderId');
-    if (storedOrderId) {
-      setOrderId(storedOrderId);
-      // Create WhatsApp message
-      const message = `Hello UrbanEx, I just placed an order! My Order ID is ${storedOrderId}. I am ready to pay the ₹300 advance to confirm.`;
-      const encodedMessage = encodeURIComponent(message);
-
-      // Open WhatsApp after a short delay
-      const timer = setTimeout(() => {
-        window.open(`https://wa.me/919898285850?text=${encodedMessage}`, '_blank');
-      }, 1500);
-
-      return () => clearTimeout(timer);
-    }
-
     const storedTotal = sessionStorage.getItem('orderTotal');
-    if (storedTotal) {
-      setOrderTotal(storedTotal);
-    }
+    const storedCustomer = sessionStorage.getItem('orderCustomer');
+
+    if (storedTotal) setOrderTotal(storedTotal);
 
     // Load order items
     const storedItems = sessionStorage.getItem('orderItems');
     if (storedItems) {
-      try {
-        setItems(JSON.parse(storedItems));
-      } catch {
-        // ignore
+      try { setItems(JSON.parse(storedItems)); } catch { /* ignore */ }
+    }
+
+    if (storedOrderId) {
+      setOrderId(storedOrderId);
+
+      // Build the rich WhatsApp order notification
+      let customer = { name: '', phone: '', address: '', product: 'Order placed', size: '-', amountPaid: '' as string | number };
+      if (storedCustomer) {
+        try { customer = { ...customer, ...JSON.parse(storedCustomer) }; } catch { /* ignore */ }
       }
+
+      const amount = storedTotal ? parseInt(storedTotal) : 0;
+      const message =
+        `🛍️ NEW ORDER - UrbanEx\n` +
+        `Order ID: ${storedOrderId}\n` +
+        `Customer: ${customer.name || 'N/A'}\n` +
+        `Phone: ${customer.phone || 'N/A'}\n` +
+        `Product: ${customer.product || 'N/A'}\n` +
+        `Size: ${customer.size || '-'}\n` +
+        `Amount: ₹${amount}\n` +
+        `Address: ${customer.address || 'N/A'}\n\n` +
+        `Please confirm this order.`;
+
+      const waUrl = `https://wa.me/919265110277?text=${encodeURIComponent(message)}`;
+      setWhatsappUrl(waUrl);
+
+      // Auto-open WhatsApp shortly after the success page shows
+      const timer = setTimeout(() => {
+        window.open(waUrl, '_blank');
+      }, 1500);
+      return () => clearTimeout(timer);
     }
   }, []);
 
@@ -143,7 +157,7 @@ export default function OrderConfirmationPage() {
 
         <div className={styles.whatsappBtn}>
           <a
-            href={`https://wa.me/919898285850?text=${encodeURIComponent(`Hello UrbanEx, I just placed an order! My Order ID is ${orderId}. I am ready to pay the ₹300 advance to confirm.`)}`}
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className={styles.whatsappLink}

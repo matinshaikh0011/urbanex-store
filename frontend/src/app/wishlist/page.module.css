@@ -1,0 +1,165 @@
+.main {
+  min-height: calc(100vh - 68px);
+  background: var(--bg-primary);
+}
+
+.pageHero {
+  padding: 48px 24px 36px;
+  background: var(--bg-dark);
+  border-bottom: var(--border);
+  text-align: center;
+}
+.title {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: var(--text-light);
+  text-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+}
+.accent { color: var(--accent-primary); }
+.count {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 15px;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 8px;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 36px 20px 72px;
+}
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 72px 24px;
+  background: var(--bg-secondary);
+  border: var(--border);
+  box-shadow: var(--shadow);
+}
+.emptyIcon { font-size: 64px; display: block; margin-bottom: 18px; }
+.empty h2 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 28px;
+  letter-spacing: 3px;
+  margin-bottom: 10px;
+}
+.empty p {
+  font-family: 'Permanent Marker', cursive;
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+}
+.shopBtn {
+  display: inline-block;
+  background: var(--accent-primary);
+  color: #fff;
+  padding: 16px 40px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  border: var(--border);
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.12s var(--ease-spring), box-shadow 0.12s ease;
+}
+.shopBtn:hover { transform: translate(4px,4px); box-shadow: var(--shadow-hover); color: #fff; }
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+@media (max-width: 1024px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 768px) { .grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
+@media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
+
+.card {
+  background: var(--bg-secondary);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform 0.15s var(--ease-spring), box-shadow 0.15s ease;
+}
+.card:hover { transform: translate(-3px,-3px); box-shadow: var(--shadow-lift); }
+
+.cardImage {
+  position: relative;
+  aspect-ratio: 1;
+  background: var(--bg-tertiary);
+  overflow: hidden;
+  border-bottom: var(--border);
+  cursor: pointer;
+}
+.cardImage img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+.card:hover .cardImage img { transform: scale(1.06); }
+
+.saleTag {
+  position: absolute;
+  top: 10px; left: 10px;
+  background: var(--accent-primary);
+  color: #fff;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  padding: 3px 12px;
+  border: 2px solid var(--border-color);
+  box-shadow: 2px 2px 0 var(--border-color);
+}
+
+.cardInfo { padding: 16px; }
+.cardBrand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+}
+.cardName {
+  font-family: 'Oswald', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 6px 0 10px;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 42px;
+}
+.cardPriceRow { display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px; }
+.cardPrice { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; color: var(--text-primary); }
+.cardOriginal { font-size: 13px; color: var(--text-muted); text-decoration: line-through; }
+
+.cardActions { display: flex; flex-direction: column; gap: 8px; }
+.addBtn {
+  background: var(--accent-primary);
+  color: #fff;
+  border: var(--border-thin);
+  padding: 11px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--border-color);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.addBtn:hover { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--border-color); }
+.removeBtn {
+  background: transparent;
+  color: var(--accent-primary);
+  border: 2px solid var(--accent-primary);
+  padding: 9px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.removeBtn:hover { background: var(--accent-primary); color: #fff; }

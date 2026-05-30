@@ -235,6 +235,29 @@
   outline: none;
 }
 
+/* UTR validation states */
+.inputError {
+  border-color: var(--error, #CC2200) !important;
+  background: rgba(204, 34, 0, 0.04) !important;
+}
+.inputValid {
+  border-color: var(--success, #009960) !important;
+}
+.utrHint {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--error, #CC2200);
+}
+.utrOk {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--success, #009960);
+}
+
 /* Payment Section */
 .paymentSection {
   margin-top: 24px;
@@ -242,31 +265,209 @@
   border-top: 2px solid var(--border-color);
 }
 
-.paymentOption {
+/* Payment method cards */
+.payCard {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  padding: 16px;
   margin-bottom: 12px;
-}
-
-.paymentOption input {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--accent-primary);
-}
-
-.paymentLabel {
-  font-size: 15px;
-  color: var(--text-primary);
-  cursor: pointer;
-}
-
-.paymentNote {
-  font-size: 14px;
-  color: var(--text-secondary);
-  padding: 12px;
   background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  box-shadow: 3px 3px 0 var(--border-color);
+  cursor: pointer;
+  transition: transform 0.12s var(--ease-spring), box-shadow 0.12s ease, background 0.15s ease;
+  position: relative;
+}
+
+.payCard:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--border-color);
+}
+
+.payCardActive {
+  background: var(--bg-secondary);
+  border-color: var(--accent-primary);
+  box-shadow: 4px 4px 0 var(--accent-primary);
+}
+
+.payCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.payCardTitle {
+  font-family: 'Oswald', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.payCardSub {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.payBadge {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #fff;
+  background: var(--accent-primary);
+  border: 2px solid var(--border-color);
+  padding: 3px 10px;
+  flex-shrink: 0;
+}
+
+/* Radio indicator */
+.radioCustom {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  background: #fff;
+  flex-shrink: 0;
+  position: relative;
+  transition: border-color 0.15s ease;
+}
+.radioCustom[data-checked='true'] {
+  border-color: var(--accent-primary);
+}
+.radioCustom[data-checked='true']::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+}
+
+/* QR box */
+.qrBox {
+  margin-top: 8px;
+  padding: 20px;
+  background: var(--bg-primary);
+  border: 2px dashed var(--accent-primary);
+}
+
+.qrInstruction {
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
+.qrInner {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.qrImageWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.qrImage {
+  width: 200px;
+  height: 200px;
+  background: #fff;
+  border: 3px solid var(--border-color);
+  box-shadow: 5px 5px 0 var(--border-color);
+  padding: 6px;
+  object-fit: contain;
+}
+
+.qrAmount {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: #fff;
+  background: var(--accent-primary);
+  border: 2px solid var(--border-color);
+  padding: 4px 16px;
+}
+
+.qrMeta {
+  flex: 1;
+  min-width: 200px;
+}
+
+.qrMetaRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.qrMetaLabel {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+}
+
+.qrMetaValue {
+  font-family: 'Oswald', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+/* UPI app chips */
+.upiApps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.upiApp {
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 5px 12px;
+  border: 2px solid var(--border-color);
+  background: #fff;
+  color: var(--text-primary);
+  border-radius: 4px;
+}
+.gpay { box-shadow: inset 0 -3px 0 #4285F4; }
+.phonepe { box-shadow: inset 0 -3px 0 #5f259f; }
+.paytm { box-shadow: inset 0 -3px 0 #00baf2; }
+.bhim { box-shadow: inset 0 -3px 0 #00a3a3; }
+
+.verifyNote {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 10px;
+  background: var(--bg-secondary);
   border: 1px dashed var(--border-color);
+}
+
+@media (max-width: 600px) {
+  .qrImage { width: 170px; height: 170px; }
+  .qrInner { gap: 16px; }
 }
 
 /* Total Section */

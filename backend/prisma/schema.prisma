@@ -29,6 +29,7 @@ model Product {
   sizes       Json
   colors      Json
   category    String?
+  subcategory String?
   inStock     Boolean    @default(true) @map("in_stock")
   isFeatured  Boolean    @default(false) @map("is_featured")
   orders      Order[]
@@ -58,6 +59,9 @@ model Order {
   totalAmount        Decimal   @map("total_amount") @db.Decimal(10, 2)
   status             String    @default("Pending Advance")
   advancePaid        Boolean   @default(false) @map("advance_paid")
+  paymentMethod      String?   @map("payment_method")
+  utrNumber          String?   @map("utr_number")
+  amountPaid         Decimal?  @map("amount_paid") @db.Decimal(10, 2)
   whatsappLeadSent   Boolean   @default(false) @map("whatsapp_lead_sent")
   shippingName       String    @map("shipping_name")
   shippingAddress    String    @map("shipping_address")

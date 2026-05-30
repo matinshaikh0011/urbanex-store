@@ -23,7 +23,7 @@ export default function ContactPage() {
       `*Subject:* ${form.subject}\n\n` +
       `*Message:*\n${form.message}`
     );
-    window.open(`https://wa.me/919999999999?text=${text}`, '_blank');
+    window.open(`https://wa.me/919265110277?text=${text}`, '_blank');
     setSent(true);
     setForm({ name: '', email: '', phone: '', subject: '', message: '' });
   };
@@ -50,7 +50,7 @@ export default function ContactPage() {
           {/* Info Cards */}
           <section className={styles.infoGrid}>
             <a
-              href="https://wa.me/919999999999"
+              href="https://wa.me/919265110277"
               target="_blank"
               rel="noreferrer"
               className={`${styles.infoCard} ${styles.whatsapp}`}
@@ -61,12 +61,12 @@ export default function ContactPage() {
                 </svg>
               </div>
               <div className={styles.infoLabel}>WhatsApp</div>
-              <div className={styles.infoValue}>+91 99999 99999</div>
+              <div className={styles.infoValue}>+91 92651 10277</div>
               <div className={styles.infoNote}>Chat with us 24/7 for fastest response</div>
             </a>
 
             <a
-              href="mailto:support@urbanex.in"
+              href="mailto:urbanexconnect@gmail.com"
               className={`${styles.infoCard} ${styles.email}`}
             >
               <div className={styles.infoIcon}>
@@ -76,7 +76,7 @@ export default function ContactPage() {
                 </svg>
               </div>
               <div className={styles.infoLabel}>Email</div>
-              <div className={styles.infoValue}>support@urbanex.in</div>
+              <div className={styles.infoValue}>urbanexconnect@gmail.com</div>
               <div className={styles.infoNote}>We reply within 24 hours</div>
             </a>
 

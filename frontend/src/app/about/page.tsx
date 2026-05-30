@@ -138,7 +138,7 @@ export default function AboutPage() {
       </main>
 
       <footer className={styles.footer}>
-        <p>© 2024 UrbanEx. All rights reserved. | 100% Premium Products</p>
+        <p>© 2026 UrbanEx. All rights reserved. | 100% Premium Products</p>
       </footer>
     </>
   );

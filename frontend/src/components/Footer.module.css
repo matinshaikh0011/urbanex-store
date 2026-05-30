@@ -39,6 +39,33 @@
   color: var(--text-muted);
 }
 
+.socials {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.socialBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+  box-shadow: 3px 3px 0 var(--border-color);
+  background: var(--bg-secondary);
+  transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.15s ease;
+}
+.socialBtn:hover {
+  background: var(--accent-primary);
+  color: #fff;
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--border-color);
+}
+.whatsapp:hover {
+  background: #25D366;
+}
+
 @media (max-width: 768px) {
   .container {
     flex-direction: column;

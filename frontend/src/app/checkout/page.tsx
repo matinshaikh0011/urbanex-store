@@ -6,6 +6,153 @@ import Header from '@/components/Header';
 import GlobalPopup from '@/components/GlobalPopup';
 import styles from './page.module.css';
 
+// ── UPI payment config ──
+const UPI_VPA = '9265110277@ptyes';
+const UPI_NAME = 'Mr Shaikh Mohammad Matin';
+const ADVANCE_AMOUNT = 300;
+
+function buildUpiQr(amount: number) {
+  // Format: https://upiqr.in/api/qr?name=...&vpa=...&amount=...
+  const name = UPI_NAME.replace(/\s+/g, '+');
+  return `https://upiqr.in/api/qr?name=${name}&vpa=${encodeURIComponent(UPI_VPA)}&amount=${amount}`;
+}
+
+// Fallback QR (encodes the standard UPI deep-link) in case the primary service is unavailable
+function buildUpiQrFallback(amount: number) {
+  const upiLink = `upi://pay?pa=${UPI_VPA}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&cu=INR`;
+  return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiLink)}`;
+}
+
+const formatINR = (price: number) =>
+  new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(price);
+
+// A valid UPI UTR / RRN is exactly 12 digits (no letters/spaces).
+const UTR_REGEX = /^\d{12}$/;
+const isValidUtr = (v: string) => UTR_REGEX.test(v.trim());
+
+// ── Reusable UPI payment section ──
+function PaymentSection({
+  total,
+  paymentMethod,
+  setPaymentMethod,
+  utrNumber,
+  setUtrNumber,
+}: {
+  total: number;
+  paymentMethod: 'cod' | 'prepaid';
+  setPaymentMethod: (m: 'cod' | 'prepaid') => void;
+  utrNumber: string;
+  setUtrNumber: (v: string) => void;
+}) {
+  const payAmount = paymentMethod === 'prepaid' ? total : ADVANCE_AMOUNT;
+  const qrUrl = buildUpiQr(payAmount);
+  const trimmed = utrNumber.trim();
+  const utrValid = isValidUtr(trimmed);
+  const showUtrError = trimmed.length > 0 && !utrValid;
+  return (
+    <div className={styles.paymentSection}>
+      <h3 className={styles.sectionTitle}>PAYMENT METHOD</h3>
+
+      {/* Option 1 — COD advance */}
+      <button
+        type="button"
+        className={`${styles.payCard} ${paymentMethod === 'cod' ? styles.payCardActive : ''}`}
+        onClick={() => setPaymentMethod('cod')}
+      >
+        <span className={styles.radioCustom} data-checked={paymentMethod === 'cod'} />
+        <span className={styles.payCardBody}>
+          <span className={styles.payCardTitle}>CASH ON DELIVERY (PAY ₹300 ADVANCE)</span>
+          <span className={styles.payCardSub}>Pay ₹300 now, balance on delivery</span>
+        </span>
+      </button>
+
+      {/* Option 2 — Full prepaid */}
+      <button
+        type="button"
+        className={`${styles.payCard} ${paymentMethod === 'prepaid' ? styles.payCardActive : ''}`}
+        onClick={() => setPaymentMethod('prepaid')}
+      >
+        <span className={styles.radioCustom} data-checked={paymentMethod === 'prepaid'} />
+        <span className={styles.payCardBody}>
+          <span className={styles.payCardTitle}>FULL PREPAID PAYMENT</span>
+          <span className={styles.payCardSub}>Get priority shipping ⚡</span>
+        </span>
+        <span className={styles.payBadge}>PRIORITY</span>
+      </button>
+
+      {/* QR + UTR block */}
+      <div className={styles.qrBox}>
+        <div className={styles.qrInstruction}>
+          {paymentMethod === 'cod'
+            ? 'Scan QR and pay ₹300 advance to confirm order. Balance on delivery.'
+            : 'Scan QR and pay full amount for priority shipping.'}
+        </div>
+
+        <div className={styles.qrInner}>
+          <div className={styles.qrImageWrap}>
+            <img
+              key={qrUrl}
+              src={qrUrl}
+              alt={`UPI QR for ${formatINR(payAmount)}`}
+              className={styles.qrImage}
+              width={220}
+              height={220}
+              onError={(e) => {
+                const img = e.currentTarget;
+                const fallback = buildUpiQrFallback(payAmount);
+                if (img.src !== fallback) img.src = fallback;
+              }}
+            />
+            <span className={styles.qrAmount}>PAY {formatINR(payAmount)}</span>
+          </div>
+
+          <div className={styles.qrMeta}>
+            <div className={styles.qrMetaRow}>
+              <span className={styles.qrMetaLabel}>UPI ID</span>
+              <span className={styles.qrMetaValue}>{UPI_VPA}</span>
+            </div>
+            <div className={styles.qrMetaRow}>
+              <span className={styles.qrMetaLabel}>NAME</span>
+              <span className={styles.qrMetaValue}>{UPI_NAME}</span>
+            </div>
+            <div className={styles.upiApps}>
+              <span className={`${styles.upiApp} ${styles.gpay}`}>GPay</span>
+              <span className={`${styles.upiApp} ${styles.phonepe}`}>PhonePe</span>
+              <span className={`${styles.upiApp} ${styles.paytm}`}>Paytm</span>
+              <span className={`${styles.upiApp} ${styles.bhim}`}>BHIM</span>
+            </div>
+          </div>
+        </div>
+
+        {/* UTR input */}
+        <div className={styles.field}>
+          <label className={styles.label}>UTR / Transaction ID *</label>
+          <input
+            type="text"
+            inputMode="numeric"
+            name="utrNumber"
+            value={utrNumber}
+            onChange={(e) => setUtrNumber(e.target.value.replace(/\D/g, '').slice(0, 12))}
+            required
+            maxLength={12}
+            aria-invalid={showUtrError}
+            className={showUtrError ? styles.inputError : (utrValid ? styles.inputValid : '')}
+            placeholder="Enter 12-digit UPI reference / UTR number"
+          />
+          {showUtrError && (
+            <span className={styles.utrHint}>UTR must be exactly 12 digits — check the reference number in your UPI app.</span>
+          )}
+          {utrValid && (
+            <span className={styles.utrOk}>✓ Looks good — we&apos;ll verify this payment before dispatch.</span>
+          )}
+        </div>
+
+        <p className={styles.verifyNote}>🔒 Your order will be confirmed after payment verification</p>
+      </div>
+    </div>
+  );
+}
+
 interface CartItem {
   id: number;
   name: string;
@@ -101,6 +248,8 @@ function CheckoutContent() {
 function CartCheckoutForm({ items }: { items: CartItem[] }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'prepaid'>('cod');
+  const [utrNumber, setUtrNumber] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -136,6 +285,12 @@ function CartCheckoutForm({ items }: { items: CartItem[] }) {
       return;
     }
 
+    if (!isValidUtr(utrNumber)) {
+      alert('Please enter a valid 12-digit UTR / Transaction ID after completing the UPI payment.');
+      setLoading(false);
+      return;
+    }
+
     try {
       // Create order for each item
       const response = await fetch('/api/orders', {
@@ -151,6 +306,9 @@ function CartCheckoutForm({ items }: { items: CartItem[] }) {
             price: item.price,
           })),
           totalAmount: total,
+          paymentMethod,
+          amountPaid: paymentMethod === 'prepaid' ? total : ADVANCE_AMOUNT,
+          utrNumber: utrNumber.trim(),
           shippingName: formData.name,
           shippingAddress: formData.address,
           shippingEmail: formData.email,
@@ -164,10 +322,32 @@ function CartCheckoutForm({ items }: { items: CartItem[] }) {
 
       const order = await response.json();
 
-      // Store order info for confirmation page
+      // Store order info for confirmation page (+ WhatsApp notification details)
       sessionStorage.setItem('orderId', order.orderId);
       sessionStorage.setItem('orderItems', JSON.stringify(items));
       sessionStorage.setItem('orderTotal', total.toString());
+      sessionStorage.setItem('orderCustomer', JSON.stringify({
+        name: formData.name,
+        phone: formData.phone,
+        address: formData.address,
+        product: items.map(i => `${i.name} (x${i.quantity})`).join(', '),
+        size: items.map(i => i.size).join(', '),
+        paymentMethod,
+        amountPaid: paymentMethod === 'prepaid' ? total : ADVANCE_AMOUNT,
+      }));
+
+      // Save to local order history (account page)
+      try {
+        const hist = JSON.parse(localStorage.getItem('urbanex_orders') || '[]');
+        hist.unshift({
+          orderId: order.orderId,
+          date: new Date().toISOString(),
+          products: items.map(i => ({ name: i.name, slug: undefined, size: i.size, quantity: i.quantity, price: i.price })),
+          status: 'Pending Verification',
+          total,
+        });
+        localStorage.setItem('urbanex_orders', JSON.stringify(hist.slice(0, 50)));
+      } catch { /* ignore */ }
 
       // Redirect to confirmation page
       router.push('/order-confirmation');
@@ -255,19 +435,13 @@ function CartCheckoutForm({ items }: { items: CartItem[] }) {
               />
             </div>
 
-            <div className={styles.paymentSection}>
-              <h3 className={styles.sectionTitle}>PAYMENT METHOD</h3>
-              <div className={styles.paymentOption}>
-                <input type="radio" id="cod" name="payment" value="cod" checked readOnly />
-                <label htmlFor="cod" className={styles.paymentLabel}>
-                  <span className={styles.radioCustom}></span>
-                  Cash on Delivery (Requires ₹300 Advance)
-                </label>
-              </div>
-              <p className={styles.paymentNote}>
-                Pay ₹300 advance via UPI/Google Pay/PhonePe to confirm your order. Balance on delivery.
-              </p>
-            </div>
+            <PaymentSection
+              total={total}
+              paymentMethod={paymentMethod}
+              setPaymentMethod={setPaymentMethod}
+              utrNumber={utrNumber}
+              setUtrNumber={setUtrNumber}
+            />
 
             <div className={styles.totalSection}>
               <span className={styles.totalLabel}>Total Amount</span>
@@ -294,6 +468,8 @@ function SingleProductCheckout({ slug, size }: { slug: string; size: string }) {
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [formLoading, setFormLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'prepaid'>('cod');
+  const [utrNumber, setUtrNumber] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -339,6 +515,12 @@ function SingleProductCheckout({ slug, size }: { slug: string; size: string }) {
       return;
     }
 
+    if (!isValidUtr(utrNumber)) {
+      alert('Please enter a valid 12-digit UTR / Transaction ID after completing the UPI payment.');
+      setFormLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch('/api/orders', {
         method: 'POST',
@@ -348,6 +530,9 @@ function SingleProductCheckout({ slug, size }: { slug: string; size: string }) {
           size: size,
           quantity: 1,
           totalAmount: product.price,
+          paymentMethod,
+          amountPaid: paymentMethod === 'prepaid' ? product.price : ADVANCE_AMOUNT,
+          utrNumber: utrNumber.trim(),
           shippingName: formData.name,
           shippingAddress: formData.address,
           shippingEmail: formData.email,
@@ -362,6 +547,28 @@ function SingleProductCheckout({ slug, size }: { slug: string; size: string }) {
       sessionStorage.setItem('orderProduct', product.name);
       sessionStorage.setItem('orderSize', size);
       sessionStorage.setItem('orderTotal', product.price.toString());
+      sessionStorage.setItem('orderCustomer', JSON.stringify({
+        name: formData.name,
+        phone: formData.phone,
+        address: formData.address,
+        product: product.name,
+        size: size,
+        paymentMethod,
+        amountPaid: paymentMethod === 'prepaid' ? product.price : ADVANCE_AMOUNT,
+      }));
+
+      // Save to local order history (account page)
+      try {
+        const hist = JSON.parse(localStorage.getItem('urbanex_orders') || '[]');
+        hist.unshift({
+          orderId: order.orderId,
+          date: new Date().toISOString(),
+          products: [{ name: product.name, slug: product.slug, size, quantity: 1, price: product.price }],
+          status: 'Pending Verification',
+          total: product.price,
+        });
+        localStorage.setItem('urbanex_orders', JSON.stringify(hist.slice(0, 50)));
+      } catch { /* ignore */ }
 
       router.push('/order-confirmation');
     } catch (error) {
@@ -428,19 +635,13 @@ function SingleProductCheckout({ slug, size }: { slug: string; size: string }) {
               <input type="tel" name="phone" value={formData.phone} onChange={handleChange} required placeholder="+91 9876543210" />
             </div>
 
-            <div className={styles.paymentSection}>
-              <h3 className={styles.sectionTitle}>PAYMENT METHOD</h3>
-              <div className={styles.paymentOption}>
-                <input type="radio" id="cod" name="payment" value="cod" checked readOnly />
-                <label htmlFor="cod" className={styles.paymentLabel}>
-                  <span className={styles.radioCustom}></span>
-                  Cash on Delivery (Requires ₹300 Advance)
-                </label>
-              </div>
-              <p className={styles.paymentNote}>
-                Pay ₹300 advance via UPI/Google Pay/PhonePe to confirm your order. Balance on delivery.
-              </p>
-            </div>
+            <PaymentSection
+              total={product.price}
+              paymentMethod={paymentMethod}
+              setPaymentMethod={setPaymentMethod}
+              utrNumber={utrNumber}
+              setUtrNumber={setUtrNumber}
+            />
 
             <div className={styles.totalSection}>
               <span className={styles.totalLabel}>Total Amount</span>

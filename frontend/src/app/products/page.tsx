@@ -17,6 +17,7 @@ interface Product {
   images: string[];
   brand: { name: string; slug: string };
   category: string;
+  subcategory?: string | null;
 }
 
 interface Brand {
@@ -27,24 +28,38 @@ interface Brand {
 
 // Category to Brand mapping
 const categoryBrands: Record<string, string[]> = {
-  sneakers: ['nike', 'adidas', 'jordan', 'puma', 'new-balance', 'reebok', 'converse', 'vans', 'asics', 'skechers'],
-  watches: ['rolex', 'omega', 'hublot'],
-  glasses: ['ray-ban', 'oakley', 'gucci'],
-  handbags: ['louis-vuitton', 'gucci', 'michael-kors'],
-  clothing: ['nike', 'adidas'],
+  sneakers: ['nike', 'adidas', 'jordan', 'puma', 'new-balance', 'reebok', 'converse', 'vans', 'asics', 'skechers', 'fila'],
+  watches: ['rolex', 'omega', 'hublot', 'tag-heuer', 'cartier'],
+  glasses: ['ray-ban', 'oakley', 'gucci', 'prada'],
+  handbags: ['louis-vuitton', 'gucci', 'michael-kors', 'prada'],
+  clothing: ['nike', 'adidas', 'puma', 'under-armour', 'levis', 'hm'],
   'ua-batch': ['nike', 'adidas', 'jordan'],
   'luxury-watches': ['rolex', 'omega'],
 };
 
-const priceRanges = [
-  { label: 'All Prices', min: 0, max: Infinity },
-  { label: 'Under ₹5,000', min: 0, max: 5000 },
-  { label: '₹5,000 - ₹10,000', min: 5000, max: 10000 },
-  { label: '₹10,000 - ₹25,000', min: 10000, max: 25000 },
-  { label: '₹25,000 - ₹50,000', min: 25000, max: 50000 },
-  { label: '₹50,000 - ₹1,00,000', min: 50000, max: 100000 },
-  { label: 'Above ₹1,00,000', min: 100000, max: Infinity },
-];
+// Subcategories per category (label + slug)
+const categorySubcategories: Record<string, { slug: string; label: string }[]> = {
+  watches: [
+    { slug: 'mens-watches', label: "Men's Watches" },
+    { slug: 'womens-watches', label: "Women's Watches" },
+  ],
+  glasses: [
+    { slug: 'mens-glasses', label: "Men's Glasses" },
+    { slug: 'womens-glasses', label: "Women's Glasses" },
+  ],
+  clothing: [
+    { slug: 'track-pants', label: 'Track Pants' },
+    { slug: 'jeans', label: 'Jeans' },
+    { slug: 'shirts', label: 'Shirts' },
+    { slug: 'tshirts', label: 'T-Shirts' },
+    { slug: 'denims', label: 'Denims' },
+  ],
+};
+
+// Overall price bounds for the slider (INR)
+const PRICE_MIN = 0;
+const PRICE_MAX = 600000;
+const PRICE_STEP = 1000;
 
 function ProductsPageContent() {
   const searchParams = useSearchParams();
@@ -56,9 +71,18 @@ function ProductsPageContent() {
   const category = searchParams.get('category');
   const brandParam = searchParams.get('brand');
   const searchQuery = searchParams.get('search');
+  const subcategoryParam = searchParams.get('subcategory');
 
   const [selectedBrand, setSelectedBrand] = useState<string>(brandParam || '');
-  const [selectedPriceRange, setSelectedPriceRange] = useState(0);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>(subcategoryParam || '');
+  const [priceMin, setPriceMin] = useState(PRICE_MIN);
+  const [priceMax, setPriceMax] = useState(PRICE_MAX);
+
+  const formatINR = (n: number) =>
+    n >= 100000 ? `₹${(n / 100000).toFixed(n % 100000 === 0 ? 0 : 1)}L` : `₹${n.toLocaleString('en-IN')}`;
+
+  // Subcategories for the active category
+  const availableSubcategories = category ? (categorySubcategories[category] || []) : [];
 
   // Get brands relevant to current category
   const availableBrands = useMemo(() => {
@@ -71,22 +95,24 @@ function ProductsPageContent() {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      fetch('/api/products').then(res => res.json()),
-      fetch('/api/brands').then(res => res.json())
+      fetch('/api/products').then(res => res.json()).catch(() => []),
+      fetch('/api/brands').then(res => res.json()).catch(() => [])
     ])
     .then(([productsData, brandsData]) => {
-      setProducts(productsData);
-      setBrands(brandsData);
+      setProducts(Array.isArray(productsData) ? productsData : []);
+      setBrands(Array.isArray(brandsData) ? brandsData : []);
       setLoading(false);
     })
     .catch(() => setLoading(false));
   }, []);
 
-  // Reset brand filter when category changes via URL
+  // Reset filters when category/brand/subcategory changes via URL
   useEffect(() => {
     setSelectedBrand(brandParam || '');
-    setSelectedPriceRange(0);
-  }, [category, brandParam]);
+    setSelectedSubcategory(subcategoryParam || '');
+    setPriceMin(PRICE_MIN);
+    setPriceMax(PRICE_MAX);
+  }, [category, brandParam, subcategoryParam]);
 
   // Filter products
   const filteredProducts = useMemo(() => {
@@ -96,6 +122,10 @@ function ProductsPageContent() {
       // Case-insensitive comparison to handle mixed case from DB
       const catLower = category.toLowerCase();
       filtered = filtered.filter(p => p.category.toLowerCase() === catLower);
+    }
+
+    if (selectedSubcategory) {
+      filtered = filtered.filter(p => p.subcategory === selectedSubcategory);
     }
 
     if (searchQuery) {
@@ -110,18 +140,19 @@ function ProductsPageContent() {
       filtered = filtered.filter(p => p.brand.slug === selectedBrand);
     }
 
-    const range = priceRanges[selectedPriceRange];
-    filtered = filtered.filter(p => p.price >= range.min && p.price < range.max);
+    filtered = filtered.filter(p => p.price >= priceMin && p.price <= priceMax);
 
     return filtered;
-  }, [products, category, searchQuery, selectedBrand, selectedPriceRange]);
+  }, [products, category, searchQuery, selectedBrand, selectedSubcategory, priceMin, priceMax]);
+
+  const hasActiveFilters = !!selectedBrand || !!selectedSubcategory || priceMin > PRICE_MIN || priceMax < PRICE_MAX;
 
   const getPageTitle = () => {
     if (searchQuery) return `SEARCH: "${searchQuery}"`;
     if (category) {
       const titles: Record<string, string> = {
         sneakers: 'SNEAKERS',
-        watches: 'WATCHES',
+        watches: 'LUXURY WATCHES',
         glasses: 'GLASSES',
         handbags: 'HANDBAGS',
         clothing: 'CLOTHING',
@@ -185,7 +216,7 @@ function ProductsPageContent() {
           >
             <span>🎛️ FILTERS</span>
             <span className={styles.filterCount}>
-              {(selectedBrand ? 1 : 0) + (selectedPriceRange > 0 ? 1 : 0)}
+              {(selectedBrand ? 1 : 0) + (selectedSubcategory ? 1 : 0) + ((priceMin > PRICE_MIN || priceMax < PRICE_MAX) ? 1 : 0)}
             </span>
           </button>
 
@@ -211,7 +242,7 @@ function ProductsPageContent() {
                   href={`/products?category=watches`}
                   className={`${styles.categoryTag} ${category === 'watches' ? styles.active : ''}`}
                 >
-                  ⌚ Watches
+                  ⌚ Luxury Watches
                 </Link>
                 <Link
                   href={`/products?category=glasses`}
@@ -233,6 +264,30 @@ function ProductsPageContent() {
                 </Link>
               </div>
             </div>
+
+            {/* Subcategory Filter (only for categories that have them) */}
+            {availableSubcategories.length > 0 && (
+              <div className={styles.filterGroup}>
+                <label className={styles.filterLabel}>TYPE</label>
+                <div className={styles.brandButtons}>
+                  <button
+                    className={`${styles.brandBtn} ${!selectedSubcategory ? styles.active : ''}`}
+                    onClick={() => setSelectedSubcategory('')}
+                  >
+                    ALL
+                  </button>
+                  {availableSubcategories.map(sub => (
+                    <button
+                      key={sub.slug}
+                      className={`${styles.brandBtn} ${selectedSubcategory === sub.slug ? styles.active : ''}`}
+                      onClick={() => setSelectedSubcategory(selectedSubcategory === sub.slug ? '' : sub.slug)}
+                    >
+                      {sub.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Brand Filter - Buttons */}
             <div className={styles.filterGroup}>
@@ -256,27 +311,60 @@ function ProductsPageContent() {
               </div>
             </div>
 
-            {/* Price Filter */}
+            {/* Price Filter — dual range slider */}
             <div className={styles.filterGroup}>
-              <label className={styles.filterLabel}>PRICE</label>
-              <select
-                className={styles.filterSelect}
-                value={selectedPriceRange}
-                onChange={(e) => setSelectedPriceRange(parseInt(e.target.value))}
+              <label className={styles.filterLabel}>PRICE RANGE</label>
+              <div className={styles.priceValues}>
+                <span>{formatINR(priceMin)}</span>
+                <span>{priceMax >= PRICE_MAX ? `${formatINR(PRICE_MAX)}+` : formatINR(priceMax)}</span>
+              </div>
+              <div
+                className={styles.slider}
+                style={{
+                  ['--lo' as string]: `${(priceMin / PRICE_MAX) * 100}%`,
+                  ['--hi' as string]: `${(priceMax / PRICE_MAX) * 100}%`,
+                }}
               >
-                {priceRanges.map((range, idx) => (
-                  <option key={idx} value={idx}>{range.label}</option>
-                ))}
-              </select>
+                <div className={styles.sliderTrack} />
+                <div className={styles.sliderFill} />
+                <input
+                  type="range"
+                  min={PRICE_MIN}
+                  max={PRICE_MAX}
+                  step={PRICE_STEP}
+                  value={priceMin}
+                  onChange={(e) => {
+                    const v = Math.min(parseInt(e.target.value), priceMax - PRICE_STEP);
+                    setPriceMin(v);
+                  }}
+                  className={styles.sliderInput}
+                  aria-label="Minimum price"
+                />
+                <input
+                  type="range"
+                  min={PRICE_MIN}
+                  max={PRICE_MAX}
+                  step={PRICE_STEP}
+                  value={priceMax}
+                  onChange={(e) => {
+                    const v = Math.max(parseInt(e.target.value), priceMin + PRICE_STEP);
+                    setPriceMax(v);
+                  }}
+                  className={styles.sliderInput}
+                  aria-label="Maximum price"
+                />
+              </div>
             </div>
 
             {/* Clear Filters */}
-            {(selectedBrand || selectedPriceRange > 0) && (
+            {hasActiveFilters && (
               <button
                 className={styles.clearFilters}
                 onClick={() => {
                   setSelectedBrand('');
-                  setSelectedPriceRange(0);
+                  setSelectedSubcategory('');
+                  setPriceMin(PRICE_MIN);
+                  setPriceMax(PRICE_MAX);
                 }}
               >
                 ✕ CLEAR ALL FILTERS
@@ -294,13 +382,7 @@ function ProductsPageContent() {
             ) : filteredProducts.length > 0 ? (
               <div className={styles.grid}>
                 {filteredProducts.map((product, idx) => (
-                  <div
-                    key={product.id}
-                    className={styles.productWrapper}
-                    style={{ animationDelay: `${idx * 0.04}s` }}
-                  >
-                    <ProductCard product={product} />
-                  </div>
+                  <ProductCard key={product.id} product={product} index={idx} />
                 ))}
               </div>
             ) : (
@@ -312,7 +394,9 @@ function ProductsPageContent() {
                   className={styles.resetBtn}
                   onClick={() => {
                     setSelectedBrand('');
-                    setSelectedPriceRange(0);
+                    setSelectedSubcategory('');
+                    setPriceMin(PRICE_MIN);
+                    setPriceMax(PRICE_MAX);
                   }}
                 >
                   RESET FILTERS

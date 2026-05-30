@@ -366,6 +366,84 @@
   box-shadow: 5px 5px 0 var(--accent-primary);
 }
 
+/* ---- Price range slider (dual handle) ---- */
+.priceValues {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Oswald', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+}
+.priceValues span {
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  box-shadow: 2px 2px 0 var(--border-color);
+  padding: 3px 12px;
+}
+
+.slider {
+  position: relative;
+  height: 34px;
+  display: flex;
+  align-items: center;
+}
+.sliderTrack {
+  position: absolute;
+  left: 0; right: 0;
+  height: 6px;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-color);
+}
+.sliderFill {
+  position: absolute;
+  height: 6px;
+  left: var(--lo, 0%);
+  right: calc(100% - var(--hi, 100%));
+  background: var(--accent-primary);
+  border-top: 2px solid var(--border-color);
+  border-bottom: 2px solid var(--border-color);
+}
+
+/* Both range inputs stacked; only thumbs are interactive */
+.sliderInput {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  background: none;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 34px;
+}
+.sliderInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  pointer-events: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--accent-primary);
+  box-shadow: 2px 2px 0 var(--border-color);
+  cursor: pointer;
+  transition: transform 0.12s var(--ease-spring);
+}
+.sliderInput::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.sliderInput::-webkit-slider-thumb:active { transform: scale(1.05); background: var(--accent-primary); }
+.sliderInput::-moz-range-thumb {
+  pointer-events: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--accent-primary);
+  box-shadow: 2px 2px 0 var(--border-color);
+  cursor: pointer;
+}
+
 /* ---- Clear filters ---- */
 .clearFilters {
   padding: 12px 20px;

@@ -7,6 +7,9 @@ import Link from 'next/link';
 import { useCart } from '@/components/ClientProviders';
 import Header from '@/components/Header';
 import GlobalPopup from '@/components/GlobalPopup';
+import RecentlyViewed from '@/components/RecentlyViewed';
+import ProductReviews from '@/components/ProductReviews';
+import { addRecentlyViewed } from '@/lib/recentlyViewed';
 import styles from './page.module.css';
 
 interface Product {
@@ -32,6 +35,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [addedToCart, setAddedToCart] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const router = useRouter();
   const { addToCart } = useCart();
 
@@ -48,20 +52,30 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
         }
         setLoading(false);
 
-        // Fetch recommendations using the product's REAL category
+        // Track in recently viewed
+        if (data && data.id) {
+          addRecentlyViewed({
+            id: data.id,
+            name: data.name,
+            slug: data.slug,
+            price: data.price,
+            originalPrice: data.originalPrice ?? null,
+            image: data.images?.[0] || '',
+            brand: data.brand?.name || '',
+          });
+        }
+
+        // Related products — same category, exclude current
         const category = data?.category;
-        fetch('/api/products')
-          .then(res => res.json())
-          .then((all: Product[]) => {
-            if (!Array.isArray(all)) return;
-            const others = all.filter((p) => p.slug !== params.slug);
-            // Prefer same category, then top up with other picks
-            const sameCat = others.filter((p) => p.category === category);
-            const rest = others.filter((p) => p.category !== category);
-            const combined = [...sameCat, ...rest].slice(0, 4);
-            setRelatedProducts(combined);
-          })
-          .catch(() => {});
+        if (category) {
+          fetch(`/api/products?category=${encodeURIComponent(category)}`)
+            .then(res => res.json())
+            .then((sameCat: Product[]) => {
+              if (!Array.isArray(sameCat)) return;
+              setRelatedProducts(sameCat.filter((p) => p.slug !== params.slug).slice(0, 4));
+            })
+            .catch(() => {});
+        }
       })
       .catch(() => {
         setLoading(false);
@@ -121,6 +135,54 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     <>
       <GlobalPopup />
       <Header />
+
+      {/* Size Guide Modal */}
+      {sizeGuideOpen && (
+        <div className={styles.sizeModalOverlay} onClick={() => setSizeGuideOpen(false)}>
+          <div className={styles.sizeModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.sizeModalHead}>
+              <h3>SIZE <span className={styles.accent}>GUIDE</span></h3>
+              <button className={styles.sizeModalClose} onClick={() => setSizeGuideOpen(false)} aria-label="Close size guide">✕</button>
+            </div>
+
+            <div className={styles.sizeChartBlock}>
+              <h4>👟 SNEAKERS SIZE CHART</h4>
+              <table className={styles.sizeTable}>
+                <thead>
+                  <tr><th>UK</th><th>US</th><th>EU</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>6</td><td>7</td><td>40</td></tr>
+                  <tr><td>7</td><td>8</td><td>41</td></tr>
+                  <tr><td>8</td><td>9</td><td>42</td></tr>
+                  <tr><td>9</td><td>10</td><td>43</td></tr>
+                  <tr><td>10</td><td>11</td><td>44</td></tr>
+                  <tr><td>11</td><td>12</td><td>45</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className={styles.sizeChartBlock}>
+              <h4>👕 CLOTHING SIZE CHART</h4>
+              <table className={styles.sizeTable}>
+                <thead>
+                  <tr><th>SIZE</th><th>CHEST</th><th>WAIST</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>S</td><td>36&quot;</td><td>30&quot;</td></tr>
+                  <tr><td>M</td><td>38&quot;</td><td>32&quot;</td></tr>
+                  <tr><td>L</td><td>40&quot;</td><td>34&quot;</td></tr>
+                  <tr><td>XL</td><td>42&quot;</td><td>36&quot;</td></tr>
+                  <tr><td>XXL</td><td>44&quot;</td><td>38&quot;</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p className={styles.sizeNote}>Sizes may vary slightly by brand. Need help? Chat with us on WhatsApp.</p>
+          </div>
+        </div>
+      )}
+
       <main className={styles.main}>
         <div className={styles.container}>
           <div className={styles.gallery}>
@@ -176,9 +238,14 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             <p className={styles.description}>{product.description}</p>
 
             <div className={styles.sizeSection}>
-              <label className={styles.sizeLabel}>
-                {product.sizes.oneSize ? 'SIZE' : 'SELECT SIZE (US)'} <span className={styles.required}>*</span>
-              </label>
+              <div className={styles.sizeLabelRow}>
+                <label className={styles.sizeLabel}>
+                  {product.sizes.oneSize ? 'SIZE' : 'SELECT SIZE (US)'} <span className={styles.required}>*</span>
+                </label>
+                <button type="button" className={styles.sizeGuideBtn} onClick={() => setSizeGuideOpen(true)}>
+                  📏 SIZE GUIDE
+                </button>
+              </div>
               <div className={styles.sizeGrid}>
                 {(product.sizes.US || product.sizes.oneSize || []).map((size: string) => (
                   <button key={size} className={`${styles.sizeBtn} ${selectedSize === size ? styles.selected : ''}`} onClick={() => setSelectedSize(size)}>
@@ -264,6 +331,12 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             </div>
           </div>
         )}
+
+        {/* Reviews */}
+        <ProductReviews slug={product.slug} />
+
+        {/* Recently Viewed */}
+        <RecentlyViewed currentSlug={product.slug} />
       </main>
 
       <footer className={styles.footer}>
@@ -280,7 +353,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
           </div>
         </div>
         <div className={styles.footerBottom}>
-          <p>© 2024 UrbanEx. All rights reserved.</p>
+          <p>© 2026 UrbanEx. All rights reserved.</p>
         </div>
       </footer>
     </>

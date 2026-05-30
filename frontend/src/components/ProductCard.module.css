@@ -17,6 +17,20 @@
     box-shadow 0.14s ease;
 }
 
+/* ---- Scroll reveal (slow, smooth entrance) ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(60px) scale(0.96);
+  transition:
+    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
 /* Hover: sticker lifts up and shifts */
 .card:hover {
   transform: translate(-4px, -4px) rotate(-0.5deg);
@@ -106,6 +120,44 @@
   transform: rotate(-3deg);
   /* Ribbon tail */
   clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
+}
+
+/* ---- Wishlist heart button ---- */
+.wishlistBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 4;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--accent-primary);
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  box-shadow: 2px 2px 0 var(--border-color);
+  cursor: pointer;
+  transition: transform 0.15s var(--ease-spring), background 0.15s ease;
+}
+
+.wishlistBtn:hover {
+  transform: scale(1.12);
+  background: #fff;
+}
+
+.wishlistBtn.wishlisted {
+  background: var(--accent-primary);
+  color: #fff;
+  animation: heartPop 0.35s var(--ease-spring);
+}
+
+@keyframes heartPop {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.35); }
+  100% { transform: scale(1); }
 }
 
 /* ---- Overlay on hover (quick-add) ---- */
