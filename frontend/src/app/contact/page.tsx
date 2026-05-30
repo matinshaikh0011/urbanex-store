@@ -23,7 +23,7 @@ export default function ContactPage() {
       `*Subject:* ${form.subject}\n\n` +
       `*Message:*\n${form.message}`
     );
-    window.open(`https://wa.me/919265110277?text=${text}`, '_blank');
+    window.open(`https://wa.me/919898285850?text=${text}`, '_blank');
     setSent(true);
     setForm({ name: '', email: '', phone: '', subject: '', message: '' });
   };
@@ -50,7 +50,7 @@ export default function ContactPage() {
           {/* Info Cards */}
           <section className={styles.infoGrid}>
             <a
-              href="https://wa.me/919265110277"
+              href="https://wa.me/919898285850"
               target="_blank"
               rel="noreferrer"
               className={`${styles.infoCard} ${styles.whatsapp}`}
@@ -61,7 +61,7 @@ export default function ContactPage() {
                 </svg>
               </div>
               <div className={styles.infoLabel}>WhatsApp</div>
-              <div className={styles.infoValue}>+91 92651 10277</div>
+              <div className={styles.infoValue}>+91 98982 85850</div>
               <div className={styles.infoNote}>Chat with us 24/7 for fastest response</div>
             </a>
 

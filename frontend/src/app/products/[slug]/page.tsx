@@ -37,8 +37,12 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
   const [addedToCart, setAddedToCart] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const [zoom, setZoom] = useState({ active: false, x: 50, y: 50 });
   const router = useRouter();
   const { addToCart } = useCart();
+
+  // Reset selected image when product changes
+  useEffect(() => { setSelectedImage(0); }, [params.slug]);
 
   useEffect(() => {
     setMounted(true);
@@ -187,22 +191,35 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
       <main className={styles.main}>
         <div className={styles.container}>
           <div className={styles.gallery}>
-            <div className={styles.mainImage}>
-              <Image
-                src={product.images[selectedImage] || '/placeholder.jpg'}
-                alt={product.name}
-                fill
-                className={styles.image}
-                priority
+            <div
+              className={styles.mainImage}
+              onMouseEnter={() => setZoom(z => ({ ...z, active: true }))}
+              onMouseLeave={() => setZoom(z => ({ ...z, active: false }))}
+              onMouseMove={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                setZoom({ active: true, x, y });
+              }}
+            >
+              <div
+                className={styles.zoomLayer}
+                style={{
+                  backgroundImage: `url(${product.images[selectedImage] || '/placeholder.jpg'})`,
+                  backgroundPosition: `${zoom.x}% ${zoom.y}%`,
+                  backgroundSize: zoom.active ? '210%' : 'cover',
+                }}
               />
+              {!zoom.active && (
+                <span className={styles.zoomHint}>🔍 Hover to zoom</span>
+              )}
               {product.originalPrice && <span className={styles.saleTag}>SALE</span>}
-              <div className={styles.imageOverlay}></div>
             </div>
             {product.images.length > 1 && (
               <div className={styles.thumbnails}>
                 {product.images.map((img, idx) => (
                   <button key={idx} className={`${styles.thumbnail} ${selectedImage === idx ? styles.active : ''}`} onClick={() => setSelectedImage(idx)}>
-                    <Image src={img} alt={`View ${idx + 1}`} fill />
+                    <Image src={img} alt={`${product.name} view ${idx + 1}`} fill sizes="100px" />
                   </button>
                 ))}
               </div>
@@ -215,10 +232,14 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
               <span>/</span>
               <Link href="/products">Shop</Link>
               <span>/</span>
-              <Link href={`/products?brand=${product.brand.slug}`}>{product.brand.name}</Link>
+              <Link href={`/products?category=${product.category}`}>{product.category}</Link>
               <span>/</span>
-              <span>{product.name}</span>
+              <span className={styles.crumbCurrent}>{product.name}</span>
             </div>
+
+            <Link href={`/products?category=${product.category}`} className={styles.backToCategory}>
+              ← Back to {product.category}
+            </Link>
 
             <Link href={`/products?brand=${product.brand.slug}`} className={styles.brand}>
               {product.brand.name}
@@ -267,7 +288,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             </div>
 
             <a 
-              href={`https://wa.me/919265110277?text=Hi, I would like to request a live video call for ${encodeURIComponent(product.name)}`}
+              href={`https://wa.me/919898285850?text=Hi, I would like to request a live video call for ${encodeURIComponent(product.name)}`}
               target="_blank" 
               rel="noopener noreferrer"
               className={styles.videoCallBtn}
@@ -297,7 +318,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             </div>
 
             <div className={styles.contact}>
-              <p>Need help? <a href="https://wa.me/919265110277" target="_blank" rel="noopener">Chat on WhatsApp</a></p>
+              <p>Need help? <a href="https://wa.me/919898285850" target="_blank" rel="noopener">Chat on WhatsApp</a></p>
             </div>
           </div>
         </div>
@@ -350,7 +371,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             <Link href="/about">About Us</Link>
             <Link href="/track-order">Track Order</Link>
             <Link href="/return-exchange">Returns</Link>
-            <p>WhatsApp: +91 9265110277</p>
+            <p>WhatsApp: +91 9898285850</p>
           </div>
         </div>
         <div className={styles.footerBottom}>

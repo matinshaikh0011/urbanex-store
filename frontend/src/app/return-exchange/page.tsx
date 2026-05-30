@@ -38,7 +38,7 @@ export default function ReturnExchangePage() {
               <div className={styles.successIcon}>✓</div>
               <h2>Request Submitted!</h2>
               <p>We have received your return/exchange request. Our team will contact you within 24 hours on WhatsApp.</p>
-              <a href="https://wa.me/919265110277" target="_blank" rel="noopener" className={styles.whatsappBtn}>
+              <a href="https://wa.me/919898285850" target="_blank" rel="noopener" className={styles.whatsappBtn}>
                 CHAT ON WHATSAPP
               </a>
             </div>
@@ -137,8 +137,8 @@ export default function ReturnExchangePage() {
           <div className={styles.contactSection}>
             <h3>Need Help?</h3>
             <p>Contact us via WhatsApp for instant assistance</p>
-            <a href="https://wa.me/919265110277" target="_blank" rel="noopener" className={styles.whatsappLink}>
-              💬 +91 9265110277
+            <a href="https://wa.me/919898285850" target="_blank" rel="noopener" className={styles.whatsappLink}>
+              💬 +91 9898285850
             </a>
           </div>
         </div>

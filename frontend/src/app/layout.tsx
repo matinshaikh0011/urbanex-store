@@ -5,6 +5,7 @@ import { WishlistProvider } from '@/components/WishlistProvider';
 import InteractiveCursor from '@/components/InteractiveCursor';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import SocialProof from '@/components/SocialProof';
 
 export const metadata: Metadata = {
   title: 'UrbanEx | Premium Streetwear & Sneakers',
@@ -32,6 +33,7 @@ export default function RootLayout({
             <AnnouncementBar />
             {children}
             <WhatsAppButton />
+            <SocialProof />
           </WishlistProvider>
         </CartProvider>
       </body>

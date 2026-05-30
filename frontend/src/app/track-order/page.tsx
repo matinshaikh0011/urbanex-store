@@ -123,7 +123,7 @@ export default function TrackOrderPage() {
               </div>
 
               <div className={styles.whatsappNote}>
-                <p>💬 Need help? <a href="https://wa.me/919265110277" target="_blank" rel="noopener">Chat on WhatsApp</a></p>
+                <p>💬 Need help? <a href="https://wa.me/919898285850" target="_blank" rel="noopener">Chat on WhatsApp</a></p>
               </div>
             </div>
           )}
@@ -134,7 +134,7 @@ export default function TrackOrderPage() {
               <li>Find your Order ID in the confirmation message</li>
               <li>Enter the Order ID in the search box above</li>
               <li>Click &quot;Track Order&quot; to see your order status</li>
-              <li>For any queries, WhatsApp us at +91 9265110277</li>
+              <li>For any queries, WhatsApp us at +91 9898285850</li>
             </ol>
           </div>
         </div>

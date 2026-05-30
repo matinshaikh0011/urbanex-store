@@ -17,7 +17,7 @@ export default function OrderConfirmationPage() {
   const [items, setItems] = useState<OrderItem[]>([]);
   const [orderId, setOrderId] = useState('N/A');
   const [orderTotal, setOrderTotal] = useState('0');
-  const [whatsappUrl, setWhatsappUrl] = useState('https://wa.me/919265110277');
+  const [whatsappUrl, setWhatsappUrl] = useState('https://wa.me/919898285850');
 
   useEffect(() => {
     // Get order info from sessionStorage
@@ -54,7 +54,7 @@ export default function OrderConfirmationPage() {
         `Address: ${customer.address || 'N/A'}\n\n` +
         `Please confirm this order.`;
 
-      const waUrl = `https://wa.me/919265110277?text=${encodeURIComponent(message)}`;
+      const waUrl = `https://wa.me/919898285850?text=${encodeURIComponent(message)}`;
       setWhatsappUrl(waUrl);
 
       // Auto-open WhatsApp shortly after the success page shows

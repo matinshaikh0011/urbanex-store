@@ -95,6 +95,12 @@ const slugify = (s) =>
 
 let _n = 0;
 const pick = (arr, i) => arr[i % arr.length];
+// Pick `count` distinct images from a pool, cycling from index i (gives each product 3-4 angles)
+const pickImages = (arr, i, count = 4) => {
+  const out = [];
+  for (let k = 0; k < count; k++) out.push(arr[(i + k) % arr.length]);
+  return out;
+};
 
 function make({ name, brandSlug, price, originalPrice, category, subcategory = null, images, sizes, color = 'Assorted', hex = '#1A1A1A', featured = false, desc }) {
   _n += 1;
@@ -149,7 +155,7 @@ const sneakerDefs = [
   ['puma', 'Puma Cali Dream "Pastel"', 6500, 8500],
 ];
 const sneakers = sneakerDefs.map((d, i) =>
-  make({ brandSlug: d[0], name: d[1], price: d[2], originalPrice: d[3], category: 'sneakers', images: [pick(IMG.sneakers, i)], sizes: SNEAKER_SIZES, color: 'Multi', hex: '#FFFFFF', featured: true })
+  make({ brandSlug: d[0], name: d[1], price: d[2], originalPrice: d[3], category: 'sneakers', images: pickImages(IMG.sneakers, i), sizes: SNEAKER_SIZES, color: 'Multi', hex: '#FFFFFF', featured: true })
 );
 
 // ================================================================
@@ -186,7 +192,7 @@ const watchDefs = [
   ['cartier', 'Cartier Tank Francaise 25mm', 225000, 265000, 'womens-watches'],
 ];
 const watches = watchDefs.map((d, i) =>
-  make({ brandSlug: d[0], name: d[1], price: d[2], originalPrice: d[3], category: 'watches', subcategory: d[4], images: [pick(IMG.watches, i)], sizes: ONE_SIZE, color: 'Steel', hex: '#C0C0C0', featured: true })
+  make({ brandSlug: d[0], name: d[1], price: d[2], originalPrice: d[3], category: 'watches', subcategory: d[4], images: pickImages(IMG.watches, i), sizes: ONE_SIZE, color: 'Steel', hex: '#C0C0C0', featured: true })
 );
 
 // ================================================================
@@ -223,7 +229,7 @@ const glassDefs = [
   ['oakley', 'Oakley Sutro "Lavender"', 4300, 5300, 'womens-glasses'],
 ];
 const glasses = glassDefs.map((d, i) =>
-  make({ brandSlug: d[0], name: d[1], price: d[2], originalPrice: d[3], category: 'glasses', subcategory: d[4], images: [pick(IMG.glasses, i)], sizes: ONE_SIZE, color: 'Black', hex: '#000000', featured: true })
+  make({ brandSlug: d[0], name: d[1], price: d[2], originalPrice: d[3], category: 'glasses', subcategory: d[4], images: pickImages(IMG.glasses, i), sizes: ONE_SIZE, color: 'Black', hex: '#000000', featured: true })
 );
 
 // ================================================================
@@ -260,7 +266,7 @@ const bagDefs = [
   ['prada', 'Prada Re-Nylon Tote', 58000, 72000],
 ];
 const handbags = bagDefs.map((d, i) =>
-  make({ brandSlug: d[0], name: d[1], price: d[2], originalPrice: d[3], category: 'handbags', images: [pick(IMG.handbags, i)], sizes: ONE_SIZE, color: 'Assorted', hex: '#8B5A2B', featured: true })
+  make({ brandSlug: d[0], name: d[1], price: d[2], originalPrice: d[3], category: 'handbags', images: pickImages(IMG.handbags, i), sizes: ONE_SIZE, color: 'Assorted', hex: '#8B5A2B', featured: true })
 );
 
 // ================================================================
@@ -297,7 +303,7 @@ const clothingDefs = [
   ['hm', 'H&M Relaxed Denim Jacket', 2600, 3600, 'denims'],
 ];
 const clothing = clothingDefs.map((d, i) =>
-  make({ brandSlug: d[0], name: d[1], price: d[2], originalPrice: d[3], category: 'clothing', subcategory: d[4], images: [pick(IMG.clothing, i)], sizes: APPAREL_SIZES, color: 'Assorted', hex: '#1A1A1A', featured: true })
+  make({ brandSlug: d[0], name: d[1], price: d[2], originalPrice: d[3], category: 'clothing', subcategory: d[4], images: pickImages(IMG.clothing, i), sizes: APPAREL_SIZES, color: 'Assorted', hex: '#1A1A1A', featured: true })
 );
 
 // ================================================================
@@ -311,7 +317,7 @@ const uaDefs = [
   ['nike', 'UA Batch Nike Air Force 1 Low', 4200, 5800],
 ];
 const uaBatch = uaDefs.map((d, i) =>
-  make({ brandSlug: d[0], name: d[1], price: d[2], originalPrice: d[3], category: 'ua-batch', images: [pick(IMG.sneakers, i + 3)], sizes: SNEAKER_SIZES, color: 'Multi', hex: '#FFFFFF', featured: i < 3 })
+  make({ brandSlug: d[0], name: d[1], price: d[2], originalPrice: d[3], category: 'ua-batch', images: pickImages(IMG.sneakers, i + 3), sizes: SNEAKER_SIZES, color: 'Multi', hex: '#FFFFFF', featured: i < 3 })
 );
 
 export const products = [

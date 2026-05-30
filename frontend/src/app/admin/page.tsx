@@ -197,7 +197,7 @@ export default function AdminPage() {
         <div className={styles.quickActions}>
           <button className={styles.qaBtn} onClick={() => router.push('/products')}>📦 VIEW ALL PRODUCTS</button>
           <a className={styles.qaBtn} href="https://www.instagram.com/urbanex.store/" target="_blank" rel="noopener noreferrer">📸 INSTAGRAM</a>
-          <a className={styles.qaBtn} href="https://wa.me/919265110277" target="_blank" rel="noopener noreferrer">💬 WHATSAPP</a>
+          <a className={styles.qaBtn} href="https://wa.me/919898285850" target="_blank" rel="noopener noreferrer">💬 WHATSAPP</a>
         </div>
 
         {/* SECTION B — Order management */}

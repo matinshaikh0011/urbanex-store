@@ -198,7 +198,7 @@ export default function LoginPage() {
 
             <div className={styles.whatsappLogin}>
               <p>Prefer to order via WhatsApp?</p>
-              <a href="https://wa.me/919265110277" target="_blank" rel="noopener" className={styles.whatsappBtn}>
+              <a href="https://wa.me/919898285850" target="_blank" rel="noopener" className={styles.whatsappBtn}>
                 💬 CHAT ON WHATSAPP
               </a>
             </div>

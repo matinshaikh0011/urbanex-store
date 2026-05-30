@@ -199,6 +199,7 @@ export default function Header() {
           </div>
           <Link href="/about" className={styles.navLink} onClick={closeMenu}>ABOUT</Link>
           <Link href="/track-order" className={styles.navLink} onClick={closeMenu}>TRACK</Link>
+          <Link href="/faq" className={styles.navLink} onClick={closeMenu}>FAQ</Link>
           <Link href="/return-exchange" className={styles.navLink} onClick={closeMenu}>RETURN</Link>
           <Link href="/contact" className={styles.navLink} onClick={closeMenu}>CONTACT</Link>
         </nav>

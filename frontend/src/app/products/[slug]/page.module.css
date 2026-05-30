@@ -43,39 +43,51 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1;
-  background: var(--bg-secondary);
-  border: 2px dashed var(--bg-tertiary);
+  background: #fff;
+  border: var(--border);
+  box-shadow: var(--shadow);
   overflow: hidden;
   margin-bottom: 16px;
+  cursor: crosshair;
 }
 
-.image {
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.mainImage:hover .image {
-  transform: scale(1.05);
-}
-
-.imageOverlay {
+/* Zoomable image layer (background-position magnify on hover) */
+.zoomLayer {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, transparent 70%, rgba(0,0,0,0.3));
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  transition: background-size 0.25s ease;
+}
+
+.zoomHint {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 2;
+  background: rgba(17,17,17,0.85);
+  color: #fff;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 1px;
+  padding: 5px 12px;
   pointer-events: none;
 }
 
 .saleTag {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
   background: var(--accent-primary);
-  color: var(--bg-primary);
+  color: #fff;
   font-family: 'Bebas Neue', sans-serif;
   font-size: 18px;
   letter-spacing: 2px;
-  padding: 8px 20px;
-  animation: pulse 2s ease infinite;
+  padding: 6px 18px;
+  border: 2px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
 @keyframes pulse {
@@ -92,8 +104,8 @@
 .thumbnail {
   position: relative;
   aspect-ratio: 1;
-  background: var(--bg-secondary);
-  border: 2px solid var(--bg-tertiary);
+  background: #fff;
+  border: 2px solid var(--border-color);
   overflow: hidden;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -120,9 +132,10 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
-  margin-bottom: 16px;
+  font-size: 13px;
+  margin-bottom: 14px;
   flex-wrap: wrap;
+  text-transform: capitalize;
 }
 
 .breadcrumb a {
@@ -133,6 +146,22 @@
 .breadcrumb a:hover {
   color: var(--accent-primary);
 }
+.crumbCurrent { color: var(--text-secondary); text-transform: none; }
+
+.backToCategory {
+  display: inline-block;
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+  text-transform: capitalize;
+  margin-bottom: 18px;
+  border-bottom: 2px solid var(--accent-primary);
+  padding-bottom: 2px;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.backToCategory:hover { color: var(--accent-primary); transform: translateX(-3px); }
 
 .breadcrumb span {
   color: var(--text-muted);

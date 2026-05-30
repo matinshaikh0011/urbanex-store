@@ -78,6 +78,7 @@ function ProductsPageContent() {
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>(subcategoryParam || '');
   const [priceMin, setPriceMin] = useState(PRICE_MIN);
   const [priceMax, setPriceMax] = useState(PRICE_MAX);
+  const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'newest'>('featured');
 
   const formatINR = (n: number) =>
     n >= 100000 ? `₹${(n / 100000).toFixed(n % 100000 === 0 ? 0 : 1)}L` : `₹${n.toLocaleString('en-IN')}`;
@@ -143,8 +144,13 @@ function ProductsPageContent() {
 
     filtered = filtered.filter(p => p.price >= priceMin && p.price <= priceMax);
 
+    // Sort
+    if (sortBy === 'price-asc') filtered.sort((a, b) => a.price - b.price);
+    else if (sortBy === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+    else if (sortBy === 'newest') filtered.sort((a, b) => b.id - a.id);
+
     return filtered;
-  }, [products, category, searchQuery, selectedBrand, selectedSubcategory, priceMin, priceMax]);
+  }, [products, category, searchQuery, selectedBrand, selectedSubcategory, priceMin, priceMax, sortBy]);
 
   const hasActiveFilters = !!selectedBrand || !!selectedSubcategory || priceMin > PRICE_MIN || priceMax < PRICE_MAX;
 
@@ -375,8 +381,38 @@ function ProductsPageContent() {
 
           {/* Products Content */}
           <div className={styles.content}>
+            {!loading && filteredProducts.length > 0 && (
+              <div className={styles.sortBar}>
+                <span className={styles.resultCount}>{filteredProducts.length} {filteredProducts.length === 1 ? 'PRODUCT' : 'PRODUCTS'}</span>
+                <label className={styles.sortWrap}>
+                  <span className={styles.sortLabel}>SORT</span>
+                  <select
+                    className={styles.sortSelect}
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                  >
+                    <option value="featured">Featured</option>
+                    <option value="newest">Newest First</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                  </select>
+                </label>
+              </div>
+            )}
+
             {loading ? (
-              <Loader label="LOADING PRODUCTS" />
+              <div className={styles.grid}>
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className={styles.skeletonCard}>
+                    <div className={styles.skeletonImg} />
+                    <div className={styles.skeletonBody}>
+                      <div className={styles.skeletonLine} style={{ width: '40%' }} />
+                      <div className={styles.skeletonLine} style={{ width: '85%' }} />
+                      <div className={styles.skeletonLine} style={{ width: '55%' }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : filteredProducts.length > 0 ? (
               <div className={styles.grid}>
                 {filteredProducts.map((product, idx) => (

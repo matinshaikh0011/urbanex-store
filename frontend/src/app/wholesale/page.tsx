@@ -39,7 +39,7 @@ export default function WholesalePage() {
       `Monthly Budget: ${form.budget || '-'}\n\n` +
       `Message:\n${form.message || '-'}`
     );
-    window.open(`https://wa.me/919265110277?text=${text}`, '_blank');
+    window.open(`https://wa.me/919898285850?text=${text}`, '_blank');
     setSent(true);
     setForm({ businessName: '', contactName: '', phone: '', email: '', city: '', businessType: '', budget: '', message: '' });
   };

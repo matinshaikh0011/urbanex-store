@@ -465,10 +465,11 @@ export default function Home() {
               <div className={styles.footerLinks}>
                 <Link href="/about">About Us</Link>
                 <Link href="/track-order">Track Order</Link>
+                <Link href="/faq">FAQ</Link>
                 <Link href="/return-exchange">Return & Exchange</Link>
                 <Link href="/wholesale">Wholesale Enquiry</Link>
-                <a href="https://wa.me/919265110277" target="_blank" rel="noopener">WhatsApp Support</a>
-                <p className={styles.footerPhone}>📱 +91 92651 10277</p>
+                <a href="https://wa.me/919898285850" target="_blank" rel="noopener">WhatsApp Support</a>
+                <p className={styles.footerPhone}>📱 +91 98982 85850</p>
               </div>
             </div>
 
@@ -500,7 +501,7 @@ export default function Home() {
               <span>@shopurbanex</span>
             </a>
             <a
-              href="https://wa.me/919265110277"
+              href="https://wa.me/919898285850"
               target="_blank"
               rel="noopener noreferrer"
               className={`${styles.socialBtn} ${styles.socialWhatsapp}`}
