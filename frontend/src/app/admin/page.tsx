@@ -18,6 +18,7 @@ interface Product {
   inStock: boolean; brand: { id: number; name: string; slug: string }; brandId: number;
   description?: string; sizes: Record<string, string[]>; colors: { name: string; hex: string }[];
   subcategory?: string | null;
+  source?: string | null; sourceId?: string | null; lastSync?: string | null;
 }
 interface Brand { id: number; name: string; slug: string; logoUrl?: string | null; _count?: { products: number }; }
 interface Coupon {
@@ -108,6 +109,9 @@ export default function AdminPage() {
               <span>{n.icon}</span> {n.label}
             </button>
           ))}
+          <a href="/admin/scraper" className={styles.navItem} style={{ textDecoration: 'none' }}>
+            <span>🕷</span> Product Scraper
+          </a>
         </nav>
         <button className={styles.logoutSide} onClick={logout}>⏻ LOGOUT</button>
       </aside>
@@ -514,7 +518,7 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
       {loading ? <div className={styles.loading}>Loading…</div> : (
         <div className={styles.tableWrap}>
           <table className={styles.table}>
-            <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Brand</th><th>Price</th><th>Orig.</th><th>Featured</th><th>Stock</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Brand</th><th>Price</th><th>Orig.</th><th>Source</th><th>Featured</th><th>Stock</th><th>Actions</th></tr></thead>
             <tbody>
               {products.map(p => (
                 <tr key={p.id}>
@@ -524,6 +528,7 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
                   <td>{p.brand?.name}</td>
                   <td>{fmt(p.price)}</td>
                   <td>{p.originalPrice ? fmt(p.originalPrice) : '—'}</td>
+                  <td>{p.source ? <span className={styles.badge} style={{ background: '#1a1a1a', border: '1px solid #333', color: '#aaa', fontSize: 10 }}>{p.source}</span> : '—'}</td>
                   <td><button className={`${styles.toggle} ${p.isFeatured ? styles.toggleOn : ''}`} onClick={() => toggleFeatured(p)}>{p.isFeatured ? '★' : '☆'}</button></td>
                   <td><button className={`${styles.toggle} ${p.inStock ? styles.toggleOn : styles.toggleOff}`} onClick={() => toggleStock(p)}>{p.inStock ? 'IN' : 'OUT'}</button></td>
                   <td>

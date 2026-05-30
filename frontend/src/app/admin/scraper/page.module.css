@@ -1,0 +1,103 @@
+/* ================================================================
+   URBANEX ADMIN — Product Scraper Page
+   Extends the admin design system (dark theme, Oswald, red accent)
+   ================================================================ */
+
+/* ── Stepper ── */
+.stepper { display: flex; gap: 0; margin-bottom: 28px; overflow-x: auto; border-bottom: 1px solid #222; }
+.stepItem { flex: 1; min-width: 90px; padding: 12px 8px; text-align: center; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #555; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; transition: color 0.15s, border-color 0.15s; }
+.stepItem:hover { color: #aaa; }
+.stepActive { color: #CC0000; border-bottom-color: #CC0000; }
+.stepDone { color: #22C55E; border-bottom-color: #22C55E; }
+
+/* ── Tabs ── */
+.tabRow { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 1px solid #222; }
+.tab { padding: 10px 20px; background: none; border: none; border-bottom: 2px solid transparent; color: #888; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.15s; }
+.tab:hover { color: #fff; }
+.tabActive { color: #CC0000; border-bottom-color: #CC0000; }
+
+/* ── Duplicate badges ── */
+.badgeNew { background: #22C55E; color: #fff; display: inline-block; padding: 2px 8px; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.badgeDuplicate { background: #CC0000; color: #fff; display: inline-block; padding: 2px 8px; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.badgeSlugDuplicate { background: #F97316; color: #fff; display: inline-block; padding: 2px 8px; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.badgePossible { background: #F5C400; color: #000; display: inline-block; padding: 2px 8px; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+
+/* ── Price preview ── */
+.pricePreview { font-family: 'Oswald', sans-serif; font-size: 16px; color: #CC0000; font-weight: 700; }
+.priceOriginal { font-size: 12px; color: #666; text-decoration: line-through; margin-left: 6px; }
+
+/* ── Sync status ── */
+.statusConnected { color: #22C55E; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.statusNotFound { color: #CC0000; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+
+/* ── Inline warning ── */
+.inlineWarning { color: #F5C400; font-size: 12px; margin-top: 4px; display: block; }
+.inlineError { color: #CC0000; font-size: 12px; margin-top: 4px; display: block; }
+
+/* ── Progress bar ── */
+.progressWrap { height: 6px; background: #222; margin: 12px 0; }
+.progressFill { height: 100%; background: #CC0000; transition: width 0.4s ease; }
+
+/* ── Scan stats ── */
+.scanStats { display: flex; gap: 20px; padding: 14px 0; font-size: 13px; color: #aaa; }
+.scanStat strong { color: #fff; font-family: 'Oswald', sans-serif; font-size: 18px; display: block; }
+
+/* ── Step header ── */
+.stepHeader { margin-bottom: 20px; }
+.stepTitle { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 2px; color: #fff; margin-bottom: 4px; }
+.stepDesc { font-size: 13px; color: #888; }
+
+/* ── Bulk bar ── */
+.bulkBar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #1a1a1a; border: 1px solid #333; margin-bottom: 12px; flex-wrap: wrap; }
+.bulkLabel { font-size: 12px; color: #888; letter-spacing: 1px; text-transform: uppercase; }
+
+/* ── Brand resolution card ── */
+.brandCard { background: #1a1a1a; border: 1px solid #2a2a2a; padding: 16px; margin-bottom: 12px; }
+.brandCardName { font-family: 'Oswald', sans-serif; font-size: 16px; color: #fff; margin-bottom: 4px; }
+.brandCardSub { font-size: 12px; color: #888; margin-bottom: 12px; }
+.brandOptions { display: flex; flex-direction: column; gap: 8px; }
+.brandOption { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ccc; cursor: pointer; }
+.brandOption input[type="radio"] { accent-color: #CC0000; }
+.resolvedBadge { display: inline-flex; align-items: center; gap: 6px; background: rgba(34,197,94,0.1); border: 1px solid #22C55E; color: #22C55E; padding: 4px 10px; font-size: 12px; font-weight: 600; }
+
+/* ── Import results ── */
+.resultGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.resultCard { background: #1a1a1a; border: 1px solid #2a2a2a; padding: 16px; text-align: center; }
+.resultNum { font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700; display: block; }
+.resultLabel { font-size: 11px; letter-spacing: 1px; color: #888; text-transform: uppercase; margin-top: 4px; display: block; }
+
+/* ── Pricing mode selector ── */
+.modeGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+.modeCard { background: #1a1a1a; border: 1px solid #333; padding: 14px; cursor: pointer; transition: border-color 0.15s; }
+.modeCard:hover { border-color: #555; }
+.modeCardActive { border-color: #CC0000; background: rgba(204,0,0,0.05); }
+.modeCardTitle { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+.modeCardDesc { font-size: 11px; color: #888; }
+
+/* ── Inputs ── */
+.inputRow { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.inputLabel { font-size: 12px; color: #888; letter-spacing: 1px; text-transform: uppercase; min-width: 80px; }
+.numInput { background: #111; border: 1px solid #333; color: #fff; padding: 8px 12px; font-size: 14px; width: 120px; outline: none; }
+.numInput:focus { border-color: #CC0000; }
+.selectInput { background: #111; border: 1px solid #333; color: #fff; padding: 8px 12px; font-size: 13px; outline: none; cursor: pointer; }
+.selectInput:focus { border-color: #CC0000; }
+.textInput { background: #111; border: 1px solid #333; color: #fff; padding: 8px 12px; font-size: 13px; outline: none; width: 100%; }
+.textInput:focus { border-color: #CC0000; }
+
+/* ── Log viewer ── */
+.logEntry { padding: 6px 10px; font-size: 12px; font-family: 'Courier New', monospace; border-bottom: 1px solid #1a1a1a; }
+.logCreated { color: #22C55E; }
+.logUpdated { color: #3B82F6; }
+.logSkipped { color: #888; }
+.logFailed { color: #CC0000; }
+
+/* ── Empty state ── */
+.emptyState { text-align: center; padding: 60px 20px; color: #555; }
+.emptyState p { font-size: 14px; margin-top: 8px; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .resultGrid { grid-template-columns: repeat(2, 1fr); }
+  .modeGrid { grid-template-columns: 1fr; }
+  .stepItem { min-width: 70px; font-size: 10px; padding: 10px 4px; }
+}

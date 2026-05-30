@@ -8,32 +8,41 @@ datasource db {
 }
 
 model Brand {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique
-  slug      String    @unique
-  logoUrl   String?   @map("logo_url")
-  products  Product[]
-  createdAt DateTime  @default(now()) @map("created_at")
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  slug          String         @unique
+  logoUrl       String?        @map("logo_url")
+  products      Product[]
+  brandMappings BrandMapping[]
+  createdAt     DateTime       @default(now()) @map("created_at")
 }
 
 model Product {
-  id          Int        @id @default(autoincrement())
-  name        String
-  slug        String     @unique
-  brand       Brand      @relation(fields: [brandId], references: [id])
-  brandId     Int        @map("brand_id")
-  description String?
-  price       Decimal    @db.Decimal(10, 2)
-  originalPrice Decimal?  @map("original_price") @db.Decimal(10, 2)
-  images      String[]
-  sizes       Json
-  colors      Json
-  category    String?
-  subcategory String?
-  inStock     Boolean    @default(true) @map("in_stock")
-  isFeatured  Boolean    @default(false) @map("is_featured")
-  orders      Order[]
-  createdAt   DateTime   @default(now()) @map("created_at")
+  id            Int        @id @default(autoincrement())
+  name          String
+  slug          String     @unique
+  brand         Brand      @relation(fields: [brandId], references: [id])
+  brandId       Int        @map("brand_id")
+  description   String?
+  price         Decimal    @db.Decimal(10, 2)
+  originalPrice Decimal?   @map("original_price") @db.Decimal(10, 2)
+  images        String[]
+  sizes         Json
+  colors        Json
+  category      String?
+  subcategory   String?
+  inStock       Boolean    @default(true) @map("in_stock")
+  isFeatured    Boolean    @default(false) @map("is_featured")
+  orders        Order[]
+  createdAt     DateTime   @default(now()) @map("created_at")
+
+  // ── Source tracking (scraper) ──
+  source        String?
+  sourceId      String?
+  sourceUrl     String?    @map("source_url")
+  lastSync      DateTime?  @map("last_sync")
+
+  @@unique([source, sourceId])
 }
 
 model User {
@@ -47,29 +56,29 @@ model User {
 }
 
 model Order {
-  id                 Int       @id @default(autoincrement())
-  orderId            String    @unique @map("order_id")
-  user               User?     @relation(fields: [userId], references: [id])
-  userId             Int?      @map("user_id")
-  product            Product?  @relation(fields: [productId], references: [id])
-  productId          Int?      @map("product_id")
-  size               String?
-  color              String?
-  quantity           Int       @default(1)
-  totalAmount        Decimal   @map("total_amount") @db.Decimal(10, 2)
-  status             String    @default("Pending Advance")
-  advancePaid        Boolean   @default(false) @map("advance_paid")
-  paymentMethod      String?   @map("payment_method")
-  utrNumber          String?   @map("utr_number")
-  amountPaid         Decimal?  @map("amount_paid") @db.Decimal(10, 2)
-  whatsappLeadSent   Boolean   @default(false) @map("whatsapp_lead_sent")
-  shippingName       String    @map("shipping_name")
-  shippingAddress    String    @map("shipping_address")
-  shippingEmail      String    @map("shipping_email")
-  shippingPhone      String    @map("shipping_phone")
-  notes              String?
-  createdAt          DateTime  @default(now()) @map("created_at")
-  updatedAt          DateTime  @updatedAt @map("updated_at")
+  id               Int       @id @default(autoincrement())
+  orderId          String    @unique @map("order_id")
+  user             User?     @relation(fields: [userId], references: [id])
+  userId           Int?      @map("user_id")
+  product          Product?  @relation(fields: [productId], references: [id])
+  productId        Int?      @map("product_id")
+  size             String?
+  color            String?
+  quantity         Int       @default(1)
+  totalAmount      Decimal   @map("total_amount") @db.Decimal(10, 2)
+  status           String    @default("Pending Advance")
+  advancePaid      Boolean   @default(false) @map("advance_paid")
+  paymentMethod    String?   @map("payment_method")
+  utrNumber        String?   @map("utr_number")
+  amountPaid       Decimal?  @map("amount_paid") @db.Decimal(10, 2)
+  whatsappLeadSent Boolean   @default(false) @map("whatsapp_lead_sent")
+  shippingName     String    @map("shipping_name")
+  shippingAddress  String    @map("shipping_address")
+  shippingEmail    String    @map("shipping_email")
+  shippingPhone    String    @map("shipping_phone")
+  notes            String?
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
 }
 
 model Coupon {
@@ -84,4 +93,29 @@ model Coupon {
   isActive        Boolean   @default(true) @map("is_active")
   expiresAt       DateTime? @map("expires_at")
   createdAt       DateTime  @default(now()) @map("created_at")
+}
+
+model BrandMapping {
+  id                Int      @id @default(autoincrement())
+  provider          String
+  supplierBrandName String   @map("supplier_brand_name")
+  brandId           Int      @map("brand_id")
+  brand             Brand    @relation(fields: [brandId], references: [id])
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  @@unique([provider, supplierBrandName])
+}
+
+model ImportHistory {
+  id           Int      @id @default(autoincrement())
+  source       String
+  sourceUrl    String   @map("source_url")
+  importedAt   DateTime @default(now()) @map("imported_at")
+  totalScraped Int      @map("total_scraped")
+  successCount Int      @map("success_count")
+  failureCount Int      @map("failure_count")
+  skippedCount Int      @map("skipped_count")
+  updatedCount Int      @map("updated_count")
+  log          Json?
+  createdAt    DateTime @default(now()) @map("created_at")
 }

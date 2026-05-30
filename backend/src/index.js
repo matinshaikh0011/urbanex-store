@@ -4,8 +4,12 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import axios from 'axios';
+import FormData from 'form-data';
 import { PrismaClient } from '@prisma/client';
 import { subcategories } from './catalog.js';
+import { validateProductData, buildProductData, slugify } from './productUtils.js';
+import { getProvider, detectProvider } from './scrapers/index.js';
 
 dotenv.config();
 
@@ -372,19 +376,13 @@ app.get('/api/products/:slug', async (req, res) => {
 
 app.post('/api/products', adminAuth, async (req, res) => {
   try {
+    const validation = validateProductData(req.body);
+    if (!validation.valid) return res.status(400).json({ error: validation.error });
     const product = await prisma.product.create({
-      data: {
-        name: req.body.name, slug: req.body.slug, category: req.body.category,
-        description: req.body.description, price: req.body.price,
-        originalPrice: req.body.originalPrice || null, brandId: req.body.brandId,
-        sizes: req.body.sizes, colors: req.body.colors,
-        inStock: req.body.inStock ?? true, isFeatured: req.body.isFeatured ?? false,
-        images: req.body.images || [],
-        subcategory: req.body.subcategory || null,
-      },
+      data: buildProductData(req.body),
       include: { brand: true },
     });
-    res.status(201).json(product);
+    res.status(201).json({ ...product, price: Number(product.price), originalPrice: product.originalPrice != null ? Number(product.originalPrice) : null });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to create product' });
@@ -393,20 +391,14 @@ app.post('/api/products', adminAuth, async (req, res) => {
 
 app.put('/api/products/:id', adminAuth, async (req, res) => {
   try {
+    const validation = validateProductData(req.body);
+    if (!validation.valid) return res.status(400).json({ error: validation.error });
     const product = await prisma.product.update({
       where: { id: parseInt(req.params.id) },
-      data: {
-        name: req.body.name, slug: req.body.slug, category: req.body.category,
-        description: req.body.description, price: req.body.price,
-        originalPrice: req.body.originalPrice || null, brandId: req.body.brandId,
-        sizes: req.body.sizes, colors: req.body.colors,
-        inStock: req.body.inStock, isFeatured: req.body.isFeatured,
-        images: req.body.images || [],
-        subcategory: req.body.subcategory || null,
-      },
+      data: buildProductData(req.body),
       include: { brand: true },
     });
-    res.json(product);
+    res.json({ ...product, price: Number(product.price), originalPrice: product.originalPrice != null ? Number(product.originalPrice) : null });
   } catch (error) {
     res.status(500).json({ error: 'Failed to update product' });
   }
@@ -501,6 +493,371 @@ app.delete('/api/orders/:orderId', async (req, res) => {
     res.json({ success: true, orderId: req.params.orderId });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete order' });
+  }
+});
+
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+
+// ════════════════════════════════════════════════════════════════
+// SCRAPER ENDPOINTS
+// ════════════════════════════════════════════════════════════════
+
+// ── Cloudinary server-side upload helper ──
+async function uploadToCloudinary(imageUrl) {
+  const cloud = process.env.CLOUDINARY_CLOUD_NAME;
+  const preset = process.env.CLOUDINARY_UPLOAD_PRESET;
+  if (!cloud || !preset) throw new Error('Cloudinary env vars not configured on backend');
+
+  const imgRes = await axios.get(imageUrl, { responseType: 'arraybuffer', timeout: 15000 });
+  const buffer = Buffer.from(imgRes.data);
+
+  const fd = new FormData();
+  fd.append('file', buffer, { filename: 'product.jpg', contentType: imgRes.headers['content-type'] || 'image/jpeg' });
+  fd.append('upload_preset', preset);
+
+  const uploadRes = await axios.post(
+    `https://api.cloudinary.com/v1_1/${cloud}/image/upload`,
+    fd,
+    { headers: fd.getHeaders(), timeout: 30000 }
+  );
+  return uploadRes.data.secure_url;
+}
+
+// POST /api/admin/scraper/scan
+app.post('/api/admin/scraper/scan', adminAuth, async (req, res) => {
+  try {
+    const { url, scope, provider: providerKey, delayMs } = req.body;
+
+    if (!url || typeof url !== 'string' || !url.trim()) {
+      return res.status(400).json({ error: 'url is required' });
+    }
+    const validScopes = ['full', 'category', 'product'];
+    if (!scope || !validScopes.includes(scope)) {
+      return res.status(400).json({ error: `scope must be one of: ${validScopes.join(', ')}` });
+    }
+
+    let resolvedKey = providerKey;
+    if (!resolvedKey) {
+      resolvedKey = detectProvider(url);
+      if (!resolvedKey) return res.status(400).json({ error: 'Could not auto-detect provider from URL. Please specify provider.' });
+    }
+
+    let provider;
+    try {
+      provider = getProvider(resolvedKey);
+    } catch (e) {
+      return res.status(400).json({ error: e.message });
+    }
+
+    // Scrape
+    let scrapeResult;
+    try {
+      scrapeResult = await provider.scrape(url, scope, { delayMs });
+    } catch (e) {
+      if (/unreachable/i.test(e.message)) return res.status(502).json({ error: e.message });
+      throw e;
+    }
+
+    const { products: scraped, failedUrls } = scrapeResult;
+
+    // Duplicate detection
+    const enriched = await Promise.all(scraped.map(async (p) => {
+      let duplicateStatus = 'new';
+      let duplicateMatch = null;
+
+      // 1. source + sourceId
+      if (p.sourceId) {
+        const existing = await prisma.product.findFirst({
+          where: { source: resolvedKey, sourceId: p.sourceId },
+          select: { name: true, slug: true },
+        });
+        if (existing) {
+          duplicateStatus = 'already-imported';
+          duplicateMatch = { name: existing.name, slug: existing.slug };
+        }
+      }
+
+      // 2. slug
+      if (duplicateStatus === 'new' && p.name) {
+        const slug = slugify(p.name) + (p.sourceId ? `-${p.sourceId}` : '');
+        const existing = await prisma.product.findFirst({
+          where: { slug },
+          select: { name: true, slug: true },
+        });
+        if (existing) {
+          duplicateStatus = 'slug-duplicate';
+          duplicateMatch = { name: existing.name, slug: existing.slug };
+        }
+      }
+
+      // 3. name fuzzy (case-insensitive exact for now)
+      if (duplicateStatus === 'new' && p.name) {
+        const existing = await prisma.product.findFirst({
+          where: { name: { equals: p.name, mode: 'insensitive' } },
+          select: { name: true, slug: true },
+        });
+        if (existing) {
+          duplicateStatus = 'possible-duplicate';
+          duplicateMatch = { name: existing.name, slug: existing.slug };
+        }
+      }
+
+      return { ...p, duplicateStatus, duplicateMatch };
+    }));
+
+    res.json({
+      provider: resolvedKey,
+      products: enriched,
+      stats: { total: enriched.length, failed: failedUrls.length, failedUrls },
+    });
+  } catch (error) {
+    console.error('[scraper/scan]', error);
+    res.status(500).json({ error: 'Scan failed: ' + error.message });
+  }
+});
+
+// POST /api/admin/scraper/import
+app.post('/api/admin/scraper/import', adminAuth, async (req, res) => {
+  const { products: incoming, source, sourceUrl, imageMode = 'cloudinary' } = req.body;
+
+  if (!Array.isArray(incoming) || incoming.length === 0) {
+    return res.status(400).json({ error: 'products array must not be empty' });
+  }
+  if (!source || !sourceUrl) {
+    return res.status(400).json({ error: 'source and sourceUrl are required' });
+  }
+
+  const log = [];
+  let successCount = 0, updatedCount = 0, failureCount = 0, skippedCount = 0;
+
+  // Phase 1 — Pre-validation
+  const validProducts = [];
+  for (const p of incoming) {
+    if (p.brandId === 'no-brand' || p.brandId == null) {
+      skippedCount++;
+      log.push({ sourceId: p.sourceId, operation: 'skipped', errorMessage: 'no-brand-assigned' });
+      continue;
+    }
+    const productData = {
+      ...p,
+      source,
+      sourceId: p.sourceId,
+      sourceUrl: p.productUrl || null,
+      slug: p.slug || (slugify(p.name) + (p.sourceId ? `-${p.sourceId}` : '')),
+    };
+    const validation = validateProductData(productData);
+    if (!validation.valid) {
+      failureCount++;
+      log.push({ sourceId: p.sourceId, operation: 'failed', errorMessage: validation.error });
+      continue;
+    }
+    validProducts.push(productData);
+  }
+
+  // Phase 2 — Image handling (outside transaction)
+  const imageFailures = [];
+  for (const p of validProducts) {
+    if (!Array.isArray(p.images) || p.images.length === 0) continue;
+    if (imageMode === 'cloudinary') {
+      const resolvedImages = [];
+      for (const imgUrl of p.images) {
+        try {
+          const cloudUrl = await uploadToCloudinary(imgUrl);
+          resolvedImages.push(cloudUrl);
+        } catch (err) {
+          imageFailures.push({ sourceId: p.sourceId, url: imgUrl, error: err.message });
+          resolvedImages.push(imgUrl); // fallback to supplier URL
+        }
+      }
+      p.images = resolvedImages;
+    }
+    // supplier-url mode: keep as-is
+  }
+
+  // Phase 3 — Transaction
+  try {
+    await prisma.$transaction(async (tx) => {
+      for (const p of validProducts) {
+        const data = buildProductData({ ...p, lastSync: new Date() });
+        const existing = p.sourceId
+          ? await tx.product.findFirst({ where: { source, sourceId: p.sourceId } })
+          : null;
+
+        if (existing) {
+          await tx.product.update({ where: { id: existing.id }, data });
+          updatedCount++;
+          log.push({ sourceId: p.sourceId, operation: 'updated' });
+        } else {
+          await tx.product.create({ data });
+          successCount++;
+          log.push({ sourceId: p.sourceId, operation: 'created' });
+        }
+      }
+    });
+  } catch (txError) {
+    console.error('[scraper/import] transaction failed:', txError);
+    // Mark all valid products as failed
+    for (const p of validProducts) {
+      if (!log.find(l => l.sourceId === p.sourceId)) {
+        failureCount++;
+        log.push({ sourceId: p.sourceId, operation: 'failed', errorMessage: txError.message });
+      }
+    }
+    successCount = 0;
+    updatedCount = 0;
+  }
+
+  // Phase 4 — Import history (outside transaction)
+  let historyId = null;
+  try {
+    const history = await prisma.importHistory.create({
+      data: {
+        source,
+        sourceUrl,
+        totalScraped: incoming.length,
+        successCount,
+        failureCount,
+        skippedCount,
+        updatedCount,
+        log,
+      },
+    });
+    historyId = history.id;
+  } catch (histErr) {
+    console.error('[scraper/import] failed to create ImportHistory:', histErr);
+  }
+
+  res.json({ successCount, updatedCount, failureCount, skippedCount, historyId, log, imageFailures });
+});
+
+// POST /api/admin/scraper/sync/:id
+app.post('/api/admin/scraper/sync/:id', adminAuth, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: 'Invalid product id' });
+
+    const product = await prisma.product.findUnique({ where: { id } });
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+    if (!product.source) return res.status(400).json({ error: 'Product has no source — cannot sync' });
+
+    const provider = getProvider(product.source);
+    const syncResult = await provider.syncProduct(product.sourceId, product.sourceUrl);
+
+    const updateData = {
+      inStock: syncResult.notFound ? false : syncResult.inStock,
+      lastSync: new Date(),
+    };
+
+    if (!syncResult.notFound) {
+      updateData.price = syncResult.price;
+      updateData.originalPrice = syncResult.originalPrice;
+    }
+
+    const { syncName, syncDescription, syncImages } = req.body;
+    if (syncName && syncResult.name) updateData.name = syncResult.name;
+    if (syncDescription && syncResult.description) updateData.description = syncResult.description;
+    if (syncImages && syncResult.images) updateData.images = syncResult.images;
+
+    const updated = await prisma.product.update({
+      where: { id },
+      data: updateData,
+      include: { brand: true },
+    });
+
+    res.json({
+      ...updated,
+      price: Number(updated.price),
+      originalPrice: updated.originalPrice != null ? Number(updated.originalPrice) : null,
+      notFound: syncResult.notFound || false,
+    });
+  } catch (error) {
+    console.error('[scraper/sync]', error);
+    res.status(500).json({ error: 'Sync failed: ' + error.message });
+  }
+});
+
+// GET /api/admin/scraper/history
+app.get('/api/admin/scraper/history', adminAuth, async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const skip = (page - 1) * limit;
+
+    const [records, total] = await Promise.all([
+      prisma.importHistory.findMany({
+        orderBy: { importedAt: 'desc' },
+        skip,
+        take: limit,
+        select: {
+          id: true, source: true, sourceUrl: true, importedAt: true,
+          totalScraped: true, successCount: true, updatedCount: true,
+          failureCount: true, skippedCount: true, createdAt: true,
+          // log excluded from list for performance
+        },
+      }),
+      prisma.importHistory.count(),
+    ]);
+
+    res.json({ records, total, page, limit });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch import history' });
+  }
+});
+
+// GET /api/admin/scraper/history/:id
+app.get('/api/admin/scraper/history/:id', adminAuth, async (req, res) => {
+  try {
+    const record = await prisma.importHistory.findUnique({ where: { id: parseInt(req.params.id) } });
+    if (!record) return res.status(404).json({ error: 'History record not found' });
+    res.json(record);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch history record' });
+  }
+});
+
+// DELETE /api/admin/scraper/history/:id
+app.delete('/api/admin/scraper/history/:id', adminAuth, async (req, res) => {
+  try {
+    const record = await prisma.importHistory.findUnique({ where: { id: parseInt(req.params.id) } });
+    if (!record) return res.status(404).json({ error: 'History record not found' });
+    await prisma.importHistory.delete({ where: { id: parseInt(req.params.id) } });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete history record' });
+  }
+});
+
+// GET /api/admin/scraper/brand-mappings
+app.get('/api/admin/scraper/brand-mappings', adminAuth, async (req, res) => {
+  try {
+    const where = req.query.provider ? { provider: req.query.provider } : {};
+    const mappings = await prisma.brandMapping.findMany({
+      where,
+      include: { brand: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(mappings);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch brand mappings' });
+  }
+});
+
+// POST /api/admin/scraper/brand-mappings
+app.post('/api/admin/scraper/brand-mappings', adminAuth, async (req, res) => {
+  try {
+    const { provider, supplierBrandName, brandId } = req.body;
+    if (!provider || !supplierBrandName || !brandId) {
+      return res.status(400).json({ error: 'provider, supplierBrandName, and brandId are required' });
+    }
+    const mapping = await prisma.brandMapping.upsert({
+      where: { provider_supplierBrandName: { provider, supplierBrandName } },
+      update: { brandId: parseInt(brandId) },
+      create: { provider, supplierBrandName, brandId: parseInt(brandId) },
+      include: { brand: true },
+    });
+    res.status(201).json(mapping);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to save brand mapping' });
   }
 });
 
