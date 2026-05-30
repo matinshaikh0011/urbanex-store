@@ -549,57 +549,70 @@ app.post('/api/admin/scraper/scan', adminAuth, async (req, res) => {
       return res.status(400).json({ error: e.message });
     }
 
-    // Scrape
+    // Scrape — only a fully-unreachable initial URL is a hard failure (502).
+    // Individual product/page failures are captured in stats and never abort the scan.
     let scrapeResult;
     try {
       scrapeResult = await provider.scrape(url, scope, { delayMs });
     } catch (e) {
       if (/unreachable/i.test(e.message)) return res.status(502).json({ error: e.message });
-      throw e;
+      // Any other unexpected error — still return a structured response, not a 500 crash
+      console.error('[scraper/scan] unexpected scrape error:', e);
+      return res.status(200).json({
+        provider: resolvedKey,
+        products: [],
+        stats: { total: 0, totalFound: 0, successful: 0, failed: 0, pagesFetched: 0, error: e.message },
+      });
     }
 
-    const { products: scraped, failedUrls, pagesFetched } = scrapeResult;
+    const { products: scraped, failedUrls, pagesFetched, pageErrors, stats: scrapeStats } = scrapeResult;
 
-    // Duplicate detection
+    // Duplicate detection — per-product try/catch so a DB hiccup on one
+    // product never aborts the whole enrichment.
     const enriched = await Promise.all(scraped.map(async (p) => {
       let duplicateStatus = 'new';
       let duplicateMatch = null;
 
-      // 1. source + sourceId
-      if (p.sourceId) {
-        const existing = await prisma.product.findFirst({
-          where: { source: resolvedKey, sourceId: p.sourceId },
-          select: { name: true, slug: true },
-        });
-        if (existing) {
-          duplicateStatus = 'already-imported';
-          duplicateMatch = { name: existing.name, slug: existing.slug };
+      try {
+        // 1. source + sourceId
+        if (p.sourceId) {
+          const existing = await prisma.product.findFirst({
+            where: { source: resolvedKey, sourceId: p.sourceId },
+            select: { name: true, slug: true },
+          });
+          if (existing) {
+            duplicateStatus = 'already-imported';
+            duplicateMatch = { name: existing.name, slug: existing.slug };
+          }
         }
-      }
 
-      // 2. slug
-      if (duplicateStatus === 'new' && p.name) {
-        const slug = slugify(p.name) + (p.sourceId ? `-${p.sourceId}` : '');
-        const existing = await prisma.product.findFirst({
-          where: { slug },
-          select: { name: true, slug: true },
-        });
-        if (existing) {
-          duplicateStatus = 'slug-duplicate';
-          duplicateMatch = { name: existing.name, slug: existing.slug };
+        // 2. slug
+        if (duplicateStatus === 'new' && p.name) {
+          const slug = slugify(p.name) + (p.sourceId ? `-${p.sourceId}` : '');
+          const existing = await prisma.product.findFirst({
+            where: { slug },
+            select: { name: true, slug: true },
+          });
+          if (existing) {
+            duplicateStatus = 'slug-duplicate';
+            duplicateMatch = { name: existing.name, slug: existing.slug };
+          }
         }
-      }
 
-      // 3. name fuzzy (case-insensitive exact for now)
-      if (duplicateStatus === 'new' && p.name) {
-        const existing = await prisma.product.findFirst({
-          where: { name: { equals: p.name, mode: 'insensitive' } },
-          select: { name: true, slug: true },
-        });
-        if (existing) {
-          duplicateStatus = 'possible-duplicate';
-          duplicateMatch = { name: existing.name, slug: existing.slug };
+        // 3. name fuzzy (case-insensitive exact for now)
+        if (duplicateStatus === 'new' && p.name) {
+          const existing = await prisma.product.findFirst({
+            where: { name: { equals: p.name, mode: 'insensitive' } },
+            select: { name: true, slug: true },
+          });
+          if (existing) {
+            duplicateStatus = 'possible-duplicate';
+            duplicateMatch = { name: existing.name, slug: existing.slug };
+          }
         }
+      } catch (dupErr) {
+        console.error(`[scraper/scan] duplicate check failed for ${p.sourceId}: ${dupErr.message}`);
+        // Default to 'new' on error — admin can still review
       }
 
       return { ...p, duplicateStatus, duplicateMatch };
@@ -608,11 +621,20 @@ app.post('/api/admin/scraper/scan', adminAuth, async (req, res) => {
     res.json({
       provider: resolvedKey,
       products: enriched,
-      stats: { total: enriched.length, failed: failedUrls.length, failedUrls, pagesFetched: pagesFetched || 0 },
+      stats: {
+        total: enriched.length,
+        totalFound: scrapeStats?.totalFound ?? enriched.length,
+        successful: scraped.length,
+        failed: (failedUrls?.length || 0),
+        pageErrors: (pageErrors?.length || 0),
+        pagesFetched: pagesFetched || 0,
+        failedUrls: failedUrls || [],
+      },
     });
   } catch (error) {
     console.error('[scraper/scan]', error);
-    res.status(500).json({ error: 'Scan failed: ' + error.message });
+    // Never return 500/502 for a partial-failure situation — return what we have.
+    res.status(200).json({ provider: req.body?.provider || null, products: [], stats: { total: 0, totalFound: 0, successful: 0, failed: 0, error: error.message } });
   }
 });
 

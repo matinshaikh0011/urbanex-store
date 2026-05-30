@@ -36,6 +36,68 @@ function clampDelay(ms) {
   return Math.max(100, Math.min(10000, n));
 }
 
+/**
+ * GET a URL with automatic retries on transient failures (5xx, timeouts, network).
+ * Does NOT retry on 404 (permanent). Returns the response data or throws after maxRetries.
+ * @param {string} url
+ * @param {object} opts - { retries, baseDelay, timeout }
+ */
+async function fetchWithRetry(url, opts = {}) {
+  const { retries = 3, baseDelay = 600, timeout = 15000 } = opts;
+  let lastErr;
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await axios.get(url, { headers: { 'User-Agent': UA }, timeout });
+    } catch (err) {
+      lastErr = err;
+      const status = err.response?.status;
+      // Don't retry on 404 — the resource is permanently gone
+      if (status === 404) throw err;
+      // Retry on 5xx, timeouts, and network errors
+      if (attempt < retries) {
+        const backoff = baseDelay * attempt + Math.random() * 300;
+        console.warn(`[CartPe] fetch attempt ${attempt}/${retries} failed for ${url} (${status || err.code || err.message}). Retrying in ${Math.round(backoff)}ms…`);
+        await sleep(backoff);
+      }
+    }
+  }
+  throw lastErr;
+}
+
+/**
+ * POST to a URL with automatic retries on transient failures.
+ * @param {string} url
+ * @param {string} body - url-encoded body
+ * @param {object} opts
+ */
+async function postWithRetry(url, body, opts = {}) {
+  const { retries = 3, baseDelay = 600, timeout = 15000, referer = BASE } = opts;
+  let lastErr;
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await axios.post(url, body, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': UA,
+          'Referer': referer,
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        timeout,
+      });
+    } catch (err) {
+      lastErr = err;
+      const status = err.response?.status;
+      if (status === 404) throw err;
+      if (attempt < retries) {
+        const backoff = baseDelay * attempt + Math.random() * 300;
+        console.warn(`[CartPe] POST attempt ${attempt}/${retries} failed (${status || err.code || err.message}). Retrying in ${Math.round(backoff)}ms…`);
+        await sleep(backoff);
+      }
+    }
+  }
+  throw lastErr;
+}
+
 // ── Brand detection ───────────────────────────────────────────────
 
 const BRAND_PATTERNS = [
@@ -216,6 +278,8 @@ async function collectProductUrls(options = {}) {
   const pageSize = 24;
   let pagesFetched = 0;
   let consecutiveEmpty = 0;
+  let consecutiveErrors = 0;
+  const pageErrors = [];
 
   console.log(`[CartPe] Starting pagination — searchKey="${searchKey}" pageUrl="${pageUrl || 'none'}"`);
 
@@ -233,17 +297,15 @@ async function collectProductUrls(options = {}) {
         variant_status: '0',
       });
 
-      const { data: html } = await axios.post(LOADMORE_URL, params.toString(), {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': UA,
-          'Referer': pageUrl || BASE,
-          'X-Requested-With': 'XMLHttpRequest',
-        },
+      // postWithRetry retries up to 3x on 5xx / network errors before throwing
+      const { data: html } = await postWithRetry(LOADMORE_URL, params.toString(), {
+        retries: 3,
         timeout: 15000,
+        referer: pageUrl || BASE,
       });
 
       pagesFetched++;
+      consecutiveErrors = 0; // reset on success
 
       // Extract product links from the HTML fragment
       const $ = cheerio.load(html);
@@ -266,7 +328,7 @@ async function collectProductUrls(options = {}) {
 
       if (newLinks.length === 0) {
         consecutiveEmpty++;
-        // Stop after 2 consecutive empty pages to handle edge cases
+        // Stop after 2 consecutive empty pages — pagination exhausted
         if (consecutiveEmpty >= 2) {
           console.log(`[CartPe] Pagination complete — ${pagesFetched} AJAX pages fetched, ${urls.length} unique products found`);
           break;
@@ -279,12 +341,25 @@ async function collectProductUrls(options = {}) {
       rowNo += pageSize;
       await sleep(delay);
     } catch (err) {
-      console.error(`[CartPe] collectProductUrls error at row_no=${rowNo}:`, err.message);
-      break;
+      // A page failed even after retries — record it, skip forward, and continue.
+      // Do NOT abort the whole pagination on a single failed page.
+      consecutiveErrors++;
+      pageErrors.push({ rowNo, error: err.response?.status ? `HTTP ${err.response.status}` : err.message });
+      console.error(`[CartPe] Page at row_no=${rowNo} failed after retries: ${err.message}. Skipping forward.`);
+
+      // Safety valve: if many pages fail back-to-back the endpoint is likely down — stop.
+      if (consecutiveErrors >= 5) {
+        console.error(`[CartPe] ${consecutiveErrors} consecutive page failures — stopping pagination. Returning ${urls.length} products collected so far.`);
+        break;
+      }
+
+      // Skip this page's offset and keep going
+      rowNo += pageSize;
+      await sleep(delay);
     }
   }
 
-  return { urls, pagesFetched };
+  return { urls, pagesFetched, pageErrors };
 }
 
 // ── Main scrape function ──────────────────────────────────────────
@@ -294,15 +369,27 @@ async function scrape(url, scope, options = {}) {
   const products = [];
   const failedUrls = [];
 
-  // Verify the initial URL is reachable
-  try {
-    await axios.head(url, { headers: { 'User-Agent': UA }, timeout: 10000 });
-  } catch (err) {
-    throw new Error(`Supplier URL unreachable: ${url} — ${err.message}`);
+  // Reachability pre-check ONLY for category/full scopes, and only a genuine
+  // network-level failure (DNS, connection refused, timeout) is fatal.
+  // An HTTP error code (404/500) on the landing page is NOT fatal because
+  // category/full scopes use the AJAX endpoint, and product scope handles
+  // per-URL failures in the batch loop below.
+  if (scope !== 'product') {
+    try {
+      await axios.head(url, { headers: { 'User-Agent': UA }, timeout: 10000 });
+    } catch (err) {
+      const isNetworkError = !err.response && ['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT', 'ECONNABORTED', 'EAI_AGAIN'].includes(err.code);
+      if (isNetworkError) {
+        throw new Error(`Supplier URL unreachable: ${url} — ${err.message}`);
+      }
+      // HTTP error code on HEAD — log and continue; AJAX endpoint may still work
+      console.warn(`[CartPe] HEAD check returned ${err.response?.status || err.code} for ${url} — continuing via AJAX endpoint`);
+    }
   }
 
   let productUrls = [];
   let pagesFetched = 0;
+  let pageErrors = [];
 
   if (scope === 'product') {
     productUrls = [url];
@@ -323,12 +410,13 @@ async function scrape(url, scope, options = {}) {
     });
     productUrls = result.urls;
     pagesFetched = result.pagesFetched;
+    pageErrors = result.pageErrors || [];
 
     // If AJAX returned nothing, fall back to parsing the page directly
     if (productUrls.length === 0) {
       console.log('[CartPe] AJAX returned 0 products, falling back to direct page parse…');
       try {
-        const { data: html } = await axios.get(url, { headers: { 'User-Agent': UA }, timeout: 15000 });
+        const { data: html } = await fetchWithRetry(url, { retries: 2, timeout: 15000 });
         const $ = cheerio.load(html);
         const seen = new Set();
         $('a[href]').each((_, el) => {
@@ -345,53 +433,83 @@ async function scrape(url, scope, options = {}) {
         });
         console.log(`[CartPe] Fallback found ${productUrls.length} products from direct page parse`);
       } catch (err) {
-        throw new Error(`Failed to parse supplier page: ${url} — ${err.message}`);
+        // Even the fallback failed — return empty results rather than throwing.
+        console.error(`[CartPe] Fallback page parse also failed: ${err.message}`);
+        return {
+          products: [],
+          failedUrls: [{ url, error: err.message }],
+          pagesFetched,
+          pageErrors,
+          stats: { totalFound: 0, successful: 0, failed: 0, pagesFetched, pageErrors: pageErrors.length },
+        };
       }
     }
   }
 
-  console.log(`[CartPe] Fetching ${productUrls.length} product detail pages (${pagesFetched} AJAX pages fetched)…`);
+  const totalFound = productUrls.length;
+  console.log(`[CartPe] Fetching ${totalFound} product detail pages (${pagesFetched} AJAX pages, ${pageErrors.length} page errors)…`);
 
-  // Fetch and parse each product detail page
-  for (const productUrl of productUrls) {
-    try {
-      await sleep(delay);
-      const { data: html } = await axios.get(productUrl, {
-        headers: { 'User-Agent': UA },
-        timeout: 15000,
-      });
-      const parsed = parseDetail(html, productUrl);
+  // ── Fetch detail pages in batches with Promise.allSettled ──
+  // A single failed product NEVER aborts the scan. Each fetch is wrapped in
+  // fetchWithRetry (3 attempts) and the batch uses allSettled so rejections
+  // are isolated. Batching keeps concurrency bounded to avoid hammering CartPe.
+  const BATCH_SIZE = 5;
 
-      if (!parsed.name || !parsed.productUrl) {
-        failedUrls.push({ url: productUrl, error: 'Missing name or URL after parse' });
-        continue;
-      }
-
-      const brandName = extractBrand(parsed);
-      const { category, subcategory } = mapCategory(parsed.cartpeCategory);
-
-      products.push({
-        name: parsed.name,
-        sourcePrice: parsed.sourcePrice,
-        originalPrice: parsed.originalPrice,
-        description: parsed.description,
-        images: parsed.images,
-        brandName,
-        productUrl: parsed.productUrl,
-        sourceId: parsed.sourceId,
-        cartpeCategory: parsed.cartpeCategory,
-        suggestedCategory: category,
-        suggestedSubcategory: subcategory,
-        inStock: parsed.inStock,
-      });
-    } catch (err) {
-      console.error(`[CartPe] Failed to fetch ${productUrl}:`, err.message);
-      failedUrls.push({ url: productUrl, error: err.message });
+  async function fetchOne(productUrl) {
+    const { data: html } = await fetchWithRetry(productUrl, { retries: 3, timeout: 15000 });
+    const parsed = parseDetail(html, productUrl);
+    if (!parsed.name || !parsed.productUrl) {
+      throw new Error('Missing name or URL after parse');
     }
+    const brandName = extractBrand(parsed);
+    const { category, subcategory } = mapCategory(parsed.cartpeCategory);
+    return {
+      name: parsed.name,
+      sourcePrice: parsed.sourcePrice,
+      originalPrice: parsed.originalPrice,
+      description: parsed.description,
+      images: parsed.images,
+      brandName,
+      productUrl: parsed.productUrl,
+      sourceId: parsed.sourceId,
+      cartpeCategory: parsed.cartpeCategory,
+      suggestedCategory: category,
+      suggestedSubcategory: subcategory,
+      inStock: parsed.inStock,
+    };
   }
 
-  console.log(`[CartPe] Scrape complete: ${products.length} products, ${failedUrls.length} failures, ${pagesFetched} AJAX pages`);
-  return { products, failedUrls, pagesFetched };
+  for (let i = 0; i < productUrls.length; i += BATCH_SIZE) {
+    const batch = productUrls.slice(i, i + BATCH_SIZE);
+    const settled = await Promise.allSettled(batch.map(u => fetchOne(u)));
+
+    settled.forEach((res, idx) => {
+      if (res.status === 'fulfilled') {
+        products.push(res.value);
+      } else {
+        const productUrl = batch[idx];
+        const reason = res.reason?.response?.status
+          ? `HTTP ${res.reason.response.status}`
+          : (res.reason?.message || 'Unknown error');
+        console.error(`[CartPe] Failed to fetch ${productUrl}: ${reason}`);
+        failedUrls.push({ url: productUrl, error: reason });
+      }
+    });
+
+    // Polite delay between batches (not between every single request)
+    if (i + BATCH_SIZE < productUrls.length) await sleep(delay);
+  }
+
+  const stats = {
+    totalFound,
+    successful: products.length,
+    failed: failedUrls.length,
+    pagesFetched,
+    pageErrors: pageErrors.length,
+  };
+
+  console.log(`[CartPe] Scrape complete: ${products.length}/${totalFound} products OK, ${failedUrls.length} failed, ${pagesFetched} AJAX pages, ${pageErrors.length} page errors`);
+  return { products, failedUrls, pagesFetched, pageErrors, stats };
 }
 
 // ── Sync single product ───────────────────────────────────────────
