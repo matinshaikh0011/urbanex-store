@@ -738,7 +738,7 @@ function InventorySection({ show }: { show: (m: string, t?: 'ok' | 'err') => voi
   };
 
   const bulkStock = async (inStock: boolean) => {
-    for (const id of selected) {
+    for (const id of Array.from(selected)) {
       await api(`/api/products/${id}/stock`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ inStock }) });
     }
     show(`${selected.size} products updated`);
