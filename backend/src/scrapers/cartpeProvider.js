@@ -407,26 +407,65 @@ async function fetchProductDetail(productUrl) {
   // Stock
   const inStock = !/out\s*of\s*stock|sold\s*out/i.test($('body').text());
 
-  // Prices (re-extract from detail page for accuracy)
-  const oldPriceText = $('.old-price, .price-old, strike, del, s').first().text().replace(/[^\d.]/g, '');
-  const newPriceText = $('.new-price, .price-new, .special-price').first().text().replace(/[^\d.]/g, '');
-  let sourcePrice = 0, originalPrice = null;
-  if (newPriceText && parseFloat(newPriceText) > 0) {
-    sourcePrice = parseFloat(newPriceText);
-    if (oldPriceText && parseFloat(oldPriceText) > 0) originalPrice = parseFloat(oldPriceText);
-  } else {
-    // Fallback: scan h3/h4 for prices
-    const allPrices = new Set();
-    $('h3, h4, .price, [class*="price"]').each((_, el) => {
+  // Prices — scoped strictly to the main product details section (#price_div / .price-area).
+  //
+  // CartPe HTML (confirmed from live page):
+  //   section#products
+  //     #price_div  (h3.price-area)
+  //       <i class="fa fa-rupee-sign"></i>3199.00          ← selling price (text node)
+  //       <span class="text-muted" style="text-decoration:line-through">
+  //         <i class="fa fa-rupee-sign"></i>8999.00         ← original/MRP
+  //       </span>
+  //
+  // The old selectors (.new-price, .old-price, strike, del) did NOT match CartPe's
+  // actual markup, causing the fallback to scan the whole page (h3/h4) and pick up
+  // prices from Related Products.
+
+  let sourcePrice = 0;
+  let originalPrice = null;
+
+  // 1. Selling price: text node inside #price_div / .price-area, EXCLUDING the MRP span
+  const priceContainer = $('#price_div, h3.price-area, .price-area').first();
+  if (priceContainer.length) {
+    // Clone, remove the struck-through MRP span, read remaining text
+    const clone = priceContainer.clone();
+    clone.find('span[style*="line-through"], .text-muted, strike, del, s').remove();
+    const sellingText = clone.text().replace(/[^\d.]/g, '');
+    const sellingVal = parseFloat(sellingText);
+    if (sellingVal >= 1) sourcePrice = sellingVal;
+
+    // 2. Original price: the struck-through span inside the same container
+    const mrpSpan = priceContainer.find('span[style*="line-through"], .text-muted').first();
+    const mrpText = mrpSpan.text().replace(/[^\d.]/g, '');
+    const mrpVal = parseFloat(mrpText);
+    if (mrpVal >= 1) originalPrice = mrpVal;
+
+    console.log(`[CartPe price] name=unknown selector=#price_div/.price-area selling=${sourcePrice} original=${originalPrice}`);
+  }
+
+  // 3. Fallback: if #price_div not found, scan ONLY section#products (not the whole page)
+  if (sourcePrice === 0) {
+    const productSection = $('section#products, #page-start');
+    const allPrices = [];
+    productSection.find('h3, h4, .price, [class*="price"]').each((_, el) => {
+      // Skip elements that are inside related-products section
+      if ($(el).closest('#best-seller, .best-seller, .related-products, .owl-carousel').length) return;
       const nums = $(el).text().match(/[\d,]+\.?\d*/g);
-      if (nums) nums.forEach(n => {
+      if (nums) nums.forEach((n) => {
         const v = parseFloat(n.replace(/,/g, ''));
-        if (v >= 100 && v <= 9999999) allPrices.add(v);
+        if (v >= 100 && v <= 9999999) allPrices.push(v);
       });
     });
-    const sorted = Array.from(allPrices).sort((a, b) => a - b);
+    const sorted = [...new Set(allPrices)].sort((a, b) => a - b);
     if (sorted.length >= 2) { sourcePrice = sorted[0]; originalPrice = sorted[sorted.length - 1]; }
     else if (sorted.length === 1) { sourcePrice = sorted[0]; }
+    console.log(`[CartPe price] fallback — selling=${sourcePrice} original=${originalPrice} candidates=${JSON.stringify(sorted)}`);
+  }
+
+  // 4. Validation: originalPrice must always be > selling price
+  if (!originalPrice || originalPrice <= sourcePrice) {
+    originalPrice = Math.round(sourcePrice * 1.4);
+    console.log(`[CartPe price] originalPrice corrected to ${originalPrice} (was <= selling price or missing)`);
   }
 
   // Category from breadcrumb

@@ -177,7 +177,52 @@
 .errorText { color: #CC0000; font-size: 12px; }
 .okText { color: #22C55E; font-size: 12px; }
 
-/* ── Responsive ── */
+/* ── Admin: restore normal browser cursor ── */
+/* The global layout applies InteractiveCursor which sets cursor:none on body.
+   Admin pages must override this so the native cursor is always visible. */
+.shell,
+.shell *,
+.shell *:not(input):not(textarea):not(select) {
+  cursor: default !important;
+}
+.shell button,
+.shell a,
+.shell [role="button"],
+.shell select,
+.shell label.toggleLabel,
+.shell .navItem,
+.shell .filterBtn,
+.shell .btnPrimary,
+.shell .btnSecondary,
+.shell .btnSmall,
+.shell .btnDanger,
+.shell .iconBtn,
+.shell .iconBtnDanger,
+.shell .logoutBtn,
+.shell .logoutSide,
+.shell .toggle,
+.shell .couponCode,
+.shell .statusSelect,
+.shell .hamburger {
+  cursor: pointer !important;
+}
+.shell input[type="text"],
+.shell input[type="number"],
+.shell input[type="email"],
+.shell input[type="date"],
+.shell input[type="password"],
+.shell input[type="search"],
+.shell input[type="color"],
+.shell textarea {
+  cursor: text !important;
+}
+.shell input[type="checkbox"],
+.shell input[type="radio"],
+.shell input[type="file"] {
+  cursor: pointer !important;
+}
+
+
 @media (max-width: 900px) {
   .sidebar { position: fixed; left: -220px; top: 0; bottom: 0; z-index: 200; transition: left 0.3s; }
   .sidebarOpen { left: 0; }
