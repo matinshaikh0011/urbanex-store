@@ -228,9 +228,13 @@ export default function ScraperPage() {
                     const brandId = brandAssignments.get(p.sourceId);
                     const manualPrice = manualPrices.get(p.sourceId);
                     const price = calculatePrice(p.sourcePrice, pricingRule, rounding, manualPrice);
+                    // originalPrice = CartPe's MRP (struck-through price on their page).
+                    // If CartPe has no MRP, or MRP <= our selling price,
+                    // buildProductData will enforce originalPrice = Math.round(price * 1.4).
+                    const originalPrice = p.originalPrice ?? null;
                     return {
                       name: p.name, sourceId: p.sourceId, productUrl: p.productUrl,
-                      sourcePrice: p.sourcePrice, price, originalPrice: p.sourcePrice,
+                      sourcePrice: p.sourcePrice, price, originalPrice,
                       description: p.description, images: p.images,
                       brandId: brandId === 'no-brand' ? 'no-brand' : brandId,
                       category: cat?.category || p.suggestedCategory || 'sneakers',
@@ -338,7 +342,7 @@ function PreviewStep({ products, selectedIds, setSelectedIds, dupResolutions, se
       )}
       <div className={adminStyles.tableWrap}>
         <table className={adminStyles.table}>
-          <thead><tr><th></th><th>Image</th><th>Name</th><th>Source Price</th><th>MRP</th><th>Brand</th><th>Status</th><th>Description</th></tr></thead>
+          <thead><tr><th></th><th>Image</th><th>Name</th><th>Supplier Price</th><th>CartPe MRP</th><th>Brand</th><th>Status</th><th>Description</th></tr></thead>
           <tbody>
             {products.map(p => (
               <tr
@@ -714,7 +718,7 @@ function ImportSettingsStep({ products, pricingRule, setPricingRule, rounding, s
         <div style={{ fontSize: 12, letterSpacing: 1, color: '#888', textTransform: 'uppercase', marginBottom: 10 }}>Price Preview</div>
         <div className={adminStyles.tableWrap}>
           <table className={adminStyles.table}>
-            <thead><tr><th>Product</th><th>Source Price (MRP)</th><th>Sale Price</th></tr></thead>
+            <thead><tr><th>Product</th><th>SUPPLIER PRICE</th><th>Sale Price</th></tr></thead>
             <tbody>
               {products.slice(0, 10).map(p => (
                 <tr key={p.sourceId}>
