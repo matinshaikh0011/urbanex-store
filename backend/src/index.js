@@ -323,6 +323,85 @@ app.delete('/api/brands/:id', adminAuth, async (req, res) => {
 });
 
 // ════════════════════════════════════════════════════════════════
+// CATEGORIES
+// ════════════════════════════════════════════════════════════════
+
+app.get('/api/categories', async (req, res) => {
+  try {
+    const categories = await prisma.category.findMany({ orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }] });
+    const productCounts = await prisma.product.groupBy({ by: ['category'], _count: { id: true } });
+    const countMap = {};
+    productCounts.forEach(r => { countMap[r.category] = r._count.id; });
+    const result = categories.map(c => ({ ...c, productCount: countMap[c.slug] || 0 }));
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch categories' });
+  }
+});
+
+app.post('/api/categories', adminAuth, async (req, res) => {
+  try {
+    const { name, slug, description, image, parentId, featured, active, sortOrder } = req.body;
+    const category = await prisma.category.create({
+      data: {
+        name,
+        slug,
+        description: description || null,
+        image: image || null,
+        parentId: parentId ? parseInt(parentId) : null,
+        featured: featured ?? false,
+        active: active ?? true,
+        sortOrder: sortOrder != null ? parseInt(sortOrder) : 0,
+      },
+    });
+    res.status(201).json(category);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create category' });
+  }
+});
+
+app.put('/api/categories/:id', adminAuth, async (req, res) => {
+  try {
+    const { name, slug, description, image, parentId, featured, active, sortOrder } = req.body;
+    const category = await prisma.category.update({
+      where: { id: parseInt(req.params.id) },
+      data: {
+        name,
+        slug,
+        description: description || null,
+        image: image || null,
+        parentId: parentId ? parseInt(parentId) : null,
+        featured: featured ?? false,
+        active: active ?? true,
+        sortOrder: sortOrder != null ? parseInt(sortOrder) : 0,
+      },
+    });
+    res.json(category);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update category' });
+  }
+});
+
+app.delete('/api/categories/:id', adminAuth, async (req, res) => {
+  try {
+    const category = await prisma.category.findUnique({ where: { id: parseInt(req.params.id) } });
+    if (!category) return res.status(404).json({ error: 'Category not found' });
+    const productCount = await prisma.product.count({ where: { category: category.slug } });
+    if (productCount > 0) {
+      return res.status(400).json({ error: `Cannot delete: ${productCount} product(s) use this category. Reassign them first.` });
+    }
+    await prisma.category.delete({ where: { id: parseInt(req.params.id) } });
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to delete category' });
+  }
+});
+
+// ════════════════════════════════════════════════════════════════
 // PRODUCTS
 // ════════════════════════════════════════════════════════════════
 
