@@ -355,23 +355,43 @@ async function fetchProductDetail(productUrl) {
   const { data: html } = await fetchWithRetry(productUrl, { retries: 3, timeout: 15000 });
   const $ = cheerio.load(html);
 
-  // Full images — only from the product's own gallery slider, NOT related products.
-  // CartPe structure: .slider-for > .product-img-big > a > img  (main gallery)
-  //                   .slider-nav > div > img                   (thumbnails)
-  // We collect from the slider containers only, then deduplicate.
+  // Full images — ONLY from the main product gallery (#carousel-custom), NOT related products.
+  //
+  // CartPe DOM structure (confirmed from live HTML):
+  //
+  //   section#products
+  //     #carousel-custom                        ← MAIN PRODUCT GALLERY (safe zone)
+  //       .carousel-inner
+  //         .item > .category-img > img         ← main slides (gallery_md)
+  //       .items
+  //         div[data-slide-to] > img            ← thumbnail strip (gallery_md)
+  //
+  //   section#best-seller                       ← RELATED PRODUCTS (must exclude)
+  //     .owl-carousel
+  //       .item > .product-details
+  //         .slider-for > .product-img-big > img  ← these are OTHER products' images
+  //
+  // The old selector used .slider-for/.product-img-big which exists in BOTH sections.
+  // The new selector is scoped strictly to #carousel-custom so related products
+  // are never touched.
   const imageSet = new Set();
 
-  // Primary: gallery slider images (the product's own photos)
-  $('.slider-for .product-img-big img, .slider-for img, .slider-nav img').each((_, el) => {
+  // Primary: main carousel slides + thumbnail strip — both live inside #carousel-custom
+  $('#carousel-custom .carousel-inner .item img, #carousel-custom .items img').each((_, el) => {
     const src = $(el).attr('src') || $(el).attr('data-src') || $(el).attr('data-lazy') || '';
     if (src && /cdn\.cartpe\.in/i.test(src) && !/logo|banner|icon/i.test(src)) {
       imageSet.add(src.replace('/gallery_sm/', '/gallery_lg/').replace('/gallery_md/', '/gallery_lg/'));
     }
   });
 
-  // Fallback: if slider found nothing, take the first product-img-big image only
-  if (imageSet.size === 0) {
-    const firstImg = $('.product-img-big img, .product-details img').first();
+  const galleryImages = Array.from(imageSet);
+  console.log('Gallery images found:', galleryImages.length);
+
+  // Fallback: if #carousel-custom found nothing, use only the first main product image
+  // (scoped to section#products to avoid pulling from related products)
+  if (galleryImages.length === 0) {
+    console.log('Gallery images found: 0 — falling back to main product image only');
+    const firstImg = $('section#products .category-img img, section#products #carousel-custom img').first();
     const src = firstImg.attr('src') || firstImg.attr('data-src') || '';
     if (src && /cdn\.cartpe\.in/i.test(src)) {
       imageSet.add(src.replace('/gallery_sm/', '/gallery_lg/').replace('/gallery_md/', '/gallery_lg/'));

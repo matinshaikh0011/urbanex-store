@@ -561,6 +561,20 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
     clearSelection(); load();
   };
 
+  const bulkSetFeatured = async (isFeatured: boolean) => {
+    setBulkSaving(true);
+    let ok = 0, fail = 0;
+    for (const id of Array.from(selected)) {
+      const p = products.find(x => x.id === id); if (!p) continue;
+      const res = await api(`/api/products/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...p, isFeatured }) });
+      res.ok ? ok++ : fail++;
+    }
+    setBulkSaving(false);
+    const label = isFeatured ? 'Featured' : 'Unfeatured';
+    show(fail > 0 ? `${label} ${ok}, failed ${fail}` : `${label} ${ok} products`);
+    clearSelection(); load();
+  };
+
   const toggleFeatured = async (p: Product) => {
     const res = await api(`/api/products/${p.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...p, isFeatured: !p.isFeatured }) });
     if (res.ok) { setProducts(prev => prev.map(x => x.id === p.id ? { ...x, isFeatured: !x.isFeatured } : x)); }
@@ -608,9 +622,17 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
         <div className={styles.bulkBar}>
           <span style={{ fontWeight: 700, color: '#fff' }}>{selected.size} selected</span>
           <button className={styles.btnSmall} onClick={clearSelection}>Deselect All</button>
-          <button className={styles.btnSmall} onClick={() => setBulkModal('brand')}>Change Brand</button>
-          <button className={styles.btnSmall} onClick={() => setBulkModal('category')}>Change Category</button>
-          <button className={styles.btnDanger} onClick={bulkDelete}>Delete Selected</button>
+          <button className={styles.btnSmall} onClick={() => setBulkModal('brand')} disabled={bulkSaving}>Change Brand</button>
+          <button className={styles.btnSmall} onClick={() => setBulkModal('category')} disabled={bulkSaving}>Change Category</button>
+          <button className={styles.btnSmall} onClick={() => bulkSetFeatured(true)} disabled={bulkSaving}
+            style={{ background: '#F5C400', color: '#111', borderColor: '#F5C400' }}>
+            {bulkSaving ? '…' : '★ Feature Selected'}
+          </button>
+          <button className={styles.btnSmall} onClick={() => bulkSetFeatured(false)} disabled={bulkSaving}
+            style={{ background: '#2a2a2a', color: '#aaa', borderColor: '#444' }}>
+            {bulkSaving ? '…' : '☆ Unfeature Selected'}
+          </button>
+          <button className={styles.btnDanger} onClick={bulkDelete} disabled={bulkSaving}>Delete Selected</button>
         </div>
       )}
 
