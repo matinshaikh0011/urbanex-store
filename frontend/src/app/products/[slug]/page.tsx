@@ -58,6 +58,17 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
         if (data.sizes?.oneSize) {
           setSelectedSize(data.sizes.oneSize[0]);
         }
+        // Scraped products with no sizes stored (sizes={}) — treat as One Size
+        // so the purchase flow is never blocked for already-imported products.
+        const hasSizes = data.sizes && (
+          (data.sizes.US && data.sizes.US.length > 0) ||
+          (data.sizes.oneSize && data.sizes.oneSize.length > 0) ||
+          Object.values(data.sizes).some((v: unknown) => Array.isArray(v) && (v as string[]).length > 0)
+        );
+        if (!hasSizes) {
+          data.sizes = { oneSize: ['One Size'] };
+          setSelectedSize('One Size');
+        }
         setLoading(false);
 
         // Track in recently viewed

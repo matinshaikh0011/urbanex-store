@@ -11,6 +11,21 @@ const VALID_CATEGORIES = [
 const SLUG_RE = /^[a-z0-9-]+$/;
 
 /**
+ * Normalises a sizes value so it is never an empty object.
+ * - If sizes has at least one non-empty array value → keep as-is
+ * - Otherwise → { oneSize: ['One Size'] }
+ */
+function normaliseSizes(sizes) {
+  if (sizes && typeof sizes === 'object') {
+    const keys = Object.keys(sizes);
+    if (keys.length > 0 && keys.some(k => Array.isArray(sizes[k]) && sizes[k].length > 0)) {
+      return sizes;
+    }
+  }
+  return { oneSize: ['One Size'] };
+}
+
+/**
  * Validates a product data object.
  * @param {object} data
  * @returns {{ valid: boolean, error?: string }}
@@ -49,16 +64,29 @@ export function validateProductData(data) {
  * @returns {object}
  */
 export function buildProductData(data) {
+  const price = Number(data.price);
+  let originalPrice = data.originalPrice != null && data.originalPrice !== ''
+    ? Number(data.originalPrice)
+    : null;
+
+  // originalPrice must always be strictly greater than price.
+  // If it's missing, equal, or lower — set it to price × 1.4.
+  if (!originalPrice || originalPrice <= price) {
+    originalPrice = Math.round(price * 1.4);
+  }
+
+  console.log(`[PRICE DEBUG] name="${data.name}" price=${price} originalPrice=${originalPrice}`);
+
   return {
     name:          String(data.name).trim(),
     slug:          String(data.slug).trim(),
     category:      data.category || null,
     subcategory:   data.subcategory || null,
     description:   data.description || null,
-    price:         Number(data.price),
-    originalPrice: data.originalPrice != null && data.originalPrice !== '' ? Number(data.originalPrice) : null,
+    price,
+    originalPrice,
     brandId:       Number(data.brandId),
-    sizes:         data.sizes || {},
+    sizes:         normaliseSizes(data.sizes),
     colors:        data.colors || [],
     inStock:       data.inStock ?? true,
     isFeatured:    data.isFeatured ?? false,

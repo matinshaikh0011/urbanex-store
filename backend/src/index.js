@@ -700,11 +700,35 @@ app.post('/api/admin/scraper/import', adminAuth, async (req, res) => {
         const globalIdx = i + batchIdx;
         if (result.status === 'fulfilled' && result.value) {
           const detail = result.value;
-          if (detail.sourcePrice > 0) validProducts[globalIdx].originalPrice = detail.sourcePrice;
-          if (detail.originalPrice) validProducts[globalIdx].price = validProducts[globalIdx].price || detail.originalPrice;
-          if (detail.images && detail.images.length > 0) validProducts[globalIdx].images = detail.images;
-          if (detail.description) validProducts[globalIdx].description = detail.description;
-          validProducts[globalIdx].inStock = detail.inStock;
+          const p = validProducts[globalIdx];
+
+          // ── Price assignment (correct direction) ──────────────────────────
+          // detail.sourcePrice = CartPe's selling price (what they charge)
+          // detail.originalPrice = CartPe's MRP (struck-through price)
+          // The admin UI may have added a margin to sourcePrice before import.
+          // p.sourcePrice (from scan listing) is the CartPe selling price.
+          // p.price (set by admin in the import UI) = sourcePrice + margin = our selling price.
+          //
+          // We want:
+          //   price         = p.price (admin-set, already includes margin)
+          //   originalPrice = detail.originalPrice (CartPe MRP) if it's > p.price,
+          //                   else Math.round(p.price * 1.4)
+          //
+          // We do NOT overwrite p.price here — the admin already set it.
+          // We only update originalPrice from the detail page's MRP.
+          if (detail.originalPrice && detail.originalPrice > p.price) {
+            p.originalPrice = detail.originalPrice;
+          }
+          // If detail has no valid MRP, leave p.originalPrice as-is;
+          // buildProductData will enforce originalPrice > price via its own rule.
+
+          console.log(`[PRICE DEBUG] name="${p.name}" sourcePrice=${detail.sourcePrice} margin=${p.price - detail.sourcePrice} finalPrice=${p.price} originalPrice=${p.originalPrice}`);
+
+          if (detail.images && detail.images.length > 0) p.images = detail.images;
+          if (detail.description) p.description = detail.description;
+          p.inStock = detail.inStock;
+          // Always apply sizes from detail page — listing scan returns {} which breaks purchase flow
+          if (detail.sizes && Object.keys(detail.sizes).length > 0) p.sizes = detail.sizes;
         } else if (result.status === 'rejected') {
           const p = batch[batchIdx];
           console.warn(`[import] Detail fetch failed for ${p.sourceId} (${p.sourceUrl}): ${result.reason?.message}`);
@@ -822,14 +846,27 @@ app.post('/api/admin/scraper/sync/:id', adminAuth, async (req, res) => {
     };
 
     if (!syncResult.notFound) {
-      updateData.price = syncResult.price;
-      updateData.originalPrice = syncResult.originalPrice;
+      if (syncResult.price > 0) updateData.price = syncResult.price;
+      if (syncResult.originalPrice) updateData.originalPrice = syncResult.originalPrice;
+      // Always refresh images and sizes on sync — these can change on CartPe
+      if (syncResult.images && syncResult.images.length > 0) updateData.images = syncResult.images;
+      if (syncResult.sizes && Object.keys(syncResult.sizes).length > 0) updateData.sizes = syncResult.sizes;
+      if (syncResult.description) updateData.description = syncResult.description;
     }
 
+    // buildProductData enforces originalPrice > price, so pass through it
+    // for price fields only (we build the full data object manually here to
+    // avoid overwriting fields the admin may have customised like name/brand).
+    if (updateData.price != null && updateData.originalPrice != null) {
+      if (updateData.originalPrice <= updateData.price) {
+        updateData.originalPrice = Math.round(updateData.price * 1.4);
+      }
+      console.log(`[PRICE DEBUG] sync name="${product.name}" price=${updateData.price} originalPrice=${updateData.originalPrice}`);
+    }
+
+    // Legacy optional flags kept for backwards compat but no longer needed
     const { syncName, syncDescription, syncImages } = req.body;
     if (syncName && syncResult.name) updateData.name = syncResult.name;
-    if (syncDescription && syncResult.description) updateData.description = syncResult.description;
-    if (syncImages && syncResult.images) updateData.images = syncResult.images;
 
     const updated = await prisma.product.update({
       where: { id },

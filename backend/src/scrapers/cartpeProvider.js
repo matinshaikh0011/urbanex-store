@@ -400,6 +400,26 @@ async function fetchProductDetail(productUrl) {
 
   const images = Array.from(imageSet).slice(0, MAX_IMAGES);
 
+  // Sizes — extracted from the product's own size selector (.size_click buttons).
+  // CartPe HTML: <a class="size_click active" ...>42</a>
+  // These live inside section#products only, so no risk of picking up related product sizes.
+  const sizeValues = [];
+  $('section#products .size_click, .size-setup .size_click').each((_, el) => {
+    const s = $(el).text().trim();
+    if (s) sizeValues.push(s);
+  });
+
+  // Build a sizes object matching the frontend's expected shape:
+  //   { US: ['42','43','44'] }  for shoes/sneakers
+  //   { oneSize: ['One Size'] } when no sizes found (watches, bags, glasses, etc.)
+  let sizes;
+  if (sizeValues.length > 0) {
+    sizes = { US: sizeValues };
+  } else {
+    sizes = { oneSize: ['One Size'] };
+  }
+  console.log(`[CartPe sizes] found=${sizeValues.length} sizes=${JSON.stringify(sizes)}`);
+
   // Description
   const description = $('.product-description, .description, #description, [class*="desc"]')
     .first().text().trim().slice(0, 1000) || null;
@@ -473,7 +493,7 @@ async function fetchProductDetail(productUrl) {
   $('ol.breadcrumb li, .breadcrumb li').each((_, el) => breadcrumbs.push($(el).text().trim()));
   const cartpeCategory = breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2] : null;
 
-  return { images, description, inStock, sourcePrice, originalPrice, cartpeCategory };
+  return { images, description, inStock, sourcePrice, originalPrice, cartpeCategory, sizes };
 }
 
 // ── Main scrape() — SCAN phase only ──────────────────────────────
@@ -497,7 +517,7 @@ async function scrape(url, scope, options = {}) {
         productUrl: url.split('?')[0], sourceId,
         suggestedCategory: mapCategory(detail.cartpeCategory || name).category,
         suggestedSubcategory: mapCategory(detail.cartpeCategory || name).subcategory,
-        inStock: detail.inStock, sizes: {},
+        inStock: detail.inStock, sizes: detail.sizes,
       };
       return {
         products: [product], failedUrls: [], pagesFetched: 1, pageErrors: [],
@@ -584,10 +604,11 @@ async function syncProduct(sourceId, sourceUrl) {
       inStock: detail.inStock,
       description: detail.description || null,
       images: detail.images.length > 0 ? detail.images : null,
+      sizes: detail.sizes,   // always include — never leave sizes stale
       notFound: false,
     };
   } catch (err) {
-    if (err.response?.status === 404) return { price: 0, originalPrice: null, inStock: false, notFound: true };
+    if (err.response?.status === 404) return { price: 0, originalPrice: null, inStock: false, sizes: null, notFound: true };
     throw err;
   }
 }
