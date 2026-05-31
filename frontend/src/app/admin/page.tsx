@@ -81,13 +81,13 @@ export default function AdminPage() {
   };
 
   const NAV = [
-    { id: 'overview', icon: 'ðŸ“Š', label: 'Overview' },
-    { id: 'orders', icon: 'ðŸ“¦', label: 'Orders' },
-    { id: 'products', icon: 'ðŸ‘Ÿ', label: 'Products' },
-    { id: 'brands', icon: 'ðŸ·ï¸', label: 'Brands' },
-    { id: 'coupons', icon: 'ðŸŽŸï¸', label: 'Coupons' },
-    { id: 'inventory', icon: 'ðŸ“ˆ', label: 'Inventory' },
-    { id: 'csv', icon: 'ðŸ“¥', label: 'Import CSV' },
+    { id: 'overview', icon: '📊', label: 'Overview' },
+    { id: 'orders', icon: '📦', label: 'Orders' },
+    { id: 'products', icon: '👟', label: 'Products' },
+    { id: 'brands', icon: '🏷️', label: 'Brands' },
+    { id: 'coupons', icon: '🎟️', label: 'Coupons' },
+    { id: 'inventory', icon: '📈', label: 'Inventory' },
+    { id: 'csv', icon: '📥', label: 'Import CSV' },
   ] as const;
 
   return (
@@ -110,10 +110,10 @@ export default function AdminPage() {
             </button>
           ))}
           <a href="/admin/scraper" className={styles.navItem} style={{ textDecoration: 'none' }}>
-            <span>ðŸ•·</span> Product Scraper
+            <span>✦</span> Product Scraper
           </a>
         </nav>
-        <button className={styles.logoutSide} onClick={logout}>â» LOGOUT</button>
+        <button className={styles.logoutSide} onClick={logout}>⏻ LOGOUT</button>
       </aside>
 
       {/* Overlay for mobile */}
@@ -122,7 +122,7 @@ export default function AdminPage() {
       {/* Main */}
       <div className={styles.main}>
         <header className={styles.topbar}>
-          <button className={styles.hamburger} onClick={() => setSidebarOpen(o => !o)}>â˜°</button>
+          <button className={styles.hamburger} onClick={() => setSidebarOpen(o => !o)}>≡</button>
           <h1 className={styles.topTitle}>UrbanEx <span className={styles.red}>Admin</span></h1>
           <button className={styles.logoutBtn} onClick={logout}>LOGOUT</button>
         </header>
@@ -152,7 +152,7 @@ function OverviewSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
     api('/api/admin/stats').then(r => r.json()).then(setStats).catch(() => show('Failed to load stats', 'err')).finally(() => setLoading(false));
   }, [show]);
 
-  if (loading) return <div className={styles.loading}>Loading statsâ€¦</div>;
+  if (loading) return <div className={styles.loading}>Loading stats…</div>;
   if (!stats) return <div className={styles.loading}>Failed to load.</div>;
 
   const cards = [
@@ -267,12 +267,12 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
     <div>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>Orders</h2>
-        <input className={styles.searchInput} placeholder="Search ID, name, phoneâ€¦" value={search} onChange={e => setSearch(e.target.value)} />
+        <input className={styles.searchInput} placeholder="Search ID, name, phone…" value={search} onChange={e => setSearch(e.target.value)} />
       </div>
       <div className={styles.filterRow}>
         {STATUSES.map(s => <button key={s} className={`${styles.filterBtn} ${filter === s ? styles.filterActive : ''}`} onClick={() => setFilter(s)}>{s}</button>)}
       </div>
-      {loading ? <div className={styles.loading}>Loadingâ€¦</div> : (
+      {loading ? <div className={styles.loading}>Loading…</div> : (
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <thead><tr><th>Order ID</th><th>Customer</th><th>Phone</th><th>Product</th><th>Size</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
@@ -282,8 +282,8 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
                   <td className={styles.mono}>{o.orderId}</td>
                   <td>{o.shippingName}</td>
                   <td><a href={`https://wa.me/91${(o.shippingPhone || '').replace(/\D/g, '').slice(-10)}`} target="_blank" rel="noopener" className={styles.phoneLink}>{o.shippingPhone}</a></td>
-                  <td>{o.product?.name || 'â€”'}</td>
-                  <td>{o.size || 'â€”'}</td>
+                  <td>{o.product?.name || '"”'}</td>
+                  <td>{o.size || '"”'}</td>
                   <td>{fmt(Number(o.totalAmount))}</td>
                   <td><span className={styles.badge} style={{ background: statusColor(o.status) }}>{o.status}</span></td>
                   <td>{fmtDate(o.createdAt)}</td>
@@ -292,10 +292,10 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
                       <select className={styles.statusSelect} value={o.status} onChange={e => updateStatus(o.orderId, e.target.value)}>
                         {['Confirmed', 'Shipped', 'Delivered', 'Cancelled'].map(s => <option key={s}>{s}</option>)}
                       </select>
-                      <button className={styles.iconBtn} title="Add note" onClick={() => { setNoteOrder(o.orderId); setNoteText(''); }}>ðŸ“</button>
-                      <button className={styles.iconBtn} title="View details" onClick={() => setDetailOrder(o)}>ðŸ‘</button>
-                      <a className={styles.iconBtn} href={`https://wa.me/91${(o.shippingPhone || '').replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(`Hi, your UrbanEx order ${o.orderId} status: ${o.status}`)}`} target="_blank" rel="noopener">ðŸ’¬</a>
-                      <button className={styles.iconBtnDanger} title="Delete" onClick={() => deleteOrder(o.orderId)}>ðŸ—‘</button>
+                      <button className={styles.iconBtn} title="Add note" onClick={() => { setNoteOrder(o.orderId); setNoteText(''); }}>📝</button>
+                      <button className={styles.iconBtn} title="View details" onClick={() => setDetailOrder(o)}>👁</button>
+                      <a className={styles.iconBtn} href={`https://wa.me/91${(o.shippingPhone || '').replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(`Hi, your UrbanEx order ${o.orderId} status: ${o.status}`)}`} target="_blank" rel="noopener">💬</a>
+                      <button className={styles.iconBtnDanger} title="Delete" onClick={() => deleteOrder(o.orderId)}>🗑</button>
                     </div>
                     {o.notes && (() => { try { const ns = JSON.parse(o.notes!); return ns.length > 0 ? <div className={styles.notesList}>{ns.map((n: { text: string; createdAt: string }, i: number) => <div key={i} className={styles.noteItem}><span>{n.text}</span><span className={styles.noteTime}>{fmtDate(n.createdAt)}</span></div>)}</div> : null; } catch { return null; } })()}
                   </td>
@@ -310,8 +310,8 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
       {noteOrder && (
         <div className={styles.modalOverlay} onClick={() => setNoteOrder(null)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
-            <h3 className={styles.modalTitle}>Add Note â€” {noteOrder}</h3>
-            <textarea className={styles.noteInput} rows={4} value={noteText} onChange={e => setNoteText(e.target.value)} placeholder="Internal note (not shown to customer)â€¦" autoFocus />
+            <h3 className={styles.modalTitle}>Add Note "” {noteOrder}</h3>
+            <textarea className={styles.noteInput} rows={4} value={noteText} onChange={e => setNoteText(e.target.value)} placeholder="Internal note (not shown to customer)…" autoFocus />
             <div className={styles.modalActions}>
               <button className={styles.btnPrimary} onClick={saveNote}>SAVE NOTE</button>
               <button className={styles.btnSecondary} onClick={() => setNoteOrder(null)}>CANCEL</button>
@@ -326,8 +326,8 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
             <h3 className={styles.modalTitle}>Order {detailOrder.orderId}</h3>
             <div className={styles.detailGrid}>
-              {[['Customer', detailOrder.shippingName], ['Phone', detailOrder.shippingPhone], ['Email', detailOrder.shippingEmail], ['Address', detailOrder.shippingAddress], ['Product', detailOrder.product?.name], ['Size', detailOrder.size], ['Amount', fmt(Number(detailOrder.totalAmount))], ['Paid', detailOrder.amountPaid ? fmt(Number(detailOrder.amountPaid)) : 'â€”'], ['UTR', detailOrder.utrNumber || 'â€”'], ['Payment', detailOrder.paymentMethod || 'â€”'], ['Status', detailOrder.status], ['Date', fmtDate(detailOrder.createdAt)]].map(([k, v]) => (
-                <div key={k as string} className={styles.detailRow}><span className={styles.detailKey}>{k}</span><span>{v || 'â€”'}</span></div>
+              {[['Customer', detailOrder.shippingName], ['Phone', detailOrder.shippingPhone], ['Email', detailOrder.shippingEmail], ['Address', detailOrder.shippingAddress], ['Product', detailOrder.product?.name], ['Size', detailOrder.size], ['Amount', fmt(Number(detailOrder.totalAmount))], ['Paid', detailOrder.amountPaid ? fmt(Number(detailOrder.amountPaid)) : '"”'], ['UTR', detailOrder.utrNumber || '"”'], ['Payment', detailOrder.paymentMethod || '"”'], ['Status', detailOrder.status], ['Date', fmtDate(detailOrder.createdAt)]].map(([k, v]) => (
+                <div key={k as string} className={styles.detailRow}><span className={styles.detailKey}>{k}</span><span>{v || '"”'}</span></div>
               ))}
             </div>
             <button className={styles.btnSecondary} onClick={() => setDetailOrder(null)}>CLOSE</button>
@@ -447,7 +447,7 @@ function ProductForm({ brands, initial, onSave, onClose }: { brands: Brand[]; in
           <div className={`${styles.formGroup} ${styles.fullWidth}`}>
             <label>Images</label>
             <div className={styles.imageUploadArea} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); Array.from(e.dataTransfer.files).forEach(f => uploadToCloudinary(f)); }}>
-              <p>{uploading ? 'Uploadingâ€¦' : 'Drag & drop images here, or'}</p>
+              <p>{uploading ? 'Uploading…' : 'Drag & drop images here, or'}</p>
               <input type="file" accept="image/*" multiple onChange={e => Array.from(e.target.files || []).forEach(f => uploadToCloudinary(f))} className={styles.fileInput} />
             </div>
             <div className={styles.urlRow}>
@@ -461,7 +461,7 @@ function ProductForm({ brands, initial, onSave, onClose }: { brands: Brand[]; in
           <div className={styles.formGroup}><label className={styles.toggleLabel}><input type="checkbox" checked={form.inStock} onChange={e => set('inStock', e.target.checked)} /> In Stock</label></div>
 
           <div className={`${styles.modalActions} ${styles.fullWidth}`}>
-            <button type="submit" className={styles.btnPrimary} disabled={saving}>{saving ? 'SAVINGâ€¦' : 'SAVE PRODUCT'}</button>
+            <button type="submit" className={styles.btnPrimary} disabled={saving}>{saving ? 'SAVING…' : 'SAVE PRODUCT'}</button>
             <button type="button" className={styles.btnSecondary} onClick={onClose}>CANCEL</button>
           </div>
         </form>
@@ -476,6 +476,7 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Product | null | undefined>(undefined);
   const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [selectionMode, setSelectionMode] = useState(false);
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState('');
   const [bulkModal, setBulkModal] = useState<'brand' | 'category' | null>(null);
@@ -581,14 +582,26 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
 
       {/* Search + filter */}
       <div className={styles.filterRow} style={{ marginBottom: 12 }}>
-        <input className={styles.searchInput} placeholder="Search name or brandâ€¦" value={search} onChange={e => setSearch(e.target.value)} style={{ minWidth: 220 }} />
+        <input className={styles.searchInput} placeholder="Search name or brand…" value={search} onChange={e => setSearch(e.target.value)} style={{ minWidth: 220 }} />
         <select className={styles.statusSelect} value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{ padding: '8px 12px', fontSize: 13 }}>
           <option value="">All categories</option>
           {uniqueCategories.map(c => <option key={c} value={c!}>{c}</option>)}
         </select>
         {(search || filterCat) && <button className={styles.btnSmall} onClick={() => { setSearch(''); setFilterCat(''); }}>Clear</button>}
+        <button
+          className={styles.btnSmall}
+          onClick={() => setSelectionMode(m => !m)}
+          style={{ marginLeft: 8, background: selectionMode ? '#CC0000' : undefined, color: selectionMode ? '#fff' : undefined, borderColor: selectionMode ? '#CC0000' : undefined }}
+        >
+          {selectionMode ? '✓ Selection Mode ON' : '☐ Selection Mode'}
+        </button>
         <span style={{ marginLeft: 'auto', fontSize: 13, color: '#888' }}>{filtered.length} shown</span>
       </div>
+      {selectionMode && (
+        <div style={{ fontSize: 12, color: '#CC0000', letterSpacing: 1, padding: '6px 14px', background: 'rgba(204,0,0,0.08)', border: '1px solid rgba(204,0,0,0.25)', marginBottom: 10 }}>
+          Selection Mode ON — click anywhere on a row to select products
+        </div>
+      )}
 
       {/* Bulk action bar */}
       {someSelected && (
@@ -601,7 +614,7 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
         </div>
       )}
 
-      {loading ? <div className={styles.loading}>Loadingâ€¦</div> : (
+      {loading ? <div className={styles.loading}>Loading…</div> : (
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <thead>
@@ -616,16 +629,23 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
             </thead>
             <tbody>
               {filtered.map(p => (
-                <tr key={p.id} style={selected.has(p.id) ? { background: 'rgba(204,0,0,0.06)' } : undefined}>
-                  <td><input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleOne(p.id)} /></td>
+                <tr
+                  key={p.id}
+                  onClick={selectionMode ? () => toggleOne(p.id) : undefined}
+                  style={{
+                    ...(selected.has(p.id) ? { background: 'rgba(204,0,0,0.13)', outline: '1px solid rgba(204,0,0,0.4)' } : undefined),
+                    ...(selectionMode ? { cursor: 'pointer' } : undefined),
+                  }}
+                >
+                  <td onClick={e => e.stopPropagation()}><input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleOne(p.id)} /></td>
                   <td><img src={p.images?.[0]} alt="" className={styles.thumbImg} /></td>
                   <td>{p.name}</td>
                   <td>{p.category}</td>
                   <td>{p.brand?.name}</td>
                   <td>{fmt(p.price)}</td>
-                  <td>{p.originalPrice ? fmt(p.originalPrice) : 'â€”'}</td>
-                  <td>{p.source ? <span className={styles.badge} style={{ background: '#1a1a1a', border: '1px solid #333', color: '#aaa', fontSize: 10 }}>{p.source}</span> : 'â€”'}</td>
-                  <td><button className={`${styles.toggle} ${p.isFeatured ? styles.toggleOn : ''}`} onClick={() => toggleFeatured(p)}>{p.isFeatured ? 'â˜…' : 'â˜†'}</button></td>
+                  <td>{p.originalPrice ? fmt(p.originalPrice) : '"”'}</td>
+                  <td>{p.source ? <span className={styles.badge} style={{ background: '#1a1a1a', border: '1px solid #333', color: '#aaa', fontSize: 10 }}>{p.source}</span> : '"”'}</td>
+                  <td><button className={`${styles.toggle} ${p.isFeatured ? styles.toggleOn : ''}`} onClick={() => toggleFeatured(p)}>{p.isFeatured ? '★' : '☆'}</button></td>
                   <td><button className={`${styles.toggle} ${p.inStock ? styles.toggleOn : styles.toggleOff}`} onClick={() => toggleStock(p)}>{p.inStock ? 'IN' : 'OUT'}</button></td>
                   <td>
                     <div className={styles.actionRow}>
@@ -644,16 +664,16 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
       {bulkModal === 'brand' && (
         <div className={styles.modalOverlay} onClick={() => setBulkModal(null)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
-            <h3 className={styles.modalTitle}>Change Brand â€” {selected.size} products</h3>
+            <h3 className={styles.modalTitle}>Change Brand "” {selected.size} products</h3>
             <div className={styles.formGroup}>
               <label>New Brand</label>
               <select value={bulkBrandId} onChange={e => setBulkBrandId(e.target.value)}>
-                <option value="">Select brandâ€¦</option>
+                <option value="">Select brand…</option>
                 {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
               </select>
             </div>
             <div className={styles.modalActions}>
-              <button className={styles.btnPrimary} onClick={bulkApplyBrand} disabled={!bulkBrandId || bulkSaving}>{bulkSaving ? 'SAVINGâ€¦' : `APPLY TO ${selected.size} PRODUCTS`}</button>
+              <button className={styles.btnPrimary} onClick={bulkApplyBrand} disabled={!bulkBrandId || bulkSaving}>{bulkSaving ? 'SAVING…' : `APPLY TO ${selected.size} PRODUCTS`}</button>
               <button className={styles.btnSecondary} onClick={() => setBulkModal(null)}>CANCEL</button>
             </div>
           </div>
@@ -664,16 +684,16 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
       {bulkModal === 'category' && (
         <div className={styles.modalOverlay} onClick={() => setBulkModal(null)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
-            <h3 className={styles.modalTitle}>Change Category â€” {selected.size} products</h3>
+            <h3 className={styles.modalTitle}>Change Category "” {selected.size} products</h3>
             <div className={styles.formGroup}>
               <label>New Category</label>
               <select value={bulkCategory} onChange={e => setBulkCategory(e.target.value)}>
-                <option value="">Select categoryâ€¦</option>
+                <option value="">Select category…</option>
                 {['sneakers','watches','luxury-watches','glasses','handbags','clothing','ua-batch'].map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div className={styles.modalActions}>
-              <button className={styles.btnPrimary} onClick={bulkApplyCategory} disabled={!bulkCategory || bulkSaving}>{bulkSaving ? 'SAVINGâ€¦' : `APPLY TO ${selected.size} PRODUCTS`}</button>
+              <button className={styles.btnPrimary} onClick={bulkApplyCategory} disabled={!bulkCategory || bulkSaving}>{bulkSaving ? 'SAVING…' : `APPLY TO ${selected.size} PRODUCTS`}</button>
               <button className={styles.btnSecondary} onClick={() => setBulkModal(null)}>CANCEL</button>
             </div>
           </div>
@@ -721,7 +741,7 @@ function BrandsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
         <h2 className={styles.sectionTitle}>Brands</h2>
         <button className={styles.btnPrimary} onClick={openAdd}>+ ADD BRAND</button>
       </div>
-      {loading ? <div className={styles.loading}>Loadingâ€¦</div> : (
+      {loading ? <div className={styles.loading}>Loading…</div> : (
         <div className={styles.brandGrid}>
           {brands.map(b => (
             <div key={b.id} className={styles.brandCard}>
@@ -743,7 +763,7 @@ function BrandsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
             <form onSubmit={save} className={styles.formStack}>
               <div className={styles.formGroup}><label>Name *</label><input value={form.name} onChange={e => { setForm(f => ({ ...f, name: e.target.value, slug: slugify(e.target.value) })); }} required /></div>
               <div className={styles.formGroup}><label>Slug *</label><input value={form.slug} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))} required /></div>
-              <div className={styles.formGroup}><label>Logo URL</label><input value={form.logoUrl} onChange={e => setForm(f => ({ ...f, logoUrl: e.target.value }))} placeholder="https://â€¦" /></div>
+              <div className={styles.formGroup}><label>Logo URL</label><input value={form.logoUrl} onChange={e => setForm(f => ({ ...f, logoUrl: e.target.value }))} placeholder="https://…" /></div>
               {form.logoUrl && <img src={form.logoUrl} alt="preview" className={styles.logoPreview} />}
               <div className={styles.modalActions}>
                 <button type="submit" className={styles.btnPrimary}>SAVE</button>
@@ -806,7 +826,7 @@ function CouponsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void 
         <h2 className={styles.sectionTitle}>Coupons</h2>
         <button className={styles.btnPrimary} onClick={openAdd}>+ ADD COUPON</button>
       </div>
-      {loading ? <div className={styles.loading}>Loadingâ€¦</div> : (
+      {loading ? <div className={styles.loading}>Loading…</div> : (
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Min Order</th><th>Usage</th><th>Active</th><th>Expires</th><th>Actions</th></tr></thead>
@@ -819,7 +839,7 @@ function CouponsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void 
                   <td>{fmt(Number(c.minimumOrder))}</td>
                   <td>{c.usedCount}/{c.usageLimit}</td>
                   <td><button className={`${styles.toggle} ${c.isActive ? styles.toggleOn : styles.toggleOff}`} onClick={() => toggleActive(c)}>{c.isActive ? 'ON' : 'OFF'}</button></td>
-                  <td>{c.expiresAt ? fmtDate(c.expiresAt) : 'â€”'}</td>
+                  <td>{c.expiresAt ? fmtDate(c.expiresAt) : '"”'}</td>
                   <td>
                     <div className={styles.actionRow}>
                       <button className={styles.btnSmall} onClick={() => openEdit(c)}>Edit</button>
@@ -921,7 +941,7 @@ function InventorySection({ show }: { show: (m: string, t?: 'ok' | 'err') => voi
           <button className={styles.btnSecondary} onClick={() => setSelected(new Set())}>Clear</button>
         </div>
       )}
-      {loading ? <div className={styles.loading}>Loadingâ€¦</div> : (
+      {loading ? <div className={styles.loading}>Loading…</div> : (
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <thead><tr>
@@ -1023,7 +1043,7 @@ function CSVSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
     <div>
       <h2 className={styles.sectionTitle}>Import Results</h2>
       <div className={styles.importResults}>
-        {results.map((r, i) => <div key={i} className={r.ok ? styles.importOk : styles.importErr}>{r.ok ? 'âœ…' : 'âŒ'} {r.name} â€” {r.msg}</div>)}
+        {results.map((r, i) => <div key={i} className={r.ok ? styles.importOk : styles.importErr}>{r.ok ? '✅' : 'âŒ'} {r.name} "” {r.msg}</div>)}
       </div>
       <div className={styles.importSummary}>{results.filter(r => r.ok).length} imported successfully</div>
       <button className={styles.btnPrimary} onClick={() => { setStep('upload'); setRows([]); setResults([]); }}>IMPORT MORE</button>
@@ -1034,7 +1054,7 @@ function CSVSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
     <div>
       <h2 className={styles.sectionTitle}>Import CSV</h2>
       <div className={styles.csvActions}>
-        <button className={styles.btnSecondary} onClick={downloadTemplate}>â¬‡ DOWNLOAD TEMPLATE</button>
+        <button className={styles.btnSecondary} onClick={downloadTemplate}>⬇ DOWNLOAD TEMPLATE</button>
       </div>
 
       <div className={styles.brandRef}>
@@ -1054,7 +1074,7 @@ function CSVSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
 
       {step === 'preview' && (
         <div>
-          <div className={styles.importSummary}>{validCount} ready Â· {errorCount} errors</div>
+          <div className={styles.importSummary}>{validCount} ready · {errorCount} errors</div>
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <thead><tr><th>Name</th><th>Category</th><th>Brand ID</th><th>Price</th><th>Status</th></tr></thead>
@@ -1062,7 +1082,7 @@ function CSVSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
                 {rows.map((r, i) => (
                   <tr key={i} className={r._errors?.length ? styles.errorRow : ''}>
                     <td>{r.name}</td><td>{r.category}</td><td>{r.brand_id}</td><td>{r.price}</td>
-                    <td>{r._errors?.length ? <span className={styles.errorText}>{r._errors.join(', ')}</span> : <span className={styles.okText}>âœ“ Ready</span>}</td>
+                    <td>{r._errors?.length ? <span className={styles.errorText}>{r._errors.join(', ')}</span> : <span className={styles.okText}>❌“ Ready</span>}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1070,7 +1090,7 @@ function CSVSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
           </div>
           {importing && <div className={styles.progressBar}><div style={{ width: `${progress}%` }} /></div>}
           <div className={styles.modalActions}>
-            <button className={styles.btnPrimary} onClick={importAll} disabled={importing || validCount === 0}>{importing ? `Importingâ€¦ ${progress}%` : `IMPORT ${validCount} VALID`}</button>
+            <button className={styles.btnPrimary} onClick={importAll} disabled={importing || validCount === 0}>{importing ? `Importing… ${progress}%` : `IMPORT ${validCount} VALID`}</button>
             <button className={styles.btnSecondary} onClick={() => { setStep('upload'); setRows([]); }}>CANCEL</button>
           </div>
         </div>

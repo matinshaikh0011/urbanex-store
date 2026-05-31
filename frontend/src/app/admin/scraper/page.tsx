@@ -305,6 +305,8 @@ function PreviewStep({ products, selectedIds, setSelectedIds, dupResolutions, se
   products: ScrapedProduct[]; selectedIds: Set<string>; setSelectedIds: (s: Set<string>) => void;
   dupResolutions: Map<string, 'skip' | 'update' | 'import'>; setDupResolutions: (m: Map<string, 'skip' | 'update' | 'import'>) => void; onNext: () => void;
 }) {
+  const [selectionMode, setSelectionMode] = useState(false);
+
   const toggle = (id: string) => { const s = new Set(selectedIds); s.has(id) ? s.delete(id) : s.add(id); setSelectedIds(s); };
   const badgeClass = (status: string) => status === 'new' ? styles.badgeNew : status === 'already-imported' ? styles.badgeDuplicate : status === 'slug-duplicate' ? styles.badgeSlugDuplicate : styles.badgePossible;
   const badgeLabel = (status: string) => status === 'new' ? 'New' : status === 'already-imported' ? 'Imported' : status === 'slug-duplicate' ? 'Slug Dup' : 'Possible Dup';
@@ -319,21 +321,40 @@ function PreviewStep({ products, selectedIds, setSelectedIds, dupResolutions, se
         <button className={adminStyles.btnSmall} onClick={() => setSelectedIds(new Set(products.map(p => p.sourceId)))}>All</button>
         <button className={adminStyles.btnSmall} onClick={() => setSelectedIds(new Set())}>None</button>
         <button className={adminStyles.btnSmall} onClick={() => setSelectedIds(new Set(products.filter(p => p.duplicateStatus === 'new').map(p => p.sourceId)))}>New Only</button>
+        <button
+          className={`${adminStyles.btnSmall} ${selectionMode ? styles.selectionModeActive : ''}`}
+          onClick={() => setSelectionMode(m => !m)}
+          title={selectionMode ? 'Disable row-click selection' : 'Enable row-click selection'}
+          style={{ marginLeft: 8 }}
+        >
+          {selectionMode ? '✓ Selection Mode ON' : '☐ Selection Mode'}
+        </button>
         <span style={{ marginLeft: 'auto', fontSize: 13, color: '#aaa' }}>{selectedIds.size} selected</span>
       </div>
+      {selectionMode && (
+        <div className={styles.selectionModeHint}>
+          Click anywhere on a row to toggle selection
+        </div>
+      )}
       <div className={adminStyles.tableWrap}>
         <table className={adminStyles.table}>
           <thead><tr><th></th><th>Image</th><th>Name</th><th>Source Price</th><th>MRP</th><th>Brand</th><th>Status</th><th>Description</th></tr></thead>
           <tbody>
             {products.map(p => (
-              <tr key={p.sourceId}>
-                <td><input type="checkbox" checked={selectedIds.has(p.sourceId)} onChange={() => toggle(p.sourceId)} /></td>
+              <tr
+                key={p.sourceId}
+                className={selectionMode ? (selectedIds.has(p.sourceId) ? styles.rowSelected : styles.rowSelectable) : undefined}
+                onClick={selectionMode ? () => toggle(p.sourceId) : undefined}
+              >
+                <td onClick={e => { if (selectionMode) e.stopPropagation(); }}>
+                  <input type="checkbox" checked={selectedIds.has(p.sourceId)} onChange={() => toggle(p.sourceId)} />
+                </td>
                 <td>{p.images[0] || (p as any).thumbnail ? <img src={(p as any).thumbnail || p.images[0]} alt="" className={adminStyles.thumbImg} /> : '—'}</td>
                 <td style={{ maxWidth: 200 }}>{p.name}</td>
                 <td>{p.sourcePrice > 0 ? fmt(p.sourcePrice) : '—'}</td>
                 <td>{p.originalPrice ? fmt(p.originalPrice) : '—'}</td>
                 <td>{p.brandName || <span style={{ color: '#555' }}>Unknown</span>}</td>
-                <td>
+                <td onClick={e => { if (selectionMode) e.stopPropagation(); }}>
                   <span className={badgeClass(p.duplicateStatus)}>{badgeLabel(p.duplicateStatus)}</span>
                   {(p.duplicateStatus === 'already-imported' || p.duplicateStatus === 'possible-duplicate') && (
                     <div style={{ marginTop: 4 }}>

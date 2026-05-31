@@ -91,6 +91,14 @@
 .logSkipped { color: #888; }
 .logFailed { color: #CC0000; }
 
+/* ── Selection mode ── */
+.selectionModeActive { background: #CC0000; border-color: #CC0000; color: #fff; }
+.selectionModeHint { font-size: 12px; color: #CC0000; letter-spacing: 1px; padding: 6px 14px; background: rgba(204,0,0,0.08); border: 1px solid rgba(204,0,0,0.25); margin-bottom: 10px; }
+.rowSelectable { cursor: pointer; }
+.rowSelectable:hover td { background: rgba(204,0,0,0.06) !important; }
+.rowSelected td { background: rgba(204,0,0,0.12) !important; }
+.rowSelected:hover td { background: rgba(204,0,0,0.18) !important; }
+
 /* ── Empty state ── */
 .emptyState { text-align: center; padding: 60px 20px; color: #555; }
 .emptyState p { font-size: 14px; margin-top: 8px; }
