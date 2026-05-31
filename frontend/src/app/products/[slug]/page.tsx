@@ -41,6 +41,9 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const { addToCart } = useCart();
 
+  // Scroll to top on every product navigation
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [params.slug]);
+
   // Reset selected image when product changes
   useEffect(() => { setSelectedImage(0); }, [params.slug]);
 
@@ -332,8 +335,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             </div>
             <div className={styles.relatedGrid}>
               {relatedProducts.map((item) => (
-                <div key={item.id} className={styles.relatedItem} onClick={() => router.push(`/products/${item.slug}`)}>
-                  <div className={styles.relatedImage}>
+                <div key={item.id} className={styles.relatedItem} onClick={() => { window.scrollTo({ top: 0, behavior: 'instant' }); router.push(`/products/${item.slug}`); }}>                  <div className={styles.relatedImage}>
                     <img src={item.images[0]} alt={item.name} />
                     {item.originalPrice && <span className={styles.relatedSale}>SALE</span>}
                     <span className={styles.relatedView}>VIEW PRODUCT →</span>

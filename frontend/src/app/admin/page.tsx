@@ -1,10 +1,10 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
-// ── Types ──────────────────────────────────────────────────────
+// â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface Order {
   id: number; orderId: string; shippingName: string; shippingPhone: string;
   shippingAddress?: string; shippingEmail?: string; totalAmount: number;
@@ -32,7 +32,7 @@ interface Stats {
   recentOrders: Order[]; outOfStockProducts: Product[];
 }
 
-// ── Helpers ────────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const fmt = (n: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(n);
 const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -45,7 +45,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 function statusColor(s: string) { return STATUS_COLORS[s.toLowerCase()] || '#888'; }
 
-// ── Toast ──────────────────────────────────────────────────────
+// â”€â”€ Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function useToast() {
   const [toasts, setToasts] = useState<{ id: number; msg: string; type: 'ok' | 'err' }[]>([]);
   const show = useCallback((msg: string, type: 'ok' | 'err' = 'ok') => {
@@ -56,14 +56,14 @@ function useToast() {
   return { toasts, show };
 }
 
-// ── API helper ─────────────────────────────────────────────────
+// â”€â”€ API helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function api(path: string, opts?: RequestInit) {
   const res = await fetch(path, { credentials: 'include', ...opts });
   if (res.status === 401) { window.location.href = '/admin/login'; throw new Error('Unauthorized'); }
   return res;
 }
 
-// ── Main Component ─────────────────────────────────────────────
+// â”€â”€ Main Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function AdminPage() {
   const router = useRouter();
   const { toasts, show } = useToast();
@@ -81,13 +81,13 @@ export default function AdminPage() {
   };
 
   const NAV = [
-    { id: 'overview', icon: '📊', label: 'Overview' },
-    { id: 'orders', icon: '📦', label: 'Orders' },
-    { id: 'products', icon: '👟', label: 'Products' },
-    { id: 'brands', icon: '🏷️', label: 'Brands' },
-    { id: 'coupons', icon: '🎟️', label: 'Coupons' },
-    { id: 'inventory', icon: '📈', label: 'Inventory' },
-    { id: 'csv', icon: '📥', label: 'Import CSV' },
+    { id: 'overview', icon: 'ðŸ“Š', label: 'Overview' },
+    { id: 'orders', icon: 'ðŸ“¦', label: 'Orders' },
+    { id: 'products', icon: 'ðŸ‘Ÿ', label: 'Products' },
+    { id: 'brands', icon: 'ðŸ·ï¸', label: 'Brands' },
+    { id: 'coupons', icon: 'ðŸŽŸï¸', label: 'Coupons' },
+    { id: 'inventory', icon: 'ðŸ“ˆ', label: 'Inventory' },
+    { id: 'csv', icon: 'ðŸ“¥', label: 'Import CSV' },
   ] as const;
 
   return (
@@ -110,10 +110,10 @@ export default function AdminPage() {
             </button>
           ))}
           <a href="/admin/scraper" className={styles.navItem} style={{ textDecoration: 'none' }}>
-            <span>🕷</span> Product Scraper
+            <span>ðŸ•·</span> Product Scraper
           </a>
         </nav>
-        <button className={styles.logoutSide} onClick={logout}>⏻ LOGOUT</button>
+        <button className={styles.logoutSide} onClick={logout}>â» LOGOUT</button>
       </aside>
 
       {/* Overlay for mobile */}
@@ -122,7 +122,7 @@ export default function AdminPage() {
       {/* Main */}
       <div className={styles.main}>
         <header className={styles.topbar}>
-          <button className={styles.hamburger} onClick={() => setSidebarOpen(o => !o)}>☰</button>
+          <button className={styles.hamburger} onClick={() => setSidebarOpen(o => !o)}>â˜°</button>
           <h1 className={styles.topTitle}>UrbanEx <span className={styles.red}>Admin</span></h1>
           <button className={styles.logoutBtn} onClick={logout}>LOGOUT</button>
         </header>
@@ -141,9 +141,9 @@ export default function AdminPage() {
   );
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // OVERVIEW SECTION
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function OverviewSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -152,7 +152,7 @@ function OverviewSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
     api('/api/admin/stats').then(r => r.json()).then(setStats).catch(() => show('Failed to load stats', 'err')).finally(() => setLoading(false));
   }, [show]);
 
-  if (loading) return <div className={styles.loading}>Loading stats…</div>;
+  if (loading) return <div className={styles.loading}>Loading statsâ€¦</div>;
   if (!stats) return <div className={styles.loading}>Failed to load.</div>;
 
   const cards = [
@@ -217,9 +217,9 @@ function OverviewSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
   );
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // ORDERS SECTION
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -239,7 +239,7 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
   const updateStatus = async (orderId: string, status: string) => {
     setOrders(prev => prev.map(o => o.orderId === orderId ? { ...o, status } : o));
     const res = await api(`/api/admin/orders/${orderId}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
-    if (!res.ok) { show('Failed to update status', 'err'); load(); } else show(`Status → ${status}`);
+    if (!res.ok) { show('Failed to update status', 'err'); load(); } else show(`Status â†’ ${status}`);
   };
 
   const deleteOrder = async (orderId: string) => {
@@ -267,12 +267,12 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
     <div>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>Orders</h2>
-        <input className={styles.searchInput} placeholder="Search ID, name, phone…" value={search} onChange={e => setSearch(e.target.value)} />
+        <input className={styles.searchInput} placeholder="Search ID, name, phoneâ€¦" value={search} onChange={e => setSearch(e.target.value)} />
       </div>
       <div className={styles.filterRow}>
         {STATUSES.map(s => <button key={s} className={`${styles.filterBtn} ${filter === s ? styles.filterActive : ''}`} onClick={() => setFilter(s)}>{s}</button>)}
       </div>
-      {loading ? <div className={styles.loading}>Loading…</div> : (
+      {loading ? <div className={styles.loading}>Loadingâ€¦</div> : (
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <thead><tr><th>Order ID</th><th>Customer</th><th>Phone</th><th>Product</th><th>Size</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
@@ -282,8 +282,8 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
                   <td className={styles.mono}>{o.orderId}</td>
                   <td>{o.shippingName}</td>
                   <td><a href={`https://wa.me/91${(o.shippingPhone || '').replace(/\D/g, '').slice(-10)}`} target="_blank" rel="noopener" className={styles.phoneLink}>{o.shippingPhone}</a></td>
-                  <td>{o.product?.name || '—'}</td>
-                  <td>{o.size || '—'}</td>
+                  <td>{o.product?.name || 'â€”'}</td>
+                  <td>{o.size || 'â€”'}</td>
                   <td>{fmt(Number(o.totalAmount))}</td>
                   <td><span className={styles.badge} style={{ background: statusColor(o.status) }}>{o.status}</span></td>
                   <td>{fmtDate(o.createdAt)}</td>
@@ -292,10 +292,10 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
                       <select className={styles.statusSelect} value={o.status} onChange={e => updateStatus(o.orderId, e.target.value)}>
                         {['Confirmed', 'Shipped', 'Delivered', 'Cancelled'].map(s => <option key={s}>{s}</option>)}
                       </select>
-                      <button className={styles.iconBtn} title="Add note" onClick={() => { setNoteOrder(o.orderId); setNoteText(''); }}>📝</button>
-                      <button className={styles.iconBtn} title="View details" onClick={() => setDetailOrder(o)}>👁</button>
-                      <a className={styles.iconBtn} href={`https://wa.me/91${(o.shippingPhone || '').replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(`Hi, your UrbanEx order ${o.orderId} status: ${o.status}`)}`} target="_blank" rel="noopener">💬</a>
-                      <button className={styles.iconBtnDanger} title="Delete" onClick={() => deleteOrder(o.orderId)}>🗑</button>
+                      <button className={styles.iconBtn} title="Add note" onClick={() => { setNoteOrder(o.orderId); setNoteText(''); }}>ðŸ“</button>
+                      <button className={styles.iconBtn} title="View details" onClick={() => setDetailOrder(o)}>ðŸ‘</button>
+                      <a className={styles.iconBtn} href={`https://wa.me/91${(o.shippingPhone || '').replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(`Hi, your UrbanEx order ${o.orderId} status: ${o.status}`)}`} target="_blank" rel="noopener">ðŸ’¬</a>
+                      <button className={styles.iconBtnDanger} title="Delete" onClick={() => deleteOrder(o.orderId)}>ðŸ—‘</button>
                     </div>
                     {o.notes && (() => { try { const ns = JSON.parse(o.notes!); return ns.length > 0 ? <div className={styles.notesList}>{ns.map((n: { text: string; createdAt: string }, i: number) => <div key={i} className={styles.noteItem}><span>{n.text}</span><span className={styles.noteTime}>{fmtDate(n.createdAt)}</span></div>)}</div> : null; } catch { return null; } })()}
                   </td>
@@ -310,8 +310,8 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
       {noteOrder && (
         <div className={styles.modalOverlay} onClick={() => setNoteOrder(null)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
-            <h3 className={styles.modalTitle}>Add Note — {noteOrder}</h3>
-            <textarea className={styles.noteInput} rows={4} value={noteText} onChange={e => setNoteText(e.target.value)} placeholder="Internal note (not shown to customer)…" autoFocus />
+            <h3 className={styles.modalTitle}>Add Note â€” {noteOrder}</h3>
+            <textarea className={styles.noteInput} rows={4} value={noteText} onChange={e => setNoteText(e.target.value)} placeholder="Internal note (not shown to customer)â€¦" autoFocus />
             <div className={styles.modalActions}>
               <button className={styles.btnPrimary} onClick={saveNote}>SAVE NOTE</button>
               <button className={styles.btnSecondary} onClick={() => setNoteOrder(null)}>CANCEL</button>
@@ -326,8 +326,8 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
             <h3 className={styles.modalTitle}>Order {detailOrder.orderId}</h3>
             <div className={styles.detailGrid}>
-              {[['Customer', detailOrder.shippingName], ['Phone', detailOrder.shippingPhone], ['Email', detailOrder.shippingEmail], ['Address', detailOrder.shippingAddress], ['Product', detailOrder.product?.name], ['Size', detailOrder.size], ['Amount', fmt(Number(detailOrder.totalAmount))], ['Paid', detailOrder.amountPaid ? fmt(Number(detailOrder.amountPaid)) : '—'], ['UTR', detailOrder.utrNumber || '—'], ['Payment', detailOrder.paymentMethod || '—'], ['Status', detailOrder.status], ['Date', fmtDate(detailOrder.createdAt)]].map(([k, v]) => (
-                <div key={k as string} className={styles.detailRow}><span className={styles.detailKey}>{k}</span><span>{v || '—'}</span></div>
+              {[['Customer', detailOrder.shippingName], ['Phone', detailOrder.shippingPhone], ['Email', detailOrder.shippingEmail], ['Address', detailOrder.shippingAddress], ['Product', detailOrder.product?.name], ['Size', detailOrder.size], ['Amount', fmt(Number(detailOrder.totalAmount))], ['Paid', detailOrder.amountPaid ? fmt(Number(detailOrder.amountPaid)) : 'â€”'], ['UTR', detailOrder.utrNumber || 'â€”'], ['Payment', detailOrder.paymentMethod || 'â€”'], ['Status', detailOrder.status], ['Date', fmtDate(detailOrder.createdAt)]].map(([k, v]) => (
+                <div key={k as string} className={styles.detailRow}><span className={styles.detailKey}>{k}</span><span>{v || 'â€”'}</span></div>
               ))}
             </div>
             <button className={styles.btnSecondary} onClick={() => setDetailOrder(null)}>CLOSE</button>
@@ -338,9 +338,9 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
   );
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // PRODUCTS SECTION
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const CATEGORIES = ['sneakers', 'watches', 'luxury-watches', 'glasses', 'handbags', 'clothing', 'ua-batch'];
 const SNEAKER_SIZES = ['6', '7', '8', '9', '10', '11', '12'];
 const APPAREL_SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -422,8 +422,8 @@ function ProductForm({ brands, initial, onSave, onClose }: { brands: Brand[]; in
           <div className={styles.formGroup}><label>Category *</label><select value={form.category} onChange={e => set('category', e.target.value)}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></div>
           <div className={styles.formGroup}><label>Brand *</label><select value={form.brandId} onChange={e => set('brandId', e.target.value)}>{brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</select></div>
           <div className={`${styles.formGroup} ${styles.fullWidth}`}><label>Description</label><textarea value={form.description} onChange={e => set('description', e.target.value)} rows={3} /></div>
-          <div className={styles.formGroup}><label>Price (₹) *</label><input type="number" value={form.price} onChange={e => set('price', e.target.value)} required /></div>
-          <div className={styles.formGroup}><label>Original Price (₹)</label><input type="number" value={form.originalPrice} onChange={e => set('originalPrice', e.target.value)} /></div>
+          <div className={styles.formGroup}><label>Price (â‚¹) *</label><input type="number" value={form.price} onChange={e => set('price', e.target.value)} required /></div>
+          <div className={styles.formGroup}><label>Original Price (â‚¹)</label><input type="number" value={form.originalPrice} onChange={e => set('originalPrice', e.target.value)} /></div>
 
           {sizeOptions && (
             <div className={`${styles.formGroup} ${styles.fullWidth}`}>
@@ -441,27 +441,27 @@ function ProductForm({ brands, initial, onSave, onClose }: { brands: Brand[]; in
               <input type="color" value={form.colorHex} onChange={e => set('colorHex', e.target.value)} className={styles.colorPicker} />
               <button type="button" className={styles.btnSmall} onClick={() => { if (form.colorName) { set('colors', [...form.colors, { name: form.colorName, hex: form.colorHex }]); set('colorName', ''); } }}>+ Add</button>
             </div>
-            <div className={styles.colorChips}>{form.colors.map((c, i) => <span key={i} className={styles.colorChip} style={{ background: c.hex }}>{c.name} <button type="button" onClick={() => set('colors', form.colors.filter((_, j) => j !== i))}>×</button></span>)}</div>
+            <div className={styles.colorChips}>{form.colors.map((c, i) => <span key={i} className={styles.colorChip} style={{ background: c.hex }}>{c.name} <button type="button" onClick={() => set('colors', form.colors.filter((_, j) => j !== i))}>Ã—</button></span>)}</div>
           </div>
 
           <div className={`${styles.formGroup} ${styles.fullWidth}`}>
             <label>Images</label>
             <div className={styles.imageUploadArea} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); Array.from(e.dataTransfer.files).forEach(f => uploadToCloudinary(f)); }}>
-              <p>{uploading ? 'Uploading…' : 'Drag & drop images here, or'}</p>
+              <p>{uploading ? 'Uploadingâ€¦' : 'Drag & drop images here, or'}</p>
               <input type="file" accept="image/*" multiple onChange={e => Array.from(e.target.files || []).forEach(f => uploadToCloudinary(f))} className={styles.fileInput} />
             </div>
             <div className={styles.urlRow}>
               <input placeholder="Or paste image URL" value={form.imageUrl} onChange={e => set('imageUrl', e.target.value)} />
               <button type="button" className={styles.btnSmall} onClick={addImageUrl}>+ Add URL</button>
             </div>
-            <div className={styles.imagePreviews}>{form.images.map((img, i) => <div key={i} className={styles.imgThumb}><img src={img} alt="" /><button type="button" onClick={() => set('images', form.images.filter((_, j) => j !== i))}>×</button></div>)}</div>
+            <div className={styles.imagePreviews}>{form.images.map((img, i) => <div key={i} className={styles.imgThumb}><img src={img} alt="" /><button type="button" onClick={() => set('images', form.images.filter((_, j) => j !== i))}>Ã—</button></div>)}</div>
           </div>
 
           <div className={styles.formGroup}><label className={styles.toggleLabel}><input type="checkbox" checked={form.isFeatured} onChange={e => set('isFeatured', e.target.checked)} /> Featured</label></div>
           <div className={styles.formGroup}><label className={styles.toggleLabel}><input type="checkbox" checked={form.inStock} onChange={e => set('inStock', e.target.checked)} /> In Stock</label></div>
 
           <div className={`${styles.modalActions} ${styles.fullWidth}`}>
-            <button type="submit" className={styles.btnPrimary} disabled={saving}>{saving ? 'SAVING…' : 'SAVE PRODUCT'}</button>
+            <button type="submit" className={styles.btnPrimary} disabled={saving}>{saving ? 'SAVINGâ€¦' : 'SAVE PRODUCT'}</button>
             <button type="button" className={styles.btnSecondary} onClick={onClose}>CANCEL</button>
           </div>
         </form>
@@ -475,6 +475,13 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Product | null | undefined>(undefined);
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [search, setSearch] = useState('');
+  const [filterCat, setFilterCat] = useState('');
+  const [bulkModal, setBulkModal] = useState<'brand' | 'category' | null>(null);
+  const [bulkBrandId, setBulkBrandId] = useState('');
+  const [bulkCategory, setBulkCategory] = useState('');
+  const [bulkSaving, setBulkSaving] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -484,6 +491,24 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
   }, [show]);
 
   useEffect(() => { load(); }, [load]);
+
+  const filtered = products.filter(p => {
+    const q = search.toLowerCase();
+    const matchSearch = !q || p.name.toLowerCase().includes(q) || (p.brand?.name || '').toLowerCase().includes(q);
+    const matchCat = !filterCat || p.category === filterCat;
+    return matchSearch && matchCat;
+  });
+
+  const allFilteredIds = filtered.map(p => p.id);
+  const allSelected = allFilteredIds.length > 0 && allFilteredIds.every(id => selected.has(id));
+  const someSelected = allFilteredIds.some(id => selected.has(id));
+
+  const toggleOne = (id: number) => setSelected(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
+  const toggleAll = () => {
+    if (allSelected) setSelected(prev => { const s = new Set(prev); allFilteredIds.forEach(id => s.delete(id)); return s; });
+    else setSelected(prev => { const s = new Set(prev); allFilteredIds.forEach(id => s.add(id)); return s; });
+  };
+  const clearSelection = () => setSelected(new Set());
 
   const saveProduct = async (data: Record<string, unknown>) => {
     const isEdit = editing && editing.id;
@@ -495,8 +520,44 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
   const deleteProduct = async (id: number, name: string) => {
     if (!confirm(`Delete "${name}"?`)) return;
     const res = await api(`/api/products/${id}`, { method: 'DELETE' });
-    if (res.ok) { setProducts(p => p.filter(x => x.id !== id)); show('Deleted'); }
+    if (res.ok) { setProducts(p => p.filter(x => x.id !== id)); setSelected(prev => { const s = new Set(prev); s.delete(id); return s; }); show('Deleted'); }
     else show('Failed to delete', 'err');
+  };
+
+  const bulkDelete = async () => {
+    if (!confirm(`Delete ${selected.size} selected products? This cannot be undone.`)) return;
+    let ok = 0, fail = 0;
+    for (const id of Array.from(selected)) { const res = await api(`/api/products/${id}`, { method: 'DELETE' }); res.ok ? ok++ : fail++; }
+    show(fail > 0 ? `Deleted ${ok}, failed ${fail}` : `Deleted ${ok} products`);
+    clearSelection(); load();
+  };
+
+  const bulkApplyBrand = async () => {
+    if (!bulkBrandId) return;
+    setBulkSaving(true);
+    let ok = 0, fail = 0;
+    for (const id of Array.from(selected)) {
+      const p = products.find(x => x.id === id); if (!p) continue;
+      const res = await api(`/api/products/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...p, brandId: Number(bulkBrandId) }) });
+      res.ok ? ok++ : fail++;
+    }
+    setBulkSaving(false); setBulkModal(null); setBulkBrandId('');
+    show(fail > 0 ? `Updated ${ok}, failed ${fail}` : `Brand updated on ${ok} products`);
+    clearSelection(); load();
+  };
+
+  const bulkApplyCategory = async () => {
+    if (!bulkCategory) return;
+    setBulkSaving(true);
+    let ok = 0, fail = 0;
+    for (const id of Array.from(selected)) {
+      const p = products.find(x => x.id === id); if (!p) continue;
+      const res = await api(`/api/products/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...p, category: bulkCategory }) });
+      res.ok ? ok++ : fail++;
+    }
+    setBulkSaving(false); setBulkModal(null); setBulkCategory('');
+    show(fail > 0 ? `Updated ${ok}, failed ${fail}` : `Category updated on ${ok} products`);
+    clearSelection(); load();
   };
 
   const toggleFeatured = async (p: Product) => {
@@ -509,27 +570,62 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
     if (res.ok) { setProducts(prev => prev.map(x => x.id === p.id ? { ...x, inStock: !x.inStock } : x)); }
   };
 
+  const uniqueCategories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
+
   return (
     <div>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>Products ({products.length})</h2>
         <button className={styles.btnPrimary} onClick={() => setEditing(null)}>+ ADD PRODUCT</button>
       </div>
-      {loading ? <div className={styles.loading}>Loading…</div> : (
+
+      {/* Search + filter */}
+      <div className={styles.filterRow} style={{ marginBottom: 12 }}>
+        <input className={styles.searchInput} placeholder="Search name or brandâ€¦" value={search} onChange={e => setSearch(e.target.value)} style={{ minWidth: 220 }} />
+        <select className={styles.statusSelect} value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{ padding: '8px 12px', fontSize: 13 }}>
+          <option value="">All categories</option>
+          {uniqueCategories.map(c => <option key={c} value={c!}>{c}</option>)}
+        </select>
+        {(search || filterCat) && <button className={styles.btnSmall} onClick={() => { setSearch(''); setFilterCat(''); }}>Clear</button>}
+        <span style={{ marginLeft: 'auto', fontSize: 13, color: '#888' }}>{filtered.length} shown</span>
+      </div>
+
+      {/* Bulk action bar */}
+      {someSelected && (
+        <div className={styles.bulkBar}>
+          <span style={{ fontWeight: 700, color: '#fff' }}>{selected.size} selected</span>
+          <button className={styles.btnSmall} onClick={clearSelection}>Deselect All</button>
+          <button className={styles.btnSmall} onClick={() => setBulkModal('brand')}>Change Brand</button>
+          <button className={styles.btnSmall} onClick={() => setBulkModal('category')}>Change Category</button>
+          <button className={styles.btnDanger} onClick={bulkDelete}>Delete Selected</button>
+        </div>
+      )}
+
+      {loading ? <div className={styles.loading}>Loadingâ€¦</div> : (
         <div className={styles.tableWrap}>
           <table className={styles.table}>
-            <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Brand</th><th>Price</th><th>Orig.</th><th>Source</th><th>Featured</th><th>Stock</th><th>Actions</th></tr></thead>
+            <thead>
+              <tr>
+                <th style={{ width: 36 }}>
+                  <input type="checkbox" checked={allSelected}
+                    ref={el => { if (el) el.indeterminate = someSelected && !allSelected; }}
+                    onChange={toggleAll} title="Select all visible" />
+                </th>
+                <th>Image</th><th>Name</th><th>Category</th><th>Brand</th><th>Price</th><th>Orig.</th><th>Source</th><th>Featured</th><th>Stock</th><th>Actions</th>
+              </tr>
+            </thead>
             <tbody>
-              {products.map(p => (
-                <tr key={p.id}>
+              {filtered.map(p => (
+                <tr key={p.id} style={selected.has(p.id) ? { background: 'rgba(204,0,0,0.06)' } : undefined}>
+                  <td><input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleOne(p.id)} /></td>
                   <td><img src={p.images?.[0]} alt="" className={styles.thumbImg} /></td>
                   <td>{p.name}</td>
                   <td>{p.category}</td>
                   <td>{p.brand?.name}</td>
                   <td>{fmt(p.price)}</td>
-                  <td>{p.originalPrice ? fmt(p.originalPrice) : '—'}</td>
-                  <td>{p.source ? <span className={styles.badge} style={{ background: '#1a1a1a', border: '1px solid #333', color: '#aaa', fontSize: 10 }}>{p.source}</span> : '—'}</td>
-                  <td><button className={`${styles.toggle} ${p.isFeatured ? styles.toggleOn : ''}`} onClick={() => toggleFeatured(p)}>{p.isFeatured ? '★' : '☆'}</button></td>
+                  <td>{p.originalPrice ? fmt(p.originalPrice) : 'â€”'}</td>
+                  <td>{p.source ? <span className={styles.badge} style={{ background: '#1a1a1a', border: '1px solid #333', color: '#aaa', fontSize: 10 }}>{p.source}</span> : 'â€”'}</td>
+                  <td><button className={`${styles.toggle} ${p.isFeatured ? styles.toggleOn : ''}`} onClick={() => toggleFeatured(p)}>{p.isFeatured ? 'â˜…' : 'â˜†'}</button></td>
                   <td><button className={`${styles.toggle} ${p.inStock ? styles.toggleOn : styles.toggleOff}`} onClick={() => toggleStock(p)}>{p.inStock ? 'IN' : 'OUT'}</button></td>
                   <td>
                     <div className={styles.actionRow}>
@@ -543,14 +639,52 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
           </table>
         </div>
       )}
+
+      {/* Bulk change brand modal */}
+      {bulkModal === 'brand' && (
+        <div className={styles.modalOverlay} onClick={() => setBulkModal(null)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <h3 className={styles.modalTitle}>Change Brand â€” {selected.size} products</h3>
+            <div className={styles.formGroup}>
+              <label>New Brand</label>
+              <select value={bulkBrandId} onChange={e => setBulkBrandId(e.target.value)}>
+                <option value="">Select brandâ€¦</option>
+                {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+              </select>
+            </div>
+            <div className={styles.modalActions}>
+              <button className={styles.btnPrimary} onClick={bulkApplyBrand} disabled={!bulkBrandId || bulkSaving}>{bulkSaving ? 'SAVINGâ€¦' : `APPLY TO ${selected.size} PRODUCTS`}</button>
+              <button className={styles.btnSecondary} onClick={() => setBulkModal(null)}>CANCEL</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk change category modal */}
+      {bulkModal === 'category' && (
+        <div className={styles.modalOverlay} onClick={() => setBulkModal(null)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <h3 className={styles.modalTitle}>Change Category â€” {selected.size} products</h3>
+            <div className={styles.formGroup}>
+              <label>New Category</label>
+              <select value={bulkCategory} onChange={e => setBulkCategory(e.target.value)}>
+                <option value="">Select categoryâ€¦</option>
+                {['sneakers','watches','luxury-watches','glasses','handbags','clothing','ua-batch'].map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className={styles.modalActions}>
+              <button className={styles.btnPrimary} onClick={bulkApplyCategory} disabled={!bulkCategory || bulkSaving}>{bulkSaving ? 'SAVINGâ€¦' : `APPLY TO ${selected.size} PRODUCTS`}</button>
+              <button className={styles.btnSecondary} onClick={() => setBulkModal(null)}>CANCEL</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {editing !== undefined && <ProductForm brands={brands} initial={editing} onSave={saveProduct} onClose={() => setEditing(undefined)} />}
     </div>
   );
 }
-
-// ════════════════════════════════════════════════════════════════
-// BRANDS SECTION
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function BrandsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
@@ -587,7 +721,7 @@ function BrandsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
         <h2 className={styles.sectionTitle}>Brands</h2>
         <button className={styles.btnPrimary} onClick={openAdd}>+ ADD BRAND</button>
       </div>
-      {loading ? <div className={styles.loading}>Loading…</div> : (
+      {loading ? <div className={styles.loading}>Loadingâ€¦</div> : (
         <div className={styles.brandGrid}>
           {brands.map(b => (
             <div key={b.id} className={styles.brandCard}>
@@ -609,7 +743,7 @@ function BrandsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
             <form onSubmit={save} className={styles.formStack}>
               <div className={styles.formGroup}><label>Name *</label><input value={form.name} onChange={e => { setForm(f => ({ ...f, name: e.target.value, slug: slugify(e.target.value) })); }} required /></div>
               <div className={styles.formGroup}><label>Slug *</label><input value={form.slug} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))} required /></div>
-              <div className={styles.formGroup}><label>Logo URL</label><input value={form.logoUrl} onChange={e => setForm(f => ({ ...f, logoUrl: e.target.value }))} placeholder="https://…" /></div>
+              <div className={styles.formGroup}><label>Logo URL</label><input value={form.logoUrl} onChange={e => setForm(f => ({ ...f, logoUrl: e.target.value }))} placeholder="https://â€¦" /></div>
               {form.logoUrl && <img src={form.logoUrl} alt="preview" className={styles.logoPreview} />}
               <div className={styles.modalActions}>
                 <button type="submit" className={styles.btnPrimary}>SAVE</button>
@@ -623,9 +757,9 @@ function BrandsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
   );
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // COUPONS SECTION
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function CouponsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(true);
@@ -672,7 +806,7 @@ function CouponsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void 
         <h2 className={styles.sectionTitle}>Coupons</h2>
         <button className={styles.btnPrimary} onClick={openAdd}>+ ADD COUPON</button>
       </div>
-      {loading ? <div className={styles.loading}>Loading…</div> : (
+      {loading ? <div className={styles.loading}>Loadingâ€¦</div> : (
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Min Order</th><th>Usage</th><th>Active</th><th>Expires</th><th>Actions</th></tr></thead>
@@ -685,7 +819,7 @@ function CouponsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void 
                   <td>{fmt(Number(c.minimumOrder))}</td>
                   <td>{c.usedCount}/{c.usageLimit}</td>
                   <td><button className={`${styles.toggle} ${c.isActive ? styles.toggleOn : styles.toggleOff}`} onClick={() => toggleActive(c)}>{c.isActive ? 'ON' : 'OFF'}</button></td>
-                  <td>{c.expiresAt ? fmtDate(c.expiresAt) : '—'}</td>
+                  <td>{c.expiresAt ? fmtDate(c.expiresAt) : 'â€”'}</td>
                   <td>
                     <div className={styles.actionRow}>
                       <button className={styles.btnSmall} onClick={() => openEdit(c)}>Edit</button>
@@ -706,8 +840,8 @@ function CouponsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void 
               <div className={styles.formGroup}><label>Code *</label><input value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))} required /></div>
               <div className={styles.formGroup}><label>Type *</label><select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}><option value="percentage">Percentage</option><option value="fixed">Fixed Amount</option></select></div>
               <div className={styles.formGroup}><label>Value *</label><input type="number" value={form.value} onChange={e => setForm(f => ({ ...f, value: e.target.value }))} required /></div>
-              <div className={styles.formGroup}><label>Min Order (₹)</label><input type="number" value={form.minimumOrder} onChange={e => setForm(f => ({ ...f, minimumOrder: e.target.value }))} /></div>
-              <div className={styles.formGroup}><label>Max Discount (₹)</label><input type="number" value={form.maximumDiscount} onChange={e => setForm(f => ({ ...f, maximumDiscount: e.target.value }))} /></div>
+              <div className={styles.formGroup}><label>Min Order (â‚¹)</label><input type="number" value={form.minimumOrder} onChange={e => setForm(f => ({ ...f, minimumOrder: e.target.value }))} /></div>
+              <div className={styles.formGroup}><label>Max Discount (â‚¹)</label><input type="number" value={form.maximumDiscount} onChange={e => setForm(f => ({ ...f, maximumDiscount: e.target.value }))} /></div>
               <div className={styles.formGroup}><label>Usage Limit</label><input type="number" value={form.usageLimit} onChange={e => setForm(f => ({ ...f, usageLimit: e.target.value }))} /></div>
               <div className={styles.formGroup}><label>Expiry Date</label><input type="date" value={form.expiresAt} onChange={e => setForm(f => ({ ...f, expiresAt: e.target.value }))} /></div>
               <div className={styles.formGroup}><label className={styles.toggleLabel}><input type="checkbox" checked={form.isActive} onChange={e => setForm(f => ({ ...f, isActive: e.target.checked }))} /> Active</label></div>
@@ -723,9 +857,9 @@ function CouponsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void 
   );
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // INVENTORY SECTION
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function InventorySection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -787,12 +921,12 @@ function InventorySection({ show }: { show: (m: string, t?: 'ok' | 'err') => voi
           <button className={styles.btnSecondary} onClick={() => setSelected(new Set())}>Clear</button>
         </div>
       )}
-      {loading ? <div className={styles.loading}>Loading…</div> : (
+      {loading ? <div className={styles.loading}>Loadingâ€¦</div> : (
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <thead><tr>
               <th><input type="checkbox" checked={allSel} onChange={e => setSelected(e.target.checked ? new Set(visible.map(p => p.id)) : new Set())} /></th>
-              <th>Product</th><th>Category</th><th>Stock</th><th>Price (₹)</th><th>Save</th>
+              <th>Product</th><th>Category</th><th>Stock</th><th>Price (â‚¹)</th><th>Save</th>
             </tr></thead>
             <tbody>
               {visible.map(p => (
@@ -813,9 +947,9 @@ function InventorySection({ show }: { show: (m: string, t?: 'ok' | 'err') => voi
   );
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // CSV IMPORT SECTION
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const CSV_HEADERS = 'name,slug,category,brand_id,description,price,original_price,sizes,colors,is_featured,in_stock,images';
 const CSV_EXAMPLE = '"Nike Air Force 1","nike-air-force-1","sneakers",1,"Classic white sneaker",8999,11999,"{""US"":[""7"",""8"",""9"",""10"",""11""]}","[{""name"":""White"",""hex"":""#FFFFFF""}]",true,true,"https://image1.jpg,https://image2.jpg"';
 const VALID_CATS = new Set(['sneakers', 'watches', 'luxury-watches', 'glasses', 'handbags', 'clothing', 'ua-batch']);
@@ -889,7 +1023,7 @@ function CSVSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
     <div>
       <h2 className={styles.sectionTitle}>Import Results</h2>
       <div className={styles.importResults}>
-        {results.map((r, i) => <div key={i} className={r.ok ? styles.importOk : styles.importErr}>{r.ok ? '✅' : '❌'} {r.name} — {r.msg}</div>)}
+        {results.map((r, i) => <div key={i} className={r.ok ? styles.importOk : styles.importErr}>{r.ok ? 'âœ…' : 'âŒ'} {r.name} â€” {r.msg}</div>)}
       </div>
       <div className={styles.importSummary}>{results.filter(r => r.ok).length} imported successfully</div>
       <button className={styles.btnPrimary} onClick={() => { setStep('upload'); setRows([]); setResults([]); }}>IMPORT MORE</button>
@@ -900,7 +1034,7 @@ function CSVSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
     <div>
       <h2 className={styles.sectionTitle}>Import CSV</h2>
       <div className={styles.csvActions}>
-        <button className={styles.btnSecondary} onClick={downloadTemplate}>⬇ DOWNLOAD TEMPLATE</button>
+        <button className={styles.btnSecondary} onClick={downloadTemplate}>â¬‡ DOWNLOAD TEMPLATE</button>
       </div>
 
       <div className={styles.brandRef}>
@@ -920,7 +1054,7 @@ function CSVSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
 
       {step === 'preview' && (
         <div>
-          <div className={styles.importSummary}>{validCount} ready · {errorCount} errors</div>
+          <div className={styles.importSummary}>{validCount} ready Â· {errorCount} errors</div>
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <thead><tr><th>Name</th><th>Category</th><th>Brand ID</th><th>Price</th><th>Status</th></tr></thead>
@@ -928,7 +1062,7 @@ function CSVSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
                 {rows.map((r, i) => (
                   <tr key={i} className={r._errors?.length ? styles.errorRow : ''}>
                     <td>{r.name}</td><td>{r.category}</td><td>{r.brand_id}</td><td>{r.price}</td>
-                    <td>{r._errors?.length ? <span className={styles.errorText}>{r._errors.join(', ')}</span> : <span className={styles.okText}>✓ Ready</span>}</td>
+                    <td>{r._errors?.length ? <span className={styles.errorText}>{r._errors.join(', ')}</span> : <span className={styles.okText}>âœ“ Ready</span>}</td>
                   </tr>
                 ))}
               </tbody>
@@ -936,7 +1070,7 @@ function CSVSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
           </div>
           {importing && <div className={styles.progressBar}><div style={{ width: `${progress}%` }} /></div>}
           <div className={styles.modalActions}>
-            <button className={styles.btnPrimary} onClick={importAll} disabled={importing || validCount === 0}>{importing ? `Importing… ${progress}%` : `IMPORT ${validCount} VALID`}</button>
+            <button className={styles.btnPrimary} onClick={importAll} disabled={importing || validCount === 0}>{importing ? `Importingâ€¦ ${progress}%` : `IMPORT ${validCount} VALID`}</button>
             <button className={styles.btnSecondary} onClick={() => { setStep('upload'); setRows([]); }}>CANCEL</button>
           </div>
         </div>

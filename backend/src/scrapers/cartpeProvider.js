@@ -355,14 +355,29 @@ async function fetchProductDetail(productUrl) {
   const { data: html } = await fetchWithRetry(productUrl, { retries: 3, timeout: 15000 });
   const $ = cheerio.load(html);
 
-  // Full images — prefer gallery_lg
+  // Full images — only from the product's own gallery slider, NOT related products.
+  // CartPe structure: .slider-for > .product-img-big > a > img  (main gallery)
+  //                   .slider-nav > div > img                   (thumbnails)
+  // We collect from the slider containers only, then deduplicate.
   const imageSet = new Set();
-  $('img').each((_, el) => {
-    const src = $(el).attr('src') || $(el).attr('data-src') || '';
+
+  // Primary: gallery slider images (the product's own photos)
+  $('.slider-for .product-img-big img, .slider-for img, .slider-nav img').each((_, el) => {
+    const src = $(el).attr('src') || $(el).attr('data-src') || $(el).attr('data-lazy') || '';
     if (src && /cdn\.cartpe\.in/i.test(src) && !/logo|banner|icon/i.test(src)) {
       imageSet.add(src.replace('/gallery_sm/', '/gallery_lg/').replace('/gallery_md/', '/gallery_lg/'));
     }
   });
+
+  // Fallback: if slider found nothing, take the first product-img-big image only
+  if (imageSet.size === 0) {
+    const firstImg = $('.product-img-big img, .product-details img').first();
+    const src = firstImg.attr('src') || firstImg.attr('data-src') || '';
+    if (src && /cdn\.cartpe\.in/i.test(src)) {
+      imageSet.add(src.replace('/gallery_sm/', '/gallery_lg/').replace('/gallery_md/', '/gallery_lg/'));
+    }
+  }
+
   const images = Array.from(imageSet).slice(0, MAX_IMAGES);
 
   // Description
