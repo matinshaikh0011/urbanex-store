@@ -83,36 +83,29 @@
 }
 
 /* ── THE SHUTTER ── */
-/* Door rolls UP and out of view. transform-origin top + translateY,
-   with an anticipation dip and weighted ease — reads like real metal,
-   not a uniform squash. */
+/* Door rolls UP into the housing. Mechanical motion: small downward
+   "engage" jolt, accelerating lift, slight overshoot past the top,
+   then settle back down a touch — like a real motorised roller door. */
 @keyframes shutterRollUp {
   0%   { transform: translate3d(0, 0, 0); }
-  14%  { transform: translate3d(0, 2.5%, 0); }            /* unlatch dip */
-  100% { transform: translate3d(0, -101%, 0); }           /* rolls fully up */
+  10%  { transform: translate3d(0, 1.5%, 0); }     /* engage / take up slack */
+  70%  { transform: translate3d(0, -98%, 0); }     /* fast lift */
+  85%  { transform: translate3d(0, -103%, 0); }    /* overshoot into housing */
+  100% { transform: translate3d(0, -100.5%, 0); }  /* settle */
 }
-/* The whole shutter container also fades its shadow as it clears */
-@keyframes shutterContainerLift {
-  0%   { transform: translate3d(0, 0, 0); }
-  14%  { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(0, -100%, 0); }
+/* Slats compress slightly as they roll into the drum — handled via the
+   translate overshoot in shutterRollUp (keeps a single transform channel). */
+/* Brand plate rides up with the door and fades as it enters the housing */
+@keyframes plateLift {
+  0%   { opacity: 1; }
+  55%  { opacity: 1; }
+  100% { opacity: 0; }
 }
-/* Tag + handle drift slightly faster than the door for parallax depth */
-@keyframes tagParallax {
-  0%   { transform: rotate(-2deg) translateY(0); opacity: 1; }
-  60%  { opacity: 1; }
-  100% { transform: rotate(-2deg) translateY(-40px); opacity: 0; }
-}
-/* Sheen sweeps down the metal as the door lifts */
+/* Metallic highlight band sweeps down the steel as it lifts */
 @keyframes sheenSweepDown {
-  0%   { transform: translateY(-120%); opacity: 0; }
-  30%  { opacity: 0.9; }
-  100% { transform: translateY(120%); opacity: 0; }
-}
-@keyframes dripFall {
-  0%   { transform: scaleY(0); opacity: 0; }
-  30%  { opacity: 1; }
-  100% { transform: scaleY(1); opacity: 1; }
+  0%   { transform: translateY(-110%); opacity: 0; }
+  25%  { opacity: 0.85; }
+  100% { transform: translateY(110%); opacity: 0; }
 }
 @keyframes chevronBob {
   0%,100% { transform: translateY(0); opacity: 1; }
@@ -827,7 +820,8 @@
 }
 
 /* ════════════════════════════════════════════════════════════════
-   THE SHUTTER — graffiti-tagged roller door over the hero
+   THE SHUTTER — industrial roller door over the hero area only
+   Horizontal steel slats, metallic highlights, mechanical roll-up.
    ════════════════════════════════════════════════════════════════ */
 .shutter {
   position: absolute;
@@ -838,7 +832,17 @@
   cursor: pointer;
 }
 
-/* The corrugated metal door — rolls up and out of view */
+/* Housing / drum the slats roll up into — dark bar pinned to the top */
+.shutterDrum {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 18px;
+  z-index: 2;
+  background: linear-gradient(180deg, #050506 0%, #1a1a1d 55%, #0a0a0b 100%);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.55), inset 0 -2px 0 rgba(255,255,255,0.06);
+}
+
+/* The roller door itself — HORIZONTAL slats stacked vertically */
 .shutterMetal {
   position: absolute;
   inset: 0;
@@ -847,129 +851,124 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* Vertical corrugated ribs + metallic sheen, pure CSS */
-  background-color: #2a2a2c;
+  background-color: #313336;
+  /* Each repeating band = one slat: dark seam → body → convex highlight → body → dark seam.
+     The 90deg base gradient gives the whole door a left-right cylindrical sheen. */
   background-image:
+    /* per-slat horizontal profile (vertical repeat) */
     repeating-linear-gradient(
-      90deg,
-      #161618 0px,
-      #2e2e30 5px,
-      #3d3d40 10px,
-      #2e2e30 15px,
-      #161618 21px
+      180deg,
+      #16171a 0px,
+      #16171a 1px,
+      #2a2d31 3px,
+      #3a3e43 14px,
+      #4a4f55 21px,   /* convex top highlight of the slat */
+      #3a3e43 28px,
+      #25282c 38px,
+      #16171a 40px     /* deep seam between slats */
     ),
-    linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 14%, transparent 86%, rgba(0,0,0,0.4) 100%);
-  box-shadow: inset 0 -10px 0 rgba(0,0,0,0.45), inset 0 8px 0 rgba(255,255,255,0.07);
-  border-bottom: 6px solid #0a0a0b;
+    /* broad cylindrical light across the width (steel catches light in the middle) */
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,0.35) 0%,
+      rgba(255,255,255,0.05) 22%,
+      rgba(255,255,255,0.14) 50%,
+      rgba(255,255,255,0.05) 78%,
+      rgba(0,0,0,0.35) 100%
+    );
+  background-blend-mode: overlay, normal;
+  box-shadow: inset 0 -10px 14px rgba(0,0,0,0.45), inset 0 6px 10px rgba(255,255,255,0.05);
   will-change: transform;
 }
 
-/* The heavy bottom rail that hangs below the door */
+/* Moving specular highlight band — light sweeping across the slats as it lifts */
+.shutterSheen {
+  position: absolute;
+  left: 0; right: 0;
+  height: 45%;
+  top: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.20) 50%, transparent);
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+/* Heavy bottom rail — the weighted aluminium bar at the door's base */
 .shutterRail {
   position: absolute;
   left: 0; right: 0;
   bottom: 0;
-  height: 26px;
-  background: linear-gradient(180deg, #3a3a3d 0%, #1a1a1c 60%, #050506 100%);
-  border-top: 2px solid rgba(255,255,255,0.08);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.5);
-  will-change: transform;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #5a5f66 0%, #34383d 40%, #15171a 100%);
+  border-top: 2px solid rgba(255,255,255,0.14);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.55), inset 0 2px 0 rgba(255,255,255,0.18);
+}
+/* Grip slot in the rail */
+.shutterHandle {
+  width: min(360px, 52%);
+  height: 8px;
+  background: linear-gradient(180deg, #0b0c0e, #2b2e33);
+  border-radius: 4px;
+  box-shadow: inset 0 2px 3px rgba(0,0,0,0.7), 0 1px 0 rgba(255,255,255,0.1);
 }
 
-/* Light sheen that sweeps down the metal during the lift */
-.shutterSheen {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.22) 48%, transparent);
-  opacity: 0;
-}
-
-/* ── Roll-up: door translates up with anticipation + weighted ease ── */
+/* ── Mechanical roll-up ── */
 .shutterLifting .shutterMetal {
-  animation: shutterRollUp 1.15s cubic-bezier(0.62, 0.02, 0.34, 1) forwards;
-}
-.shutterLifting .shutterRail {
-  animation: shutterContainerLift 1.15s cubic-bezier(0.62, 0.02, 0.34, 1) forwards;
-}
-.shutterLifting .shutterTag {
-  animation: tagParallax 1.0s cubic-bezier(0.5, 0, 0.3, 1) forwards;
+  animation: shutterRollUp 1.25s cubic-bezier(0.55, 0.05, 0.2, 1) forwards;
 }
 .shutterLifting .shutterSheen {
-  animation: sheenSweepDown 0.9s ease-in 0.1s forwards;
+  animation: sheenSweepDown 1.0s ease-in 0.05s forwards;
 }
-/* Fade the hint/skip immediately so they don't ride up awkwardly */
+.shutterLifting .shutterPlate {
+  animation: plateLift 1.0s ease-in forwards;
+}
 .shutterLifting .shutterLift,
-.shutterLifting .shutterSkip,
-.shutterLifting .shutterHandle {
+.shutterLifting .shutterSkip {
   opacity: 0;
   transition: opacity 0.2s ease;
 }
 
-/* ── Spray-tagged brand stencil ── */
-.shutterTag {
+/* ── Embossed brand plate stamped into the steel (not graffiti) ── */
+.shutterPlate {
   position: relative;
+  z-index: 1;
   text-align: center;
-  padding: 28px 44px;
-  border: 4px dashed rgba(255,255,255,0.28);
-  transform: rotate(-2deg);
+  pointer-events: none;
 }
-.shutterTagWord {
+.shutterPlateWord {
   display: block;
   font-family: 'Oswald', sans-serif;
   font-weight: 700;
-  font-size: clamp(40px, 9vw, 104px);
-  letter-spacing: 4px;
-  line-height: 0.9;
-  color: transparent;
-  -webkit-text-stroke: 2px #fff;
-  text-shadow: 4px 4px 0 var(--accent-primary);
-  /* spray-paint texture: speckled mask feel via layered shadows */
+  font-size: clamp(40px, 8.5vw, 96px);
+  letter-spacing: 6px;
+  line-height: 1;
+  color: #2c2f33;
+  /* embossed look: dark fill + top dark shadow + bottom light edge = stamped into metal */
+  text-shadow:
+    0 -1px 1px rgba(0,0,0,0.6),
+    0 1px 1px rgba(255,255,255,0.12),
+    0 2px 0 rgba(0,0,0,0.4);
 }
-.shutterTagSub {
+.shutterPlateSub {
   display: block;
-  margin-top: 14px;
-  font-family: 'Permanent Marker', cursive;
-  font-size: clamp(13px, 2vw, 20px);
-  letter-spacing: 3px;
-  color: var(--accent-primary);
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.6);
-}
-
-/* Paint drips off the stencil box */
-.drip {
-  position: absolute;
-  width: 5px;
-  background: var(--accent-primary);
-  transform-origin: top;
-  border-radius: 0 0 3px 3px;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
-}
-.shutter .drip { animation: dripFall 1.2s ease-out both; }
-.drip1 { left: 18%;  bottom: -34px; height: 34px; animation-delay: 0.3s !important; }
-.drip2 { left: 52%;  bottom: -52px; height: 52px; animation-delay: 0.5s !important; }
-.drip3 { right: 22%; bottom: -26px; height: 26px; animation-delay: 0.7s !important; }
-
-/* Handle bar near the bottom */
-.shutterHandle {
-  position: absolute;
-  bottom: 8%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(420px, 60%);
-  height: 18px;
-  background: linear-gradient(180deg, #4a4a4d, #232325);
-  border: 2px solid #0c0c0d;
-  border-radius: 4px;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.12);
+  margin-top: 12px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(12px, 1.6vw, 17px);
+  letter-spacing: 8px;
+  color: #44484d;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.1), 0 -1px 0 rgba(0,0,0,0.5);
 }
 
 /* Lift hint */
 .shutterLift {
   position: absolute;
-  bottom: calc(8% + 40px);
+  bottom: 56px;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -980,22 +979,23 @@
   font-family: 'Bebas Neue', sans-serif;
   font-size: 15px;
   letter-spacing: 4px;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255,255,255,0.75);
 }
 .shutterChevron {
   font-size: 30px;
   line-height: 1;
-  color: var(--accent-tag);
+  color: var(--accent-primary);
   animation: chevronBob 1.4s ease-in-out infinite;
 }
 
 /* Skip button — always-available escape hatch */
 .shutterSkip {
   position: absolute;
-  top: 18px;
+  top: 30px;
   right: 18px;
-  background: rgba(0,0,0,0.4);
-  border: 2px solid rgba(255,255,255,0.4);
+  z-index: 3;
+  background: rgba(0,0,0,0.45);
+  border: 2px solid rgba(255,255,255,0.35);
   color: #fff;
   font-family: 'Oswald', sans-serif;
   font-size: 12px;
@@ -1013,15 +1013,15 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(ellipse 60% 50% at 70% 45%, rgba(255,255,255,0.22), transparent 70%);
-  animation: spotlightIn 0.7s ease 0.45s both;
+  background: radial-gradient(ellipse 58% 52% at 70% 45%, rgba(255,255,255,0.20), transparent 70%);
+  animation: spotlightIn 0.7s ease 0.55s both;
   pointer-events: none;
 }
 
 @media (max-width: 768px) {
-  .shutterTag { padding: 20px 26px; border-width: 3px; }
-  .shutterHandle { height: 14px; bottom: 12%; }
-  .shutterLift { bottom: calc(12% + 34px); font-size: 13px; }
+  .shutterPlateWord { letter-spacing: 4px; }
+  .shutterPlateSub { letter-spacing: 5px; }
+  .shutterLift { bottom: 48px; font-size: 13px; }
 }
 
 /* ════════════════════════════════════════════════════════════════ */
@@ -1032,7 +1032,7 @@
   .productActive, .scrollArrow, .letter, .titleBottom, .badge, .lede,
   .specRow, .ctaRow, .statsRow, .trustRow, .showcase, .titleUnderline,
   .cycleWord, .cornerSticker, .mGlyph, .mSheen,
-  .shutterMetal, .shutterRail, .shutterTag, .shutterSheen, .drip, .shutterChevron {
+  .shutterMetal, .shutterSheen, .shutterPlate, .shutterChevron {
     animation: none !important;
   }
   .letter { opacity: 1; transform: none; }

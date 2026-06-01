@@ -66,8 +66,8 @@ export default function HeroBanner() {
     setShutterState(prev => {
       if (prev !== 'closed') return prev;
       try { sessionStorage.setItem('urbanex_shutter_opened', '1'); } catch { /* private mode */ }
-      // Door finishes its roll-up (~1.15s) then unmounts
-      const t1 = window.setTimeout(() => setShutterState('open'), 1200);
+      // Door finishes its roll-up + settle (~1.25s) then unmounts
+      const t1 = window.setTimeout(() => setShutterState('open'), 1320);
       shutterTimers.current.push(t1);
       return 'lifting';
     });
@@ -321,7 +321,7 @@ export default function HeroBanner() {
         <div className={styles.scrollArrow} />
       </div>
 
-      {/* ════════ THE SHUTTER — graffiti-tagged roller door ════════ */}
+      {/* ════════ THE SHUTTER — industrial roller door over the hero ════════ */}
       {shutterState !== 'open' && (
         <div
           className={`${styles.shutter} ${shutterState === 'lifting' ? styles.shutterLifting : ''}`}
@@ -331,23 +331,24 @@ export default function HeroBanner() {
           onTouchMove={onShutterTouchMove}
           onTouchEnd={onShutterTouchEnd}
         >
-          {/* Corrugated metal door */}
+          {/* Roll drum / housing shadow at the very top — slats roll into this */}
+          <div className={styles.shutterDrum} aria-hidden />
+
+          {/* The corrugated metal door (horizontal slats) */}
           <div className={styles.shutterMetal}>
-            {/* light sheen that sweeps down the metal while lifting */}
+            {/* moving highlight band — light catching the steel as it lifts */}
             <span className={styles.shutterSheen} aria-hidden />
 
-            {/* Spray-tagged brand stencil */}
-            <div className={styles.shutterTag}>
-              <span className={styles.shutterTagWord}>URBANEX</span>
-              <span className={styles.shutterTagSub}>✦ STREET CERTIFIED ✦</span>
-              {/* paint drips */}
-              <span className={`${styles.drip} ${styles.drip1}`} />
-              <span className={`${styles.drip} ${styles.drip2}`} />
-              <span className={`${styles.drip} ${styles.drip3}`} />
+            {/* Minimal embossed brand plate — stamped into the metal, not graffiti */}
+            <div className={styles.shutterPlate}>
+              <span className={styles.shutterPlateWord}>URBANEX</span>
+              <span className={styles.shutterPlateSub}>EST. STREETWEAR</span>
             </div>
 
-            {/* Handle bar */}
-            <div className={styles.shutterHandle} aria-hidden />
+            {/* Heavy bottom rail with the lift handle */}
+            <div className={styles.shutterRail} aria-hidden>
+              <span className={styles.shutterHandle} />
+            </div>
 
             {/* Lift hint + skip */}
             <button className={styles.shutterLift} onClick={liftShutter} aria-label="Lift the shutter and enter the store">
@@ -356,8 +357,6 @@ export default function HeroBanner() {
             </button>
             <button className={styles.shutterSkip} onClick={liftShutter} aria-label="Skip intro">SKIP →</button>
           </div>
-          {/* Bottom edge bar — the heavy rail that rolls up with the door */}
-          <div className={styles.shutterRail} aria-hidden />
         </div>
       )}
     </section>
