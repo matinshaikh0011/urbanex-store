@@ -73,7 +73,7 @@ async function api(path: string, opts?: RequestInit) {
 export default function AdminPage() {
   const router = useRouter();
   const { toasts, show } = useToast();
-  const [section, setSection] = useState<'overview' | 'orders' | 'products' | 'brands' | 'coupons' | 'inventory' | 'csv'>('overview');
+  const [section, setSection] = useState<'overview' | 'orders' | 'products' | 'brands' | 'categories' | 'coupons' | 'inventory' | 'csv'>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Verify auth on mount
@@ -91,6 +91,7 @@ export default function AdminPage() {
     { id: 'orders', icon: '📦', label: 'Orders' },
     { id: 'products', icon: '👟', label: 'Products' },
     { id: 'brands', icon: '🏷️', label: 'Brands' },
+    { id: 'categories', icon: '🗂️', label: 'Categories' },
     { id: 'coupons', icon: '🎟️', label: 'Coupons' },
     { id: 'inventory', icon: '📈', label: 'Inventory' },
     { id: 'csv', icon: '📥', label: 'Import CSV' },
@@ -138,6 +139,7 @@ export default function AdminPage() {
           {section === 'orders' && <OrdersSection show={show} />}
           {section === 'products' && <ProductsSection show={show} />}
           {section === 'brands' && <BrandsSection show={show} />}
+          {section === 'categories' && <CategoriesSection show={show} />}
           {section === 'coupons' && <CouponsSection show={show} />}
           {section === 'inventory' && <InventorySection show={show} />}
           {section === 'csv' && <CSVSection show={show} />}
@@ -153,13 +155,36 @@ export default function AdminPage() {
 function OverviewSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   useEffect(() => {
-    api('/api/admin/stats').then(r => r.json()).then(setStats).catch(() => show('Failed to load stats', 'err')).finally(() => setLoading(false));
+    api('/api/admin/stats')
+      .then(r => r.json())
+      .then(data => {
+        // Guard: if the API returned an error object instead of stats, treat as failure
+        if (data && data.error) {
+          setApiError(data.error);
+          setStats(null);
+        } else {
+          setStats(data);
+        }
+      })
+      .catch(() => {
+        setApiError('Could not reach the server.');
+        show('Failed to load stats', 'err');
+      })
+      .finally(() => setLoading(false));
   }, [show]);
 
   if (loading) return <div className={styles.loading}>Loading stats…</div>;
-  if (!stats) return <div className={styles.loading}>Failed to load.</div>;
+  if (apiError || !stats) return (
+    <div className={styles.loading} style={{ color: '#CC0000' }}>
+      ⚠ Failed to load stats{apiError ? `: ${apiError}` : ''}.<br />
+      <span style={{ fontSize: 12, color: '#888', marginTop: 8, display: 'block' }}>
+        Check that the backend DATABASE_URL environment variable is set on Render.
+      </span>
+    </div>
+  );
 
   const cards = [
     { label: 'Total Orders', value: stats.totalOrders, color: '#3B82F6' },
@@ -169,6 +194,10 @@ function OverviewSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
     { label: 'Out of Stock', value: stats.outOfStock, color: '#CC0000' },
     { label: 'Active Coupons', value: stats.activeCoupons, color: '#F97316' },
   ];
+
+  // Safe fallbacks — never crash if API returns partial data
+  const recentOrders = Array.isArray(stats.recentOrders) ? stats.recentOrders : [];
+  const outOfStockProducts = Array.isArray(stats.outOfStockProducts) ? stats.outOfStockProducts : [];
 
   return (
     <div>
@@ -187,27 +216,30 @@ function OverviewSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
         <table className={styles.table}>
           <thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
           <tbody>
-            {stats.recentOrders.map(o => (
-              <tr key={o.id}>
-                <td className={styles.mono}>{o.orderId}</td>
-                <td>{o.shippingName}</td>
-                <td>{fmt(Number(o.totalAmount))}</td>
-                <td><span className={styles.badge} style={{ background: statusColor(o.status) }}>{o.status}</span></td>
-                <td>{fmtDate(o.createdAt)}</td>
-              </tr>
-            ))}
+            {recentOrders.length === 0
+              ? <tr><td colSpan={5} style={{ textAlign: 'center', color: '#888', padding: '20px' }}>No recent orders</td></tr>
+              : recentOrders.map(o => (
+                <tr key={o.id}>
+                  <td className={styles.mono}>{o.orderId}</td>
+                  <td>{o.shippingName}</td>
+                  <td>{fmt(Number(o.totalAmount))}</td>
+                  <td><span className={styles.badge} style={{ background: statusColor(o.status) }}>{o.status}</span></td>
+                  <td>{fmtDate(o.createdAt)}</td>
+                </tr>
+              ))
+            }
           </tbody>
         </table>
       </div>
 
-      {stats.outOfStockProducts.length > 0 && (
+      {outOfStockProducts.length > 0 && (
         <>
           <h3 className={styles.subTitle}>Out of Stock</h3>
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <thead><tr><th>Product</th><th>Category</th><th>Brand</th></tr></thead>
               <tbody>
-                {stats.outOfStockProducts.map(p => (
+                {outOfStockProducts.map(p => (
                   <tr key={p.id}>
                     <td>{p.name}</td>
                     <td>{p.category}</td>
