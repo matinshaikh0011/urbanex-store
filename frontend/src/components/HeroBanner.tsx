@@ -1,90 +1,95 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import styles from './HeroBanner.module.css';
 
 // ──────────────────────────────────────────────────────────────
-// CATEGORY DROPS — each has its own identity (manifesto + stamp)
-// Product cutouts are transparent PNGs so they can break the frame.
+// PRODUCT DROPS — cycles through the four core categories
 // ──────────────────────────────────────────────────────────────
-interface Drop {
-  key: string;
-  label: string;
-  manifesto: [string, string, string]; // three-word identity
-  accent: 0 | 1 | 2;                    // which manifesto word is red
-  spec: string;
-  image: string;
-  href: string;
-  dropNo: string;
-}
-
-const DROPS: Drop[] = [
+const PRODUCTS = [
   {
-    key: 'sneakers',
+    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=900&q=80',
     label: 'SNEAKERS',
-    manifesto: ['STREET', 'SPEED', 'CULTURE'],
-    accent: 1,
+    tagline: 'FRESH KICKS',
     spec: 'VULCANIZED RUBBER · MID-TOP SILHOUETTE',
-    image: '/hero-morph-sneakers.png',
+    emoji: '👟',
     href: '/products?category=sneakers',
-    dropNo: 'DROP 001',
   },
   {
-    key: 'watches',
+    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=900&q=80',
     label: 'WATCHES',
-    manifesto: ['TIME', 'STATUS', 'PRECISION'],
-    accent: 1,
+    tagline: 'TIME PIECES',
     spec: '316L STEEL · SAPPHIRE CRYSTAL GLASS',
-    image: '/hero-morph-watch.png',
+    emoji: '⌚',
     href: '/products?category=watches',
-    dropNo: 'DROP 002',
   },
   {
-    key: 'glasses',
+    image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=900&q=80',
     label: 'GLASSES',
-    manifesto: ['VISION', 'ATTITUDE', 'ICON'],
-    accent: 2,
+    tagline: 'CLEAR VISION',
     spec: 'POLARIZED ACETATE · ANTI-REFLECTIVE COAT',
-    image: '/hero-morph-glasses.png',
+    emoji: '🕶️',
     href: '/products?category=glasses',
-    dropNo: 'DROP 003',
   },
   {
-    key: 'handbags',
+    image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=900&q=80',
     label: 'HANDBAGS',
-    manifesto: ['CRAFT', 'STYLE', 'STATEMENT'],
-    accent: 2,
+    tagline: 'CARRY HARD',
     spec: 'MATTE CALF LEATHER · HAND-STITCHED',
-    image: '/hero-morph-handbag.png',
+    emoji: '👜',
     href: '/products?category=handbags',
-    dropNo: 'DROP 004',
   },
 ];
 
-const TRUST = ['VERIFIED AUTHENTIC', 'CURATED BRANDS', 'FAST SHIPPING', '7-DAY RETURNS'];
-const TICKER = ['NEW DROP 2026', '100% AUTHENTIC', 'FAST SHIPPING', 'LIMITED STOCK', 'STREET CERTIFIED', 'COP OR DROP'];
+const TICKER = [
+  'NEW DROP 2026',
+  '100% AUTHENTIC',
+  'FAST SHIPPING',
+  'LIMITED STOCK',
+  'STREET CERTIFIED',
+  'COP OR DROP',
+];
 
 export default function HeroBanner() {
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+  const statRefs = useRef<(HTMLSpanElement | null)[]>([null, null, null]);
 
-  // Auto-cycle drops
+  // Auto-cycle products
   useEffect(() => {
     if (paused) return;
-    const id = setInterval(() => setCurrent(p => (p + 1) % DROPS.length), 4200);
-    return () => clearInterval(id);
+    const interval = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % PRODUCTS.length);
+    }, 3800);
+    return () => clearInterval(interval);
   }, [paused]);
 
-  // Pause cycling while tab is hidden (saves cycles + avoids jump on return)
+  // Animated stat counters — pure rAF, no libraries
   useEffect(() => {
-    const onVis = () => setPaused(document.hidden);
-    document.addEventListener('visibilitychange', onVis);
-    return () => document.removeEventListener('visibilitychange', onVis);
+    const stats = [
+      { end: 5, suffix: 'K+' },
+      { end: 50, suffix: '+' },
+      { end: 12, suffix: 'K+' },
+    ];
+    const start = performance.now();
+    const duration = 1900;
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      stats.forEach((stat, i) => {
+        const el = statRefs.current[i];
+        if (el) el.innerText = Math.floor(eased * stat.end) + stat.suffix;
+      });
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, []);
 
-  // Pointer parallax → CSS vars (desktop only, rAF-smoothed, transform-only)
+  // Mouse parallax — drives CSS vars, smoothed with rAF (cheap)
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -94,47 +99,61 @@ export default function HeroBanner() {
     let raf = 0;
     const target = { x: 0, y: 0 };
     const cur = { x: 0, y: 0 };
+
     const onMove = (e: MouseEvent) => {
-      const r = section.getBoundingClientRect();
-      target.x = (e.clientX - r.left) / r.width - 0.5;
-      target.y = (e.clientY - r.top) / r.height - 0.5;
+      const rect = section.getBoundingClientRect();
+      target.x = (e.clientX - rect.left) / rect.width - 0.5;
+      target.y = (e.clientY - rect.top) / rect.height - 0.5;
     };
     const loop = () => {
-      cur.x += (target.x - cur.x) * 0.08;
-      cur.y += (target.y - cur.y) * 0.08;
+      cur.x += (target.x - cur.x) * 0.07;
+      cur.y += (target.y - cur.y) * 0.07;
       section.style.setProperty('--mx', cur.x.toFixed(4));
       section.style.setProperty('--my', cur.y.toFixed(4));
       raf = requestAnimationFrame(loop);
     };
     section.addEventListener('mousemove', onMove);
     raf = requestAnimationFrame(loop);
-    return () => { section.removeEventListener('mousemove', onMove); cancelAnimationFrame(raf); };
+    return () => {
+      section.removeEventListener('mousemove', onMove);
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
-  const select = useCallback((i: number) => setCurrent(i), []);
-
-  const d = DROPS[current];
+  const product = PRODUCTS[current];
 
   return (
-    <section ref={sectionRef} className={styles.hero} data-cat={d.key}>
-      {/* ════════ BACKGROUND ════════ */}
+    <section ref={sectionRef} className={styles.hero}>
+      {/* ════════ ANIMATED BACKGROUND (GPU-cheap) ════════ */}
       <div className={styles.bg} aria-hidden>
-        <div className={styles.bgWash} />
+        <div className={styles.bgMesh} />
+        <div className={styles.bgStripes} />
         <div className={styles.bgGrid} />
-        {/* Giant kinetic category wordmark — re-keys to replay the slide */}
-        <div className={styles.ghostWrap}>
-          <span key={d.key} className={styles.ghostWord}>{d.label}</span>
+        <div className={styles.bgWordWrap}>
+          <div className={styles.bgWordTrack}>
+            <span>{product.label}</span>
+            <span className={styles.bgWordOutline}>{product.label}</span>
+            <span>{product.label}</span>
+          </div>
         </div>
-        {/* Mobile-only rising glyphs + sheen */}
+        {/* Floating graffiti shapes (desktop/tablet) */}
+        <span className={`${styles.shape} ${styles.shapeRing}`} />
+        <span className={`${styles.shape} ${styles.shapeSquare}`} />
+        <span className={`${styles.shape} ${styles.shapeDot}`} />
+        <span className={`${styles.shape} ${styles.shapePlus}`}>+</span>
+        <span className={`${styles.shape} ${styles.shapeStar}`}>✦</span>
+        <span className={`${styles.shape} ${styles.shapeZig}`} />
+
+        {/* Mobile-only animated background: rising graffiti symbols + sheen */}
         <div className={styles.mobileFX} aria-hidden>
           <span className={styles.mSheen} />
-          {['✦', '✕', '★', '◆', '+', '●', '✦', '✕'].map((g, i) => (
+          {['✦', '✕', '★', '◆', '+', '●', '✦', '✕', '★'].map((g, i) => (
             <span key={i} className={styles.mGlyph}>{g}</span>
           ))}
         </div>
       </div>
 
-      {/* ════════ TICKER ════════ */}
+      {/* Top ticker tape — now flush under the header (no gap) */}
       <div className={styles.tape} aria-hidden>
         <div className={styles.tapeTrack}>
           {[...TICKER, ...TICKER, ...TICKER].map((w, i) => (
@@ -145,42 +164,104 @@ export default function HeroBanner() {
 
       {/* ════════ CONTENT ════════ */}
       <div className={styles.content}>
-        {/* ── DROP CARD (product breaks the frame) ── */}
-        <div className={styles.cardCol}>
-          <div className={styles.dropCard}>
-            <span className={styles.dropStamp}>
-              <span key={`${d.key}-no`} className={styles.dropStampInner}>{d.dropNo}</span>
+        {/* LEFT — typography + CTAs */}
+        <div className={styles.left}>
+          <div className={styles.badge}>
+            <span className={styles.badgeDot} />
+            LIVE DROP 2026 — 100% AUTHENTIC
+          </div>
+
+          <h1 className={styles.title}>
+            <span className={styles.titleTop}>
+              {'URBANEX'.split('').map((c, i) => (
+                <span
+                  key={i}
+                  className={styles.letter}
+                  style={{ animationDelay: `${0.15 + i * 0.06}s` }}
+                >
+                  {c}
+                </span>
+              ))}
             </span>
-            <span className={styles.liveChip}><i className={styles.liveDot} />LIVE</span>
+            <span className={styles.titleBottom}>
+              THE{' '}
+              <span key={current} className={styles.cycleWord}>{product.label}</span>{' '}
+              DROP
+            </span>
+            <span className={styles.titleUnderline} />
+          </h1>
 
-            <Link href={d.href} className={styles.cardStage} data-cursor="view" aria-label={`Shop ${d.label}`}>
-              {/* Clipped backdrop + ghost letter live inside the stage */}
-              <span className={styles.stageTint} />
-              <span key={`${d.key}-ghost`} className={styles.stageLetter}>{d.label.charAt(0)}</span>
+          <p className={styles.lede}>
+            Watches · Sneakers · Glasses · Handbags. The street&apos;s most wanted —
+            verified original, shipped fast across India.
+          </p>
+
+          <div className={styles.specRow}>
+            <span className={styles.specTag}>{product.tagline}</span>
+            <span className={styles.specText}>{product.spec}</span>
+          </div>
+
+          <div className={styles.ctaRow}>
+            <Link href="/products" className={styles.ctaPrimary} data-cursor="cop">
+              <span className={styles.ctaShine} />
+              SHOP THE DROP <i>→</i>
             </Link>
+            <Link href="/brands" className={styles.ctaSecondary} data-cursor="explore">
+              EXPLORE BRANDS
+            </Link>
+          </div>
 
-            {/* Product layer is OUTSIDE the clip → breaks above the top border */}
-            <div className={styles.productLayer}>
-              {DROPS.map((p, i) => (
+          <div className={styles.trustRow}>
+            <span>⚡ Instant WhatsApp Support</span>
+            <span>↩️ 7-Day Returns</span>
+            <span>🔒 Secure Checkout</span>
+          </div>
+
+          <div className={styles.statsRow}>
+            <div className={styles.statBlock}>
+              <span ref={(el) => { statRefs.current[0] = el; }} className={styles.statNum}>0K+</span>
+              <span className={styles.statLabel}>ITEMS</span>
+            </div>
+            <div className={styles.statBlock}>
+              <span ref={(el) => { statRefs.current[1] = el; }} className={styles.statNum}>0+</span>
+              <span className={styles.statLabel}>BRANDS</span>
+            </div>
+            <div className={styles.statBlock}>
+              <span ref={(el) => { statRefs.current[2] = el; }} className={styles.statNum}>0K+</span>
+              <span className={styles.statLabel}>MEMBERS</span>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT — product showcase tile */}
+        <div className={styles.right}>
+          <div className={styles.showcase}>
+            <span className={styles.showcaseTag}>{product.emoji} {product.label}</span>
+            <span className={styles.cornerSticker}>NEW<br />DROP</span>
+
+            <Link href={product.href} className={styles.stage} data-cursor="view">
+              {PRODUCTS.map((p, i) => (
                 <img
-                  key={p.key}
+                  key={p.image}
                   src={p.image}
                   alt={p.label}
-                  className={`${styles.product} ${i === current ? styles.productActive : ''}`}
+                  className={`${styles.productImg} ${i === current ? styles.productActive : ''}`}
                   loading={i === 0 ? 'eager' : 'lazy'}
                   draggable={false}
                 />
               ))}
-            </div>
+              <span className={styles.stageGlow} />
+              <span className={styles.stageLabel}>SHOP {product.label} →</span>
+            </Link>
 
-            <div className={styles.cardFoot}>
-              <span className={styles.spec}>{d.spec}</span>
+            <div className={styles.showcaseFoot}>
+              <span className={styles.priceHint}>{product.tagline}</span>
               <div className={styles.dots}>
-                {DROPS.map((p, i) => (
+                {PRODUCTS.map((p, i) => (
                   <button
-                    key={p.key}
+                    key={p.label}
                     className={`${styles.dot} ${i === current ? styles.dotActive : ''}`}
-                    onClick={() => select(i)}
+                    onClick={() => setCurrent(i)}
                     onMouseEnter={() => setPaused(true)}
                     onMouseLeave={() => setPaused(false)}
                     aria-label={`Show ${p.label}`}
@@ -190,54 +271,9 @@ export default function HeroBanner() {
             </div>
           </div>
         </div>
-
-        {/* ── MANIFESTO + CTAs ── */}
-        <div className={styles.copyCol}>
-          <div className={styles.kicker}>
-            <span className={styles.kickerMark}>URBANEX</span>
-            <span className={styles.kickerLine} />
-            <span className={styles.kickerCat}>{d.label}</span>
-          </div>
-
-          {/* Three-word category manifesto — the headline */}
-          <h1 className={styles.manifesto} key={d.key}>
-            {d.manifesto.map((word, i) => (
-              <span
-                key={word}
-                className={`${styles.word} ${i === d.accent ? styles.wordAccent : ''}`}
-                style={{ animationDelay: `${0.08 + i * 0.09}s` }}
-              >
-                <span className={styles.wordInner}>{word}<i className={styles.wordDot}>.</i></span>
-              </span>
-            ))}
-          </h1>
-
-          <p className={styles.lede}>
-            The street&apos;s most wanted — verified original, shipped fast across India.
-          </p>
-
-          <div className={styles.ctaRow}>
-            <Link href={d.href} className={styles.ctaPrimary} data-cursor="cop">
-              <span className={styles.ctaShine} />
-              SHOP {d.label} <i>→</i>
-            </Link>
-            <Link href="/brands" className={styles.ctaSecondary} data-cursor="explore">
-              EXPLORE BRANDS
-            </Link>
-          </div>
-
-          {/* Trust strip — designed in, not bolted on */}
-          <div className={styles.trustStrip}>
-            {TRUST.map((t, i) => (
-              <span key={t} className={styles.trustItem}>
-                <i className={styles.trustTick}>✓</i>{t}
-                {i < TRUST.length - 1 && <i className={styles.trustSep} />}
-              </span>
-            ))}
-          </div>
-        </div>
       </div>
 
+      {/* Scroll cue */}
       <div className={styles.scrollCue} aria-hidden>
         <span>SCROLL</span>
         <div className={styles.scrollArrow} />
