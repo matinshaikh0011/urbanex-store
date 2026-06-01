@@ -311,12 +311,10 @@ export default function Header() {
   const [mounted, setMounted] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isMobile, setIsMobile] = useState(false);
-  const [megaTop, setMegaTop] = useState(0);
 
   // Hover intent refs — prevent flicker when moving mouse from trigger to panel
   const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const megaRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -326,23 +324,6 @@ export default function Header() {
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
-  }, []);
-
-  // Track header bottom edge for mega menu positioning
-  useEffect(() => {
-    const updateTop = () => {
-      if (headerRef.current) {
-        const rect = headerRef.current.getBoundingClientRect();
-        setMegaTop(rect.bottom);
-      }
-    };
-    updateTop();
-    window.addEventListener('scroll', updateTop, { passive: true });
-    window.addEventListener('resize', updateTop);
-    return () => {
-      window.removeEventListener('scroll', updateTop);
-      window.removeEventListener('resize', updateTop);
-    };
   }, []);
 
   // Fetch categories from API — fall back to static list if API is down
@@ -407,7 +388,7 @@ export default function Header() {
   }, [megaOpen]);
 
   return (
-    <header className={styles.header} ref={headerRef}>
+    <header className={styles.header}>
       <div className={styles.container}>
         {/* Logo */}
         <Link href="/" className={styles.logo} onClick={closeAll}>
@@ -454,7 +435,6 @@ export default function Header() {
               {megaOpen && (
                 <div
                   className={styles.megaWrapper}
-                  style={{ top: megaTop }}
                   onMouseEnter={handleMegaMouseEnter}
                   onMouseLeave={handleMegaMouseLeave}
                 >

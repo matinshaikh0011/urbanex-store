@@ -163,10 +163,13 @@
 
 /* ================================================================
    MEGA MENU WRAPPER
-   — Full-width panel anchored below the header (top set dynamically via JS)
+   — Anchored to the header's bottom edge via absolute positioning.
+     .header is position:sticky (a positioned ancestor), so top:100%
+     always sits flush under the nav row — no JS measurement needed.
    ================================================================ */
 .megaWrapper {
-  position: fixed;
+  position: absolute;
+  top: 100%;
   left: 0;
   right: 0;
   z-index: 199;
