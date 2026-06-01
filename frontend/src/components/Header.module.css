@@ -1,11 +1,10 @@
 /* ================================================================
    HEADER — Graffiti Concrete Style
-   Thick black marker nav on a raw concrete bar
    ================================================================ */
 
 @keyframes dropIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes popIn {
@@ -24,6 +23,14 @@
   to   { opacity: 1; transform: scale(1); }
 }
 
+@keyframes megaFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ================================================================
+   HEADER SHELL
+   ================================================================ */
 .header {
   position: sticky;
   top: 0;
@@ -33,7 +40,7 @@
   box-shadow: 0 4px 0 var(--border-color);
 }
 
-/* ---- Top spray tape accent line ---- */
+/* Spray tape accent line */
 .header::before {
   content: '';
   display: block;
@@ -59,7 +66,7 @@
 }
 
 /* ================================================================
-   LOGO — Brand image logo
+   LOGO
    ================================================================ */
 .logo {
   display: inline-flex;
@@ -68,11 +75,7 @@
   transition: transform 0.2s var(--ease-spring);
   flex-shrink: 0;
 }
-
-.logo:hover {
-  transform: scale(1.04) rotate(-0.5deg);
-  color: var(--text-primary);
-}
+.logo:hover { transform: scale(1.04) rotate(-0.5deg); color: var(--text-primary); }
 
 .logoImage {
   height: 38px;
@@ -81,7 +84,6 @@
   filter: contrast(1.1);
   transition: filter 0.2s ease;
 }
-
 .logo:hover .logoImage {
   filter: contrast(1.2) drop-shadow(0 2px 8px rgba(204, 0, 0, 0.25));
 }
@@ -106,6 +108,8 @@
   transition: color 0.15s ease;
   white-space: nowrap;
   display: block;
+  background: none;
+  border: none;
 }
 
 /* Marker underline draw effect */
@@ -121,102 +125,198 @@
   transform-origin: left;
   transition: transform 0.2s var(--ease-out);
 }
+.navLink:hover { color: var(--text-primary); }
+.navLink:hover::after { transform: scaleX(1); }
 
-.navLink:hover {
-  color: var(--text-primary);
-}
+/* Scramble text */
+.scrambleText { display: inline-block; transition: all 0.1s ease; }
+.scrambleText.animating { color: var(--accent-primary); font-style: italic; }
 
-.navLink:hover::after {
-  transform: scaleX(1);
-}
-
-/* Scramble text span */
-.scrambleText {
+/* Chevron inside nav buttons */
+.chevron {
+  font-size: 10px;
+  margin-left: 4px;
   display: inline-block;
-  transition: all 0.1s ease;
-}
-
-.scrambleText.animating {
-  color: var(--accent-primary);
-  font-style: italic;
+  transition: transform 0.2s ease;
 }
 
 /* ================================================================
-   DROPDOWN
+   CATEGORIES TRIGGER — Desktop
    ================================================================ */
-.dropdown {
+.catTrigger {
+  position: static; /* mega menu is positioned relative to header, not this */
+}
+
+.catBtn {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Active state when mega is open */
+.catTriggerActive .catBtn {
+  color: var(--text-primary);
+}
+.catTriggerActive .catBtn::after {
+  transform: scaleX(1);
+}
+
+/* ================================================================
+   MEGA MENU WRAPPER
+   — Full-width panel anchored below the header (top set dynamically via JS)
+   ================================================================ */
+.megaWrapper {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 199;
+  animation: megaFadeIn 0.18s ease forwards;
+}
+
+/* ================================================================
+   MEGA MENU PANEL
+   ================================================================ */
+.megaMenu {
+  background: var(--bg-secondary);
+  border-bottom: 4px solid var(--border-color);
+  border-top: 3px solid var(--accent-primary);
+  box-shadow: 0 8px 0 var(--border-color), 0 12px 40px rgba(0,0,0,0.5);
+  width: 100%;
+}
+
+.megaInner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: stretch;
+}
+
+/* ================================================================
+   MEGA MENU COLUMNS — equal width, no auto-fit weirdness
+   ================================================================ */
+.megaCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 20px 24px;
+  border-right: 2px solid var(--border-color);
+  min-width: 0; /* prevent flex blowout */
+}
+.megaCol:first-child { padding-left: 0; }
+.megaCol:last-of-type { border-right: none; }
+
+/* Parent category heading */
+.megaParent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 3px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin-bottom: 0;
+  padding-bottom: 12px;
+  border-bottom: 3px solid var(--border-color);
+  transition: color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   position: relative;
 }
-
-.dropdownContent {
-  /* Use visibility+opacity instead of display:none so we can add transition-delay */
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
+/* Red underline slides in on hover */
+.megaParent::after {
+  content: '';
   position: absolute;
-  top: calc(100% + 4px);
-  left: 50%;
-  transform: translateX(-50%) translateY(-8px);
-  background: var(--bg-secondary);
-  border: var(--border);
-  box-shadow: var(--shadow-lg);
-  min-width: 230px;
-  max-height: 70vh;
-  overflow-y: auto;
-  z-index: 300;
-  /* Show instantly, hide after 1.5s delay */
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease,
-    visibility 0s linear 1.5s;  /* 1.5s before becoming invisible */
-}
-
-@keyframes dropIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
-
-.dropdown:hover .dropdownContent,
-.dropdownContent:hover {
-  visibility: visible;
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease,
-    visibility 0s linear 0s;   /* show immediately */
-}
-
-.dropdownContent a {
-  display: block;
-  padding: 12px 20px;
-  font-family: 'Oswald', sans-serif;
-  font-size: 15px;
-  letter-spacing: 2px;
-  color: var(--text-secondary);
-  border-bottom: 2px solid var(--border-color);
-  transition: all 0.15s ease;
-}
-
-.dropdownContent a:last-child { border-bottom: none; }
-
-.dropdownContent a:hover {
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 3px;
   background: var(--accent-primary);
-  color: #fff;
-  padding-left: 28px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+.megaParent:hover { color: var(--accent-primary); }
+.megaParent:hover::after { transform: scaleX(1); }
+
+.megaParentIcon {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
-/* Sub-category items — indented + smaller */
-.subItem {
-  font-size: 13px !important;
-  color: var(--text-muted) !important;
-  padding-left: 32px !important;
-  background: var(--bg-primary);
+/* Children list — stacked vertically under the heading */
+.megaChildren {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
-.subItem:hover {
-  color: #fff !important;
-  padding-left: 38px !important;
+
+.megaChild {
+  display: block;
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  color: var(--text-secondary);
+  padding: 8px 0 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: color 0.12s ease, padding-left 0.12s ease;
+  text-transform: uppercase;
+  position: relative;
+}
+.megaChild::before {
+  content: '—';
+  margin-right: 6px;
+  color: var(--accent-primary);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.megaChildren li:last-child .megaChild { border-bottom: none; }
+.megaChild:hover {
+  color: var(--text-primary);
+  padding-left: 4px;
+}
+.megaChild:hover::before { opacity: 1; }
+
+/* ================================================================
+   MEGA MENU — CTA COLUMN
+   ================================================================ */
+.megaColCta {
+  flex: 0 0 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0 24px 20px;
+  border-left: 2px solid var(--border-color);
+}
+
+.megaViewAll {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: #fff;
+  background: var(--accent-primary);
+  border: 3px solid var(--border-color);
+  box-shadow: 4px 4px 0 var(--border-color);
+  padding: 18px 16px;
+  line-height: 1.4;
+  transition: all 0.15s var(--ease-spring);
+  white-space: nowrap;
+  width: 100%;
+}
+.megaViewAll:hover {
+  background: var(--text-primary);
+  color: var(--bg-secondary);
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--border-color);
 }
 
 /* ================================================================
@@ -241,7 +341,6 @@
   cursor: pointer;
   transition: all 0.15s var(--ease-spring);
 }
-
 .iconBtn:hover {
   background: var(--text-primary);
   color: var(--bg-secondary);
@@ -263,7 +362,6 @@
   cursor: pointer;
   transition: all 0.15s var(--ease-spring);
 }
-
 .cartLink:hover {
   background: var(--accent-primary);
   color: #fff;
@@ -290,14 +388,8 @@
   animation: popIn 0.3s var(--ease-spring);
 }
 
-@keyframes popIn {
-  0%   { transform: scale(0) rotate(-10deg); }
-  60%  { transform: scale(1.2) rotate(5deg);  }
-  100% { transform: scale(1) rotate(0);       }
-}
-
 /* ================================================================
-   HAMBURGER MENU
+   HAMBURGER
    ================================================================ */
 .menuToggle {
   display: none;
@@ -313,7 +405,6 @@
   cursor: pointer;
   transition: all 0.15s ease;
 }
-
 .menuToggle span {
   width: 22px;
   height: 3px;
@@ -321,19 +412,11 @@
   transition: all 0.3s ease;
   display: block;
 }
-
-.menuToggle:hover {
-  background: var(--accent-primary);
-  transform: translate(2px, 2px);
-  box-shadow: var(--shadow-hover);
-}
-
-.menuToggle:hover span {
-  background: #fff;
-}
+.menuToggle:hover { background: var(--accent-primary); transform: translate(2px, 2px); box-shadow: var(--shadow-hover); }
+.menuToggle:hover span { background: #fff; }
 
 /* ================================================================
-   SEARCH OVERLAY (live results modal)
+   SEARCH OVERLAY
    ================================================================ */
 .searchOverlay {
   position: fixed;
@@ -346,11 +429,7 @@
   padding: 80px 20px 20px;
   animation: searchFade 0.2s ease;
 }
-
-@keyframes searchFade {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
+@keyframes searchFade { from { opacity: 0; } to { opacity: 1; } }
 
 .searchModal {
   width: 100%;
@@ -363,7 +442,6 @@
   flex-direction: column;
   animation: searchSlide 0.25s var(--ease-out);
 }
-
 @keyframes searchSlide {
   from { opacity: 0; transform: translateY(-20px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -377,7 +455,6 @@
   border-bottom: var(--border);
   background: var(--bg-primary);
 }
-
 .searchTopIcon { color: var(--accent-primary); flex-shrink: 0; }
 
 .searchModalInput {
@@ -408,10 +485,7 @@
 }
 .searchClose:hover { background: var(--accent-primary); color: #fff; transform: rotate(90deg); }
 
-.searchResults {
-  overflow-y: auto;
-  padding: 8px;
-}
+.searchResults { overflow-y: auto; padding: 8px; }
 
 .searchHint {
   text-align: center;
@@ -422,11 +496,7 @@
   color: var(--text-muted);
 }
 
-.searchEmpty {
-  text-align: center;
-  padding: 48px 20px;
-  color: var(--text-secondary);
-}
+.searchEmpty { text-align: center; padding: 48px 20px; color: var(--text-secondary); }
 .searchEmptyIcon { font-size: 48px; display: block; margin-bottom: 12px; opacity: 0.5; }
 
 .searchResult {
@@ -465,44 +535,108 @@
   text-overflow: ellipsis;
 }
 .searchResultMeta { display: flex; gap: 8px; align-items: center; }
-.searchResultBrand {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 12px;
-  letter-spacing: 1px;
-  color: var(--accent-primary);
-}
-.searchResultCat {
-  font-size: 11px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.searchResultPrice {
-  font-family: 'Oswald', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-primary);
-  flex-shrink: 0;
-}
-
-@media (max-width: 480px) {
-  .searchOverlay { padding: 64px 12px 12px; }
-  .searchModalInput { font-size: 16px; }
-  .searchResultPrice { font-size: 14px; }
-}
+.searchResultBrand { font-family: 'Bebas Neue', sans-serif; font-size: 12px; letter-spacing: 1px; color: var(--accent-primary); }
+.searchResultCat { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+.searchResultPrice { font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 700; color: var(--text-primary); flex-shrink: 0; }
 
 /* ================================================================
-   RESPONSIVE — Mobile
+   MOBILE ACCORDION (inside drawer)
+   ================================================================ */
+.mobileCatWrapper {
+  width: 100%;
+}
+
+.mobileCatBtn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+}
+
+.mobileAccordion {
+  background: var(--bg-primary);
+  border-top: 2px solid var(--border-color);
+}
+
+.accordionItem {
+  border-bottom: 2px solid var(--border-color);
+}
+
+.accordionHeader {
+  display: flex;
+  align-items: stretch;
+}
+
+.accordionParentLink {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: var(--text-secondary);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.accordionParentLink:hover { color: var(--text-primary); background: rgba(204,0,0,0.06); }
+
+.accordionToggle {
+  flex-shrink: 0;
+  width: 48px;
+  background: transparent;
+  border: none;
+  border-left: 2px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.accordionToggle:hover { background: var(--accent-primary); color: #fff; }
+.accordionToggleOpen { transform: rotate(180deg); color: var(--accent-primary); }
+
+.accordionBody {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.accordionBodyOpen {
+  max-height: 400px;
+}
+
+.accordionChild {
+  display: block;
+  padding: 11px 24px 11px 44px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+}
+.accordionChild:last-child { border-bottom: none; }
+.accordionChild:hover { color: var(--text-primary); background: rgba(204,0,0,0.06); padding-left: 52px; }
+
+/* ================================================================
+   RESPONSIVE — Mobile (≤960px)
    ================================================================ */
 @media (max-width: 960px) {
   .menuToggle { display: flex; }
+
+  /* Mega menu is hidden on mobile — accordion is used instead */
+  .megaWrapper { display: none; }
 
   .nav {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
-    width: 280px;
+    width: 300px;
     background: var(--bg-secondary);
     border-right: var(--border);
     box-shadow: var(--shadow-lg);
@@ -530,50 +664,19 @@
     border-bottom: 2px solid var(--border-color);
     font-size: 18px;
   }
-
   .navLink::after { display: none; }
+  .navLink:hover { background: var(--accent-primary); color: #fff; }
 
-  .navLink:hover {
-    background: var(--accent-primary);
-    color: #fff;
-  }
-
-  .dropdown { width: 100%; }
-
-  .dropdown .navLink {
-    display: flex;
+  /* Category trigger on mobile fills full width */
+  .catTrigger { width: 100%; }
+  .catBtn {
+    width: 100%;
     justify-content: space-between;
-    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 2px solid var(--border-color);
+    font-size: 18px;
   }
-
-  .dropdownContent {
-    position: static;
-    transform: none !important;
-    box-shadow: none;
-    border: none;
-    border-top: 2px solid var(--border-color);
-    background: var(--bg-tertiary);
-    animation: none;
-    /* Mobile: always hidden unless .dropdownOpen is set */
-    visibility: hidden;
-    opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.2s ease, visibility 0s linear 0.2s;
-  }
-
-  .dropdownOpen {
-    visibility: visible !important;
-    opacity: 1 !important;
-    max-height: 400px !important;
-    transition: max-height 0.3s ease, opacity 0.2s ease, visibility 0s linear 0s !important;
-    pointer-events: auto !important;
-  }
-
-  .dropdownContent a {
-    padding-left: 36px;
-    font-size: 14px;
-  }
+  .catBtn::after { display: none; }
 }
 
 @media (max-width: 480px) {
@@ -581,4 +684,19 @@
   .logoImage { height: 30px; }
   .iconBtn { width: 34px; height: 34px; }
   .cartLink { width: 38px; height: 38px; }
+  .searchOverlay { padding: 64px 12px 12px; }
+  .searchModalInput { font-size: 16px; }
+  .searchResultPrice { font-size: 14px; }
+}
+
+/* ================================================================
+   MEGA MENU — Responsive adjustments for mid-range screens
+   ================================================================ */
+@media (min-width: 961px) and (max-width: 1200px) {
+  .megaInner { padding: 0 16px; }
+  .megaCol { padding: 20px 14px; }
+  .megaParent { font-size: 15px; letter-spacing: 2px; }
+  .megaChild { font-size: 11px; }
+  .megaColCta { flex: 0 0 100px; padding-left: 14px; }
+  .megaViewAll { font-size: 12px; padding: 14px 10px; }
 }
