@@ -286,9 +286,7 @@ export default function Home() {
           </section>
         </ScrollReveal>
 
-        <ScrollReveal animation="fadeIn" delay={100}>
-          <BrandCarousel brands={brands} />
-        </ScrollReveal>
+        <BrandCarousel brands={brands} />
 
         {/* Featured Drops - Subdivided by Category */}
         <section className={styles.featured}>
