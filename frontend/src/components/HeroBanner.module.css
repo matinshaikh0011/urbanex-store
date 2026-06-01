@@ -82,6 +82,31 @@
   100% { background-position: 0% 0%, 100% 0%, 50% 100%; }
 }
 
+/* ── THE SHUTTER ── */
+@keyframes shutterRollUp {
+  from { transform: scaleY(1); }
+  to   { transform: scaleY(0); }
+}
+@keyframes shutterClackShake {
+  0%   { transform: translateY(0); }
+  35%  { transform: translateY(6px); }
+  70%  { transform: translateY(-3px); }
+  100% { transform: translateY(0); }
+}
+@keyframes dripFall {
+  0%   { transform: scaleY(0); opacity: 0; }
+  30%  { opacity: 1; }
+  100% { transform: scaleY(1); opacity: 1; }
+}
+@keyframes chevronBob {
+  0%,100% { transform: translateY(0); opacity: 1; }
+  50%     { transform: translateY(-6px); opacity: 0.5; }
+}
+@keyframes spotlightIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 /* ───────────────────────── CONTAINER ───────────────────────── */
 .hero {
   position: relative;
@@ -785,12 +810,181 @@
   .cornerSticker { width: 48px; height: 48px; font-size: 10px; top: -12px; right: -4px; }
 }
 
+/* ════════════════════════════════════════════════════════════════
+   THE SHUTTER — graffiti-tagged roller door over the hero
+   ════════════════════════════════════════════════════════════════ */
+.shutter {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  overflow: hidden;
+  touch-action: pan-y;
+  cursor: pointer;
+}
+
+/* The corrugated metal door — rolls up from the top edge */
+.shutterMetal {
+  position: absolute;
+  inset: 0;
+  transform-origin: top center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Vertical corrugated ribs + metallic sheen, pure CSS */
+  background-color: #2a2a2c;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      #1c1c1e 0px,
+      #2e2e30 6px,
+      #3a3a3d 11px,
+      #2e2e30 16px,
+      #1c1c1e 22px
+    ),
+    linear-gradient(180deg, rgba(255,255,255,0.10) 0%, transparent 18%, transparent 82%, rgba(0,0,0,0.35) 100%);
+  box-shadow: inset 0 -8px 0 rgba(0,0,0,0.4), inset 0 6px 0 rgba(255,255,255,0.06);
+  border-bottom: 6px solid #0c0c0d;
+}
+
+/* Roll-up animation */
+.shutterLifting .shutterMetal {
+  animation: shutterRollUp 0.75s cubic-bezier(0.5, 0, 0.4, 1) forwards;
+}
+/* Metallic clack jolt at the top */
+.shutterClack .shutterMetal {
+  animation: shutterRollUp 0.75s cubic-bezier(0.5, 0, 0.4, 1) forwards,
+             shutterClackShake 0.18s ease-out 0.74s;
+}
+
+/* ── Spray-tagged brand stencil ── */
+.shutterTag {
+  position: relative;
+  text-align: center;
+  padding: 28px 44px;
+  border: 4px dashed rgba(255,255,255,0.28);
+  transform: rotate(-2deg);
+}
+.shutterTagWord {
+  display: block;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: clamp(40px, 9vw, 104px);
+  letter-spacing: 4px;
+  line-height: 0.9;
+  color: transparent;
+  -webkit-text-stroke: 2px #fff;
+  text-shadow: 4px 4px 0 var(--accent-primary);
+  /* spray-paint texture: speckled mask feel via layered shadows */
+}
+.shutterTagSub {
+  display: block;
+  margin-top: 14px;
+  font-family: 'Permanent Marker', cursive;
+  font-size: clamp(13px, 2vw, 20px);
+  letter-spacing: 3px;
+  color: var(--accent-primary);
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.6);
+}
+
+/* Paint drips off the stencil box */
+.drip {
+  position: absolute;
+  width: 5px;
+  background: var(--accent-primary);
+  transform-origin: top;
+  border-radius: 0 0 3px 3px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
+}
+.shutter .drip { animation: dripFall 1.2s ease-out both; }
+.drip1 { left: 18%;  bottom: -34px; height: 34px; animation-delay: 0.3s !important; }
+.drip2 { left: 52%;  bottom: -52px; height: 52px; animation-delay: 0.5s !important; }
+.drip3 { right: 22%; bottom: -26px; height: 26px; animation-delay: 0.7s !important; }
+
+/* Handle bar near the bottom */
+.shutterHandle {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(420px, 60%);
+  height: 18px;
+  background: linear-gradient(180deg, #4a4a4d, #232325);
+  border: 2px solid #0c0c0d;
+  border-radius: 4px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.12);
+}
+
+/* Lift hint */
+.shutterLift {
+  position: absolute;
+  bottom: calc(8% + 40px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 15px;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.85);
+}
+.shutterChevron {
+  font-size: 30px;
+  line-height: 1;
+  color: var(--accent-tag);
+  animation: chevronBob 1.4s ease-in-out infinite;
+}
+
+/* Skip button — always-available escape hatch */
+.shutterSkip {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: rgba(0,0,0,0.4);
+  border: 2px solid rgba(255,255,255,0.4);
+  color: #fff;
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.shutterSkip:hover { background: var(--accent-primary); transform: translateY(-1px); }
+
+/* Spotlight wash that fades in over the product as the door clears */
+.shutterLifting::after,
+.shutterClack::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse 60% 50% at 70% 45%, rgba(255,255,255,0.25), transparent 70%);
+  animation: spotlightIn 0.6s ease 0.5s both;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .shutterTag { padding: 20px 26px; border-width: 3px; }
+  .shutterHandle { height: 14px; bottom: 12%; }
+  .shutterLift { bottom: calc(12% + 34px); font-size: 13px; }
+}
+
+/* ════════════════════════════════════════════════════════════════ */
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .tapeTrack, .bgMesh, .bgStripes, .bgWordTrack, .shape, .badgeDot,
   .productActive, .scrollArrow, .letter, .titleBottom, .badge, .lede,
   .specRow, .ctaRow, .statsRow, .trustRow, .showcase, .titleUnderline,
-  .cycleWord, .cornerSticker, .mGlyph, .mSheen {
+  .cycleWord, .cornerSticker, .mGlyph, .mSheen,
+  .shutterMetal, .drip, .shutterChevron {
     animation: none !important;
   }
   .letter { opacity: 1; transform: none; }

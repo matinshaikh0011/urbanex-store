@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import styles from './HeroBanner.module.css';
 
@@ -56,6 +56,51 @@ export default function HeroBanner() {
   const [paused, setPaused] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const statRefs = useRef<(HTMLSpanElement | null)[]>([null, null, null]);
+
+  // ── THE SHUTTER — "open the store" reveal ──────────────────────
+  const [shutterState, setShutterState] = useState<'closed' | 'lifting' | 'open'>('closed');
+  const [clack, setClack] = useState(false);
+  const shutterTimers = useRef<number[]>([]);
+  const touchStartY = useRef<number | null>(null);
+
+  const liftShutter = useCallback(() => {
+    setShutterState(prev => {
+      if (prev !== 'closed') return prev;
+      try { sessionStorage.setItem('urbanex_shutter_opened', '1'); } catch { /* private mode */ }
+      // Metal "clack" jolt as the door reaches the top, then unmount
+      const t1 = window.setTimeout(() => setClack(true), 850);
+      const t2 = window.setTimeout(() => setShutterState('open'), 1050);
+      const t3 = window.setTimeout(() => setClack(false), 1180);
+      shutterTimers.current.push(t1, t2, t3);
+      return 'lifting';
+    });
+  }, []);
+
+  // Decide on mount: skip for repeat visits (same session) + reduced motion; else auto-lift
+  useEffect(() => {
+    let reduced = false;
+    try { reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { /* noop */ }
+    let alreadyOpened = false;
+    try { alreadyOpened = sessionStorage.getItem('urbanex_shutter_opened') === '1'; } catch { /* noop */ }
+
+    if (reduced || alreadyOpened) {
+      setShutterState('open');
+      return;
+    }
+    const auto = window.setTimeout(() => liftShutter(), 1900);
+    shutterTimers.current.push(auto);
+    const timers = shutterTimers.current;
+    return () => { timers.forEach(t => clearTimeout(t)); };
+  }, [liftShutter]);
+
+  // Swipe-up to lift (mobile)
+  const onShutterTouchStart = (e: React.TouchEvent) => { touchStartY.current = e.touches[0].clientY; };
+  const onShutterTouchMove = (e: React.TouchEvent) => {
+    if (touchStartY.current == null) return;
+    const dy = e.touches[0].clientY - touchStartY.current;
+    if (dy < -36) { liftShutter(); touchStartY.current = null; }
+  };
+  const onShutterTouchEnd = () => { touchStartY.current = null; };
 
   // Auto-cycle products
   useEffect(() => {
@@ -278,6 +323,41 @@ export default function HeroBanner() {
         <span>SCROLL</span>
         <div className={styles.scrollArrow} />
       </div>
+
+      {/* ════════ THE SHUTTER — graffiti-tagged roller door ════════ */}
+      {shutterState !== 'open' && (
+        <div
+          className={`${styles.shutter} ${shutterState === 'lifting' ? styles.shutterLifting : ''} ${clack ? styles.shutterClack : ''}`}
+          role="dialog"
+          aria-label="Enter the UrbanEx store"
+          onTouchStart={onShutterTouchStart}
+          onTouchMove={onShutterTouchMove}
+          onTouchEnd={onShutterTouchEnd}
+        >
+          {/* Corrugated metal door */}
+          <div className={styles.shutterMetal}>
+            {/* Spray-tagged brand stencil */}
+            <div className={styles.shutterTag}>
+              <span className={styles.shutterTagWord}>URBANEX</span>
+              <span className={styles.shutterTagSub}>✦ STREET CERTIFIED ✦</span>
+              {/* paint drips */}
+              <span className={`${styles.drip} ${styles.drip1}`} />
+              <span className={`${styles.drip} ${styles.drip2}`} />
+              <span className={`${styles.drip} ${styles.drip3}`} />
+            </div>
+
+            {/* Handle bar */}
+            <div className={styles.shutterHandle} aria-hidden />
+
+            {/* Lift hint + skip */}
+            <button className={styles.shutterLift} onClick={liftShutter} aria-label="Lift the shutter and enter the store">
+              <span className={styles.shutterChevron} aria-hidden>⌃</span>
+              LIFT TO ENTER
+            </button>
+            <button className={styles.shutterSkip} onClick={liftShutter} aria-label="Skip intro">SKIP →</button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
