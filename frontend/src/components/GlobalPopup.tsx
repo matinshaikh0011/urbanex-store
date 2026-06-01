@@ -16,7 +16,7 @@ export default function GlobalPopup() {
     const timer = setTimeout(() => {
       setIsVisible(true);
       setIsLoaded(true);
-    }, 800);
+    }, 7000);
     return () => clearTimeout(timer);
   }, [pathname]);
 

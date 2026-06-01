@@ -59,7 +59,6 @@ export default function HeroBanner() {
 
   // ── THE SHUTTER — "open the store" reveal ──────────────────────
   const [shutterState, setShutterState] = useState<'closed' | 'lifting' | 'open'>('closed');
-  const [clack, setClack] = useState(false);
   const shutterTimers = useRef<number[]>([]);
   const touchStartY = useRef<number | null>(null);
 
@@ -67,11 +66,9 @@ export default function HeroBanner() {
     setShutterState(prev => {
       if (prev !== 'closed') return prev;
       try { sessionStorage.setItem('urbanex_shutter_opened', '1'); } catch { /* private mode */ }
-      // Metal "clack" jolt as the door reaches the top, then unmount
-      const t1 = window.setTimeout(() => setClack(true), 850);
-      const t2 = window.setTimeout(() => setShutterState('open'), 1050);
-      const t3 = window.setTimeout(() => setClack(false), 1180);
-      shutterTimers.current.push(t1, t2, t3);
+      // Door finishes its roll-up (~1.15s) then unmounts
+      const t1 = window.setTimeout(() => setShutterState('open'), 1200);
+      shutterTimers.current.push(t1);
       return 'lifting';
     });
   }, []);
@@ -87,7 +84,7 @@ export default function HeroBanner() {
       setShutterState('open');
       return;
     }
-    const auto = window.setTimeout(() => liftShutter(), 1900);
+    const auto = window.setTimeout(() => liftShutter(), 3200);
     shutterTimers.current.push(auto);
     const timers = shutterTimers.current;
     return () => { timers.forEach(t => clearTimeout(t)); };
@@ -327,7 +324,7 @@ export default function HeroBanner() {
       {/* ════════ THE SHUTTER — graffiti-tagged roller door ════════ */}
       {shutterState !== 'open' && (
         <div
-          className={`${styles.shutter} ${shutterState === 'lifting' ? styles.shutterLifting : ''} ${clack ? styles.shutterClack : ''}`}
+          className={`${styles.shutter} ${shutterState === 'lifting' ? styles.shutterLifting : ''}`}
           role="dialog"
           aria-label="Enter the UrbanEx store"
           onTouchStart={onShutterTouchStart}
@@ -336,6 +333,9 @@ export default function HeroBanner() {
         >
           {/* Corrugated metal door */}
           <div className={styles.shutterMetal}>
+            {/* light sheen that sweeps down the metal while lifting */}
+            <span className={styles.shutterSheen} aria-hidden />
+
             {/* Spray-tagged brand stencil */}
             <div className={styles.shutterTag}>
               <span className={styles.shutterTagWord}>URBANEX</span>
@@ -356,6 +356,8 @@ export default function HeroBanner() {
             </button>
             <button className={styles.shutterSkip} onClick={liftShutter} aria-label="Skip intro">SKIP →</button>
           </div>
+          {/* Bottom edge bar — the heavy rail that rolls up with the door */}
+          <div className={styles.shutterRail} aria-hidden />
         </div>
       )}
     </section>
