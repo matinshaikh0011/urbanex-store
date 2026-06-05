@@ -95,10 +95,21 @@
 }
 /* Slats compress slightly as they roll into the drum — handled via the
    translate overshoot in shutterRollUp (keeps a single transform channel). */
-/* Brand plate rides up with the door and fades as it enters the housing */
-@keyframes plateLift {
+/* Interior glow breathing (anticipation) */
+@keyframes shutterGlowBreathe {
+  0%,100% { opacity: 0.75; }
+  50%     { opacity: 1; }
+}
+/* Product silhouette subtle sway behind the door */
+@keyframes shutterSilhouetteSway {
+  0%,100% { transform: translate(-50%, -50%) scale(1); }
+  50%     { transform: translate(-50%, -51%) scale(1.02); }
+}
+/* Interior scrim clears: a brief spotlight bloom, then the dark interior
+   fades to transparent so the REAL hero is revealed progressively. */
+@keyframes shutterInteriorClear {
   0%   { opacity: 1; }
-  55%  { opacity: 1; }
+  35%  { opacity: 0.9; }
   100% { opacity: 0; }
 }
 /* Metallic highlight band sweeps down the steel as it lifts */
@@ -820,8 +831,8 @@
 }
 
 /* ════════════════════════════════════════════════════════════════
-   THE SHUTTER — industrial roller door over the hero area only
-   Horizontal steel slats, metallic highlights, mechanical roll-up.
+   THE STOREFRONT SHUTTER — reveal layer over the hero area only
+   Horizontal steel slats · readable storefront sign · mechanical roll-up
    ════════════════════════════════════════════════════════════════ */
 .shutter {
   position: absolute;
@@ -830,145 +841,212 @@
   overflow: hidden;
   touch-action: pan-y;
   cursor: pointer;
+  background: transparent; /* hero shows through as the interior layer fades */
 }
 
-/* Housing / drum the slats roll up into — dark bar pinned to the top */
-.shutterDrum {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 18px;
-  z-index: 2;
-  background: linear-gradient(180deg, #050506 0%, #1a1a1d 55%, #0a0a0b 100%);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.55), inset 0 -2px 0 rgba(255,255,255,0.06);
-}
-
-/* The roller door itself — HORIZONTAL slats stacked vertically */
-.shutterMetal {
+/* ── Interior scrim + glow + product silhouette (anticipation, behind the door) ──
+   This is the dark "inside the closed store" layer. It FADES OUT during the
+   reveal so the real hero appears progressively (no black flash / no hard pop). */
+.shutterGlow {
   position: absolute;
   inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 62% 55% at 64% 46%, rgba(255, 196, 120, 0.22), transparent 66%),
+    #0a0b0d;
+  animation: shutterGlowBreathe 3.2s ease-in-out infinite;
+}
+.shutterSilhouette {
+  position: absolute;
+  top: 50%; left: 64%;
+  width: 46%;
+  max-width: 460px;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  /* render as a faint dark silhouette, not the real photo */
+  filter: brightness(0.18) contrast(1.4) blur(1px);
+  opacity: 0.5;
+  animation: shutterSilhouetteSway 6s ease-in-out infinite;
+}
+
+/* ── Top housing / drum — the slats roll up into this ── */
+.shutterHousing {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 22px;
+  z-index: 3;
+  background: linear-gradient(180deg, #050506 0%, #232327 48%, #0c0c0e 100%);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.6), inset 0 -2px 0 rgba(255,255,255,0.07);
+}
+
+/* ── The roller door (transform target) ── */
+.shutterDoor {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
   transform-origin: top center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #313336;
-  /* Each repeating band = one slat: dark seam → body → convex highlight → body → dark seam.
-     The 90deg base gradient gives the whole door a left-right cylindrical sheen. */
-  background-image:
-    /* per-slat horizontal profile (vertical repeat) */
-    repeating-linear-gradient(
-      180deg,
-      #16171a 0px,
-      #16171a 1px,
-      #2a2d31 3px,
-      #3a3e43 14px,
-      #4a4f55 21px,   /* convex top highlight of the slat */
-      #3a3e43 28px,
-      #25282c 38px,
-      #16171a 40px     /* deep seam between slats */
-    ),
-    /* broad cylindrical light across the width (steel catches light in the middle) */
-    linear-gradient(
-      90deg,
-      rgba(0,0,0,0.35) 0%,
-      rgba(255,255,255,0.05) 22%,
-      rgba(255,255,255,0.14) 50%,
-      rgba(255,255,255,0.05) 78%,
-      rgba(0,0,0,0.35) 100%
-    );
-  background-blend-mode: overlay, normal;
-  box-shadow: inset 0 -10px 14px rgba(0,0,0,0.45), inset 0 6px 10px rgba(255,255,255,0.05);
   will-change: transform;
+  /* hard bottom edge so the door has a defined leading line */
+  box-shadow: inset 0 -12px 18px rgba(0,0,0,0.5), inset 0 10px 14px rgba(255,255,255,0.05);
 }
 
-/* Moving specular highlight band — light sweeping across the slats as it lifts */
+/* HORIZONTAL slats — stacked vertically (35px pitch). Never vertical ribs. */
+.shutterSlats {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: #2b2e33;
+  background-image:
+    /* one slat profile, repeated down the door */
+    repeating-linear-gradient(
+      180deg,
+      #0c0d0f 0px,      /* deep seam */
+      #1c1f24 2px,
+      #33383f 9px,
+      #51575f 18px,     /* convex highlight ridge — light catches the curve */
+      #353b42 27px,
+      #1a1d22 33px,
+      #0c0d0f 35px      /* next seam — slat pitch */
+    ),
+    /* broad cylindrical cross-light: brightest center-screen */
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,0.45) 0%,
+      rgba(255,255,255,0.06) 30%,
+      rgba(255,255,255,0.14) 50%,
+      rgba(255,255,255,0.06) 70%,
+      rgba(0,0,0,0.45) 100%
+    );
+  background-blend-mode: overlay, normal;
+}
+
+/* Moving specular highlight band that sweeps the slats as the door lifts */
 .shutterSheen {
   position: absolute;
   left: 0; right: 0;
-  height: 45%;
   top: 0;
+  height: 42%;
+  z-index: 1;
   pointer-events: none;
   background: linear-gradient(180deg, transparent, rgba(255,255,255,0.20) 50%, transparent);
   opacity: 0;
   mix-blend-mode: screen;
 }
 
-/* Heavy bottom rail — the weighted aluminium bar at the door's base */
+/* ── Storefront sign — VARIANT B: white stencil paint on the steel ──
+   The wordmark is sprayed/stencilled directly onto the door: heavy white
+   paint with a subtle worn edge, a red underline accent, and a stencilled
+   tagline. No plate — the metal shows through, cleaner / Kith-level. */
+.shutterSign {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 0 24px;
+  pointer-events: none;
+}
+.shutterSignWord {
+  position: relative;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: clamp(52px, 11vw, 132px);
+  letter-spacing: 10px;
+  line-height: 0.9;
+  color: #f4f4f2;
+  text-transform: uppercase;
+  /* stencil paint: crisp white with a faint spray halo + hard depth so it
+     reads as paint sitting ON the metal, not embossed into it */
+  text-shadow:
+    0 0 1px rgba(255,255,255,0.9),
+    3px 4px 0 rgba(0,0,0,0.55),
+    0 0 22px rgba(255,255,255,0.18);
+}
+/* red spray underline accent beneath the wordmark */
+.shutterSignWord::after {
+  content: '';
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: -10px;
+  height: 7px;
+  background: var(--accent-primary);
+  box-shadow: 0 0 12px rgba(204,0,0,0.5);
+  transform: skewX(-12deg);
+}
+.shutterSignSub {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(13px, 1.9vw, 20px);
+  letter-spacing: 11px;
+  color: #f4f4f2;
+  opacity: 0.82;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+}
+
+/* ── Weighted bottom rail with grip ── */
 .shutterRail {
   position: absolute;
   left: 0; right: 0;
   bottom: 0;
-  height: 30px;
+  height: 32px;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, #5a5f66 0%, #34383d 40%, #15171a 100%);
-  border-top: 2px solid rgba(255,255,255,0.14);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.55), inset 0 2px 0 rgba(255,255,255,0.18);
+  background: linear-gradient(180deg, #5a5f66 0%, #34383d 42%, #131519 100%);
+  border-top: 2px solid rgba(255,255,255,0.16);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.6), inset 0 2px 0 rgba(255,255,255,0.18);
 }
-/* Grip slot in the rail */
+/* red pinstripe accent along the rail */
+.shutterRail::before {
+  content: '';
+  position: absolute;
+  top: -4px; left: 0; right: 0;
+  height: 3px;
+  background: var(--accent-primary);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.4);
+}
 .shutterHandle {
   width: min(360px, 52%);
-  height: 8px;
+  height: 9px;
   background: linear-gradient(180deg, #0b0c0e, #2b2e33);
-  border-radius: 4px;
-  box-shadow: inset 0 2px 3px rgba(0,0,0,0.7), 0 1px 0 rgba(255,255,255,0.1);
+  border-radius: 5px;
+  box-shadow: inset 0 2px 3px rgba(0,0,0,0.7), 0 1px 0 rgba(255,255,255,0.12);
 }
 
-/* ── Mechanical roll-up ── */
-.shutterLifting .shutterMetal {
+/* ── Mechanical roll-up (door travels up into the housing) ── */
+.shutterOpening .shutterDoor {
   animation: shutterRollUp 1.25s cubic-bezier(0.55, 0.05, 0.2, 1) forwards;
 }
-.shutterLifting .shutterSheen {
+.shutterOpening .shutterSheen {
   animation: sheenSweepDown 1.0s ease-in 0.05s forwards;
 }
-.shutterLifting .shutterPlate {
-  animation: plateLift 1.0s ease-in forwards;
-}
-.shutterLifting .shutterLift,
-.shutterLifting .shutterSkip {
+.shutterOpening .shutterLift,
+.shutterOpening .shutterSkip {
   opacity: 0;
   transition: opacity 0.2s ease;
 }
-
-/* ── Embossed brand plate stamped into the steel (not graffiti) ── */
-.shutterPlate {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  pointer-events: none;
-}
-.shutterPlateWord {
-  display: block;
-  font-family: 'Oswald', sans-serif;
-  font-weight: 700;
-  font-size: clamp(40px, 8.5vw, 96px);
-  letter-spacing: 6px;
-  line-height: 1;
-  color: #2c2f33;
-  /* embossed look: dark fill + top dark shadow + bottom light edge = stamped into metal */
-  text-shadow:
-    0 -1px 1px rgba(0,0,0,0.6),
-    0 1px 1px rgba(255,255,255,0.12),
-    0 2px 0 rgba(0,0,0,0.4);
-}
-.shutterPlateSub {
-  display: block;
-  margin-top: 12px;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(12px, 1.6vw, 17px);
-  letter-spacing: 8px;
-  color: #44484d;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.1), 0 -1px 0 rgba(0,0,0,0.5);
+/* spotlight blooms then the interior scrim fades, revealing the real hero
+   progressively as the door clears (no black flash, no hard pop) */
+.shutterOpening .shutterGlow {
+  animation: shutterInteriorClear 1.15s ease 0.15s forwards;
 }
 
-/* Lift hint */
+/* ── Lift hint ── */
 .shutterLift {
   position: absolute;
-  bottom: 56px;
+  bottom: 60px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 3;
+  z-index: 4;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -979,23 +1057,23 @@
   font-family: 'Bebas Neue', sans-serif;
   font-size: 15px;
   letter-spacing: 4px;
-  color: rgba(255,255,255,0.75);
+  color: rgba(255,255,255,0.78);
 }
 .shutterChevron {
   font-size: 30px;
   line-height: 1;
-  color: var(--accent-primary);
+  color: #fff;
   animation: chevronBob 1.4s ease-in-out infinite;
 }
 
-/* Skip button — always-available escape hatch */
+/* ── Skip — always-available escape hatch ── */
 .shutterSkip {
   position: absolute;
-  top: 30px;
+  top: 34px;
   right: 18px;
-  z-index: 3;
-  background: rgba(0,0,0,0.45);
-  border: 2px solid rgba(255,255,255,0.35);
+  z-index: 4;
+  background: rgba(0,0,0,0.5);
+  border: 2px solid #fff;
   color: #fff;
   font-family: 'Oswald', sans-serif;
   font-size: 12px;
@@ -1003,25 +1081,28 @@
   letter-spacing: 2px;
   padding: 8px 14px;
   cursor: pointer;
+  box-shadow: 3px 3px 0 #000;
   transition: background 0.15s ease, transform 0.15s ease;
 }
 .shutterSkip:hover { background: var(--accent-primary); transform: translateY(-1px); }
 
-/* Spotlight wash that fades in over the product as the door clears */
-.shutterLifting::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: radial-gradient(ellipse 58% 52% at 70% 45%, rgba(255,255,255,0.20), transparent 70%);
-  animation: spotlightIn 0.7s ease 0.55s both;
-  pointer-events: none;
-}
-
 @media (max-width: 768px) {
-  .shutterPlateWord { letter-spacing: 4px; }
-  .shutterPlateSub { letter-spacing: 5px; }
-  .shutterLift { bottom: 48px; font-size: 13px; }
+  .shutterSlats {
+    background-image:
+      repeating-linear-gradient(
+        180deg,
+        #0c0d0f 0px, #1c1f24 2px, #33383f 7px,
+        #51575f 13px, #353b42 20px, #1a1d22 24px, #0c0d0f 26px
+      ),
+      linear-gradient(90deg, rgba(0,0,0,0.45) 0%, rgba(255,255,255,0.06) 30%,
+        rgba(255,255,255,0.14) 50%, rgba(255,255,255,0.06) 70%, rgba(0,0,0,0.45) 100%);
+  }
+  .shutterSign { padding: 0 16px; gap: 10px; }
+  .shutterSignWord { letter-spacing: 6px; text-shadow: 0 0 1px rgba(255,255,255,0.9), 2px 3px 0 rgba(0,0,0,0.55); }
+  .shutterSignWord::after { bottom: -7px; height: 5px; }
+  .shutterSignSub { letter-spacing: 7px; }
+  .shutterSilhouette { width: 70%; }
+  .shutterLift { bottom: 50px; font-size: 13px; }
 }
 
 /* ════════════════════════════════════════════════════════════════ */
@@ -1032,7 +1113,7 @@
   .productActive, .scrollArrow, .letter, .titleBottom, .badge, .lede,
   .specRow, .ctaRow, .statsRow, .trustRow, .showcase, .titleUnderline,
   .cycleWord, .cornerSticker, .mGlyph, .mSheen,
-  .shutterMetal, .shutterSheen, .shutterPlate, .shutterChevron {
+  .shutterDoor, .shutterSheen, .shutterGlow, .shutterSilhouette, .shutterChevron {
     animation: none !important;
   }
   .letter { opacity: 1; transform: none; }

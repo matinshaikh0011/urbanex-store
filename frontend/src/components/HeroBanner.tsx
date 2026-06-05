@@ -51,43 +51,80 @@ const TICKER = [
   'COP OR DROP',
 ];
 
+// ── Shutter trigger gate ───────────────────────────────────────
+// Survives client-side navigation within one document load; resets on
+// a real page load. Prevents the reveal from replaying when the user
+// navigates back to "/" via <Link> (returning from a product page,
+// category change, etc.).
+let playedThisDocument = false;
+
+/**
+ * Decides whether the shutter reveal should play on this mount.
+ * - reduced motion  → never (open instantly)
+ * - development     → every refresh / HMR remount (ignore the doc flag)
+ * - production      → first visit + browser refresh only; never on
+ *                     internal SPA navigation (guarded by playedThisDocument)
+ */
+function shouldPlayShutter(): boolean {
+  if (typeof window === 'undefined') return false;
+
+  try {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+  } catch { /* matchMedia unsupported — continue */ }
+
+  const isDev = process.env.NODE_ENV !== 'production';
+  if (isDev) return true; // dev: replay on every refresh, ignore the flag
+
+  // Production: only on a genuine document load (navigate or reload),
+  // and only once per loaded document.
+  if (playedThisDocument) return false;
+
+  let navType: string | undefined;
+  try {
+    const entries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+    navType = entries[0]?.type;
+  } catch { /* Navigation Timing unsupported */ }
+
+  // navigate = first visit / typed URL / external link; reload = refresh.
+  // back_forward / undefined → treat conservatively as "play once" only if
+  // we have never played in this document.
+  return navType === 'navigate' || navType === 'reload' || navType === undefined;
+}
+
 export default function HeroBanner() {
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const statRefs = useRef<(HTMLSpanElement | null)[]>([null, null, null]);
 
-  // ── THE SHUTTER — "open the store" reveal ──────────────────────
-  const [shutterState, setShutterState] = useState<'closed' | 'lifting' | 'open'>('closed');
+  // ── THE SHUTTER — storefront roller-door reveal ────────────────
+  // 'closed' → 'opening' → 'open'. Initialised lazily so the gate
+  // decision (reduced-motion / dev / nav-type) runs once on mount.
+  const [shutterState, setShutterState] = useState<'closed' | 'opening' | 'open'>(() =>
+    shouldPlayShutter() ? 'closed' : 'open'
+  );
   const shutterTimers = useRef<number[]>([]);
   const touchStartY = useRef<number | null>(null);
 
   const liftShutter = useCallback(() => {
     setShutterState(prev => {
       if (prev !== 'closed') return prev;
-      try { sessionStorage.setItem('urbanex_shutter_opened', '1'); } catch { /* private mode */ }
-      // Door finishes its roll-up + settle (~1.25s) then unmounts
+      playedThisDocument = true; // mark so internal nav back to "/" won't replay
+      // Door rolls up + settles (~1.32s) then the overlay unmounts.
       const t1 = window.setTimeout(() => setShutterState('open'), 1320);
       shutterTimers.current.push(t1);
-      return 'lifting';
+      return 'opening';
     });
   }, []);
 
-  // Decide on mount: skip for repeat visits (same session) + reduced motion; else auto-lift
+  // On mount: if we're playing, schedule the ~3s auto-lift; always clean up timers.
   useEffect(() => {
-    let reduced = false;
-    try { reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { /* noop */ }
-    let alreadyOpened = false;
-    try { alreadyOpened = sessionStorage.getItem('urbanex_shutter_opened') === '1'; } catch { /* noop */ }
-
-    if (reduced || alreadyOpened) {
-      setShutterState('open');
-      return;
-    }
-    const auto = window.setTimeout(() => liftShutter(), 3200);
+    if (shutterState !== 'closed') return;
+    const auto = window.setTimeout(() => liftShutter(), 3000);
     shutterTimers.current.push(auto);
     const timers = shutterTimers.current;
     return () => { timers.forEach(t => clearTimeout(t)); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [liftShutter]);
 
   // Swipe-up to lift (mobile)
@@ -321,42 +358,59 @@ export default function HeroBanner() {
         <div className={styles.scrollArrow} />
       </div>
 
-      {/* ════════ THE SHUTTER — industrial roller door over the hero ════════ */}
+      {/* ════════ THE STOREFRONT SHUTTER — reveal layer over the hero ════════ */}
       {shutterState !== 'open' && (
         <div
-          className={`${styles.shutter} ${shutterState === 'lifting' ? styles.shutterLifting : ''}`}
+          className={`${styles.shutter} ${shutterState === 'opening' ? styles.shutterOpening : ''}`}
           role="dialog"
-          aria-label="Enter the UrbanEx store"
+          aria-label="UrbanEx store intro — press Skip to enter"
           onTouchStart={onShutterTouchStart}
           onTouchMove={onShutterTouchMove}
           onTouchEnd={onShutterTouchEnd}
         >
-          {/* Roll drum / housing shadow at the very top — slats roll into this */}
-          <div className={styles.shutterDrum} aria-hidden />
+          {/* Interior light / spotlight warm-up + product silhouette (behind the door) */}
+          <div className={styles.shutterGlow} aria-hidden>
+            <img
+              src={product.image}
+              alt=""
+              className={styles.shutterSilhouette}
+              aria-hidden
+              draggable={false}
+            />
+          </div>
 
-          {/* The corrugated metal door (horizontal slats) */}
-          <div className={styles.shutterMetal}>
-            {/* moving highlight band — light catching the steel as it lifts */}
+          {/* Top housing / drum — the slats roll up into this */}
+          <div className={styles.shutterHousing} aria-hidden />
+
+          {/* The roller door (transform target) */}
+          <div className={styles.shutterDoor}>
+            <div className={styles.shutterSlats} aria-hidden />
             <span className={styles.shutterSheen} aria-hidden />
 
-            {/* Minimal embossed brand plate — stamped into the metal, not graffiti */}
-            <div className={styles.shutterPlate}>
-              <span className={styles.shutterPlateWord}>URBANEX</span>
-              <span className={styles.shutterPlateSub}>EST. STREETWEAR</span>
+            {/* Storefront sign — the readable brand (Variant A: red plate) */}
+            <div className={styles.shutterSign}>
+              <span className={styles.shutterSignWord}>URBANEX</span>
+              <span className={styles.shutterSignSub}>EST. STREETWEAR</span>
             </div>
 
-            {/* Heavy bottom rail with the lift handle */}
+            {/* Weighted bottom rail with grip handle */}
             <div className={styles.shutterRail} aria-hidden>
               <span className={styles.shutterHandle} />
             </div>
-
-            {/* Lift hint + skip */}
-            <button className={styles.shutterLift} onClick={liftShutter} aria-label="Lift the shutter and enter the store">
-              <span className={styles.shutterChevron} aria-hidden>⌃</span>
-              LIFT TO ENTER
-            </button>
-            <button className={styles.shutterSkip} onClick={liftShutter} aria-label="Skip intro">SKIP →</button>
           </div>
+
+          {/* Controls */}
+          <button
+            className={styles.shutterLift}
+            onClick={liftShutter}
+            aria-label="Lift the shutter and enter the store"
+          >
+            <span className={styles.shutterChevron} aria-hidden>⌃</span>
+            LIFT TO ENTER
+          </button>
+          <button className={styles.shutterSkip} onClick={liftShutter} aria-label="Skip intro and enter the store">
+            SKIP →
+          </button>
         </div>
       )}
     </section>
