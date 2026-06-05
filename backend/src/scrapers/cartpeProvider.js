@@ -252,81 +252,140 @@ function mapCategory(text) {
   return { category: 'clothing', subcategory: null };
 }
 
+// ── Image + price helpers (work across ALL CartPe themes) ─────────
+
+/**
+ * Extract the best image URL from a cheerio img element.
+ * Handles lazy-load patterns: data-src, data-original, data-lazy, src.
+ */
+function extractImgSrc(imgEl) {
+  const attrs = ['data-src', 'data-original', 'data-lazy', 'data-lazy-src', 'src'];
+  for (const attr of attrs) {
+    const val = imgEl.attr(attr) || '';
+    if (val && !val.startsWith('data:') && val.length > 10 && !/placeholder|blank\.gif|1x1|logo/i.test(val)) {
+      return val
+        .replace('/gallery_sm/', '/gallery_lg/')
+        .replace('/gallery_md/', '/gallery_lg/');
+    }
+  }
+  return null;
+}
+
+/**
+ * Extract selling price and MRP from a card container.
+ * Handles: ₹999, Rs.999, "999 1299" (two prices = selling + MRP).
+ */
+function extractCardPrices($, card) {
+  let sourcePrice = 0;
+  let originalPrice = null;
+
+  // Try struck-through/muted child for MRP first
+  const mrpEl = card.find('.old-price, .text-muted, strike, del, s, [style*="line-through"], .mrp-price').first();
+  const mrpVal = parseFloat((mrpEl.text() || '').replace(/[^\d.]/g, ''));
+  if (mrpVal >= 1) originalPrice = mrpVal;
+
+  // Price container: h4, .price, known CartPe classes
+  const priceEl = card.find('h4, .price, [class*="price"], [class*="amount"], .product-price').first();
+  if (priceEl.length) {
+    const clone = priceEl.clone();
+    clone.find('.old-price, .text-muted, strike, del, s, [style*="line-through"], .mrp-price').remove();
+    const sellingVal = parseFloat(clone.text().replace(/[^\d.]/g, ''));
+    if (sellingVal >= 1) sourcePrice = sellingVal;
+  }
+
+  // Numeric fallback: collect all numbers in card, pick lowest as selling price
+  if (sourcePrice === 0) {
+    const nums = [];
+    card.find('h3,h4,h5,p,span').each((_, el) => {
+      const t = $(el).clone().children().remove().end().text();
+      (t.match(/[\d,]+\.?\d*/g) || []).forEach(n => {
+        const v = parseFloat(n.replace(/,/g, ''));
+        if (v >= 10 && v <= 999999) nums.push(v);
+      });
+    });
+    const sorted = [...new Set(nums)].sort((a, b) => a - b);
+    if (sorted.length >= 2) { sourcePrice = sorted[0]; if (!originalPrice) originalPrice = sorted[sorted.length - 1]; }
+    else if (sorted.length === 1) sourcePrice = sorted[0];
+  }
+
+  if (originalPrice !== null && originalPrice <= sourcePrice) originalPrice = null;
+  return { sourcePrice, originalPrice };
+}
+
 // ── SCAN PHASE: Parse listing card ───────────────────────────────
 
 function parseListingCard($, el, base) {
   const card = $(el);
 
-  // Product URL — find any link to a product page (.html on this domain)
+  // Product URL
   let productUrl = null;
   card.find('a[href]').each((_, a) => {
     const href = $(a).attr('href') || '';
-    const resolved = href.startsWith('http') ? href : `${base}${href}`;
-    // Must match a CartPe product URL pattern
+    const resolved = href.startsWith('http') ? href
+      : `${base}${href.startsWith('/') ? href : '/' + href}`;
     if (/-((?:npi|lpi)?\d{6,})-[a-z0-9-]+\.html/i.test(resolved)) {
       productUrl = resolved.split('?')[0];
-      return false; // break
+      return false;
     }
   });
-
   if (!productUrl) return null;
   const sourceId = idFromUrl(productUrl);
   if (!sourceId) return null;
 
-  // Name
-  const name = (card.find('h5 a, h4 a').first().text().trim()
-    || card.find('h5, h4').first().text().trim()).replace(/\s+/g, ' ');
+  // Name: heading link > heading > URL slug fallback
+  const nameFromEl = card.find('h5 a, h4 a, h3 a, .product-name a').first().text().trim()
+    || card.find('h5, h4, h3, .product-name, .prod-name').first().text().trim();
+  const nameFromUrl = productUrl.split('/').pop()
+    .replace(/-((?:npi|lpi)?\d{6,})-[a-z0-9-]+\.html$/i, '')
+    .replace(/-/g, ' ').trim();
+  const name = (nameFromEl || nameFromUrl).replace(/\s+/g, ' ');
   if (!name) return null;
 
-  // Prices
-  const salePriceText = card.find('h4').first().clone().children().remove().end().text().replace(/[^\d.]/g, '');
-  const mrpText = card.find('.old-price, .text-muted').first().text().replace(/[^\d.]/g, '');
-  const sourcePrice = parseFloat(salePriceText) || 0;
-  const originalPrice = parseFloat(mrpText) || null;
+  // Image: use extractImgSrc for all lazy-load variants
+  const imgEl = card.find('img').first();
+  const thumbnail = imgEl.length ? extractImgSrc(imgEl) : null;
 
-  // Thumbnail
-  const imgEl = card.find('img.img-responsive, img').first();
-  const imgSrc = imgEl.attr('src') || imgEl.attr('data-src') || '';
-  const thumbnail = imgSrc
-    ? imgSrc.replace('/gallery_sm/', '/gallery_lg/').replace('/gallery_md/', '/gallery_lg/')
-    : null;
+  // Prices: use extractCardPrices helper
+  const { sourcePrice, originalPrice } = extractCardPrices($, card);
 
   const brandName = extractBrand(name);
   const { category: suggestedCategory, subcategory: suggestedSubcategory } = mapCategory(name);
 
   return {
-    name,
-    sourcePrice,
-    originalPrice,
-    thumbnail,
-    brandName,
-    productUrl,
-    sourceId,
-    suggestedCategory,
-    suggestedSubcategory,
+    name, sourcePrice, originalPrice, thumbnail, brandName,
+    productUrl, sourceId, suggestedCategory, suggestedSubcategory,
     images: thumbnail ? [thumbnail] : [],
-    description: null,
-    sizes: {},
-    inStock: true,
+    description: null, sizes: {}, inStock: true,
   };
 }
 
 // ── SCAN PHASE: Parse products from any HTML ─────────────────────
 
 /**
- * Scans ALL <a href> links in a page and collects every CartPe product URL.
- * This works regardless of the theme/template the store uses.
+ * Scans a cheerio document for all CartPe product cards.
+ * Tries structured card selectors first; if none match, falls back
+ * to collecting any product URL from <a> tags and extracting
+ * image + price from the link's closest container element.
  */
 function parseAllProductLinks($, base) {
   const seen = new Set();
   const products = [];
 
-  // First try structured cards (faster, gets price/name)
+  // Ordered list of card container selectors (most specific first)
   const cardSelectors = [
-    'div.product-disp', 'div.product-details', 'div.product-item',
-    'div.product_item', 'li.product-item', 'div.col-md-3.col-sm-4.col-xs-6',
-    'div[class*="product"]', 'li[class*="product"]',
+    'div.product-disp',
+    'div.product-details',
+    'div.product-item',
+    'div.product_item',
+    'li.product-item',
+    'div.col-md-3.col-sm-4.col-xs-6',
+    'div[class*="product-card"]',
+    'div[class*="productcard"]',
+    'article[class*="product"]',
+    'li[class*="product"]',
+    // Generic: any div that directly contains a CartPe product link
   ];
+
   for (const sel of cardSelectors) {
     $(sel).each((_, el) => {
       const parsed = parseListingCard($, el, base);
@@ -335,36 +394,70 @@ function parseAllProductLinks($, base) {
         products.push(parsed);
       }
     });
-    if (products.length > 0) break;
+    if (products.length > 0) {
+      console.log(`[CartPe] parseAllProductLinks: matched selector "${sel}" → ${products.length} products`);
+      return products;
+    }
   }
 
-  // Fallback: collect any product URL from <a> tags across the whole page
-  if (products.length === 0) {
-    $('a[href]').each((_, a) => {
-      const href = $(a).attr('href') || '';
-      const resolved = href.startsWith('http') ? href : href.startsWith('/') ? `${base}${href}` : null;
-      if (!resolved) return;
-      const sourceId = idFromUrl(resolved);
-      if (!sourceId || seen.has(sourceId)) return;
-      seen.add(sourceId);
-      const cleanUrl = resolved.split('?')[0];
-      // Try to get name from link text or nearby heading
-      const linkEl = $(a);
-      const name = linkEl.text().trim() || linkEl.closest('[class]').find('h4,h5,h3,.product-name').first().text().trim() || cleanUrl.split('/').pop().replace(/-((?:npi|lpi)?\d{6,})-[a-z0-9-]+\.html/i,'').replace(/-/g,' ').trim();
-      if (!name) return;
-      const brandName = extractBrand(name);
-      const { category: suggestedCategory, subcategory: suggestedSubcategory } = mapCategory(name);
-      products.push({
-        name, sourcePrice: 0, originalPrice: null, thumbnail: null,
-        brandName, productUrl: cleanUrl, sourceId,
-        suggestedCategory, suggestedSubcategory,
-        images: [], description: null, sizes: {}, inStock: true, cartpeCategory: null,
-      });
+  // Href fallback: find all product links, then extract context from parent container
+  console.log('[CartPe] parseAllProductLinks: no card selector matched, using href fallback');
+  $('a[href]').each((_, a) => {
+    const href = $(a).attr('href') || '';
+    const resolved = href.startsWith('http') ? href
+      : href.startsWith('/') ? `${base}${href}` : null;
+    if (!resolved) return;
+    const sourceId = idFromUrl(resolved);
+    if (!sourceId || seen.has(sourceId)) return;
+    seen.add(sourceId);
+    const cleanUrl = resolved.split('?')[0];
+
+    // Walk up the DOM to find the smallest useful container for this link
+    const container = $(a).closest(
+      '[class*="product"], .col-md-3, .col-sm-4, .col-xs-6, li, article, .item, .card'
+    );
+    const ctx = container.length ? container : $(a).parent();
+
+    // Name: link text > heading inside container > URL slug
+    const rawName = $(a).text().trim()
+      || ctx.find('h3,h4,h5,.product-name,.prod-name,.title').first().text().trim()
+      || cleanUrl.split('/').pop()
+          .replace(/-((?:npi|lpi)?\d{6,})-[a-z0-9-]+\.html$/i, '')
+          .replace(/-/g, ' ').trim();
+    const name = rawName.replace(/\s+/g, ' ').trim();
+    if (!name) return;
+
+    // Thumbnail: search all img tags inside the container
+    let thumbnail = null;
+    ctx.find('img').each((_, img) => {
+      const src = extractImgSrc($(img));
+      if (src) { thumbnail = src; return false; }
     });
-  }
+    // If not in container, check if the <a> itself wraps an img
+    if (!thumbnail) {
+      $(a).find('img').each((_, img) => {
+        const src = extractImgSrc($(img));
+        if (src) { thumbnail = src; return false; }
+      });
+    }
+
+    // Prices
+    const { sourcePrice, originalPrice } = extractCardPrices($, ctx);
+
+    const brandName = extractBrand(name);
+    const { category: suggestedCategory, subcategory: suggestedSubcategory } = mapCategory(name);
+    products.push({
+      name, sourcePrice, originalPrice,
+      thumbnail, images: thumbnail ? [thumbnail] : [],
+      brandName, productUrl: cleanUrl, sourceId,
+      suggestedCategory, suggestedSubcategory,
+      description: null, sizes: {}, inStock: true, cartpeCategory: null,
+    });
+  });
 
   return products;
 }
+
 
 // ── SCAN PHASE: Paginate AJAX endpoint ───────────────────────────
 
