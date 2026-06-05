@@ -12,6 +12,32 @@ import { validateProductData, buildProductData, slugify } from './productUtils.j
 import { getProvider, detectProvider } from './scrapers/index.js';
 import { fetchProductDetail } from './scrapers/cartpeProvider.js';
 
+// ── Background Scan Job Store ─────────────────────────────────
+// Scan jobs run in the background so the HTTP response returns
+// immediately, avoiding Render's 30-second timeout for large catalogs.
+//
+// Jobs are stored in-memory (sufficient for a single-instance server).
+// Each job has the shape:
+//   { status, pagesScanned, productsFound, products, error, startedAt, completedAt }
+
+const scanJobs = new Map();
+
+function createScanJob() {
+  const jobId = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  scanJobs.set(jobId, {
+    status: 'running',     // 'running' | 'done' | 'error'
+    pagesScanned: 0,
+    productsFound: 0,
+    products: null,        // null while running, array when done
+    error: null,
+    startedAt: new Date().toISOString(),
+    completedAt: null,
+  });
+  // Auto-expire after 30 minutes to avoid memory leaks
+  setTimeout(() => scanJobs.delete(jobId), 30 * 60 * 1000);
+  return jobId;
+}
+
 dotenv.config();
 
 const app = express();
@@ -604,122 +630,146 @@ async function uploadToCloudinary(imageUrl) {
 }
 
 // POST /api/admin/scraper/scan
+// BACKGROUND JOB VERSION — returns immediately with a jobId.
+// The scan runs in the background to avoid HTTP timeout (502) on large catalogs.
+// Poll GET /api/admin/scraper/scan/status/:jobId for live progress.
 app.post('/api/admin/scraper/scan', adminAuth, async (req, res) => {
+  const { url, scope, provider: providerKey, delayMs } = req.body;
+
+  if (!url || typeof url !== 'string' || !url.trim()) {
+    return res.status(400).json({ error: 'url is required' });
+  }
+  const validScopes = ['full', 'category', 'product'];
+  if (!scope || !validScopes.includes(scope)) {
+    return res.status(400).json({ error: `scope must be one of: ${validScopes.join(', ')}` });
+  }
+
+  let resolvedKey = providerKey;
+  if (!resolvedKey) {
+    resolvedKey = detectProvider(url);
+    if (!resolvedKey) return res.status(400).json({ error: 'Could not auto-detect provider from URL. Please specify provider.' });
+  }
+
+  let provider;
   try {
-    const { url, scope, provider: providerKey, delayMs } = req.body;
+    provider = getProvider(resolvedKey);
+  } catch (e) {
+    return res.status(400).json({ error: e.message });
+  }
 
-    if (!url || typeof url !== 'string' || !url.trim()) {
-      return res.status(400).json({ error: 'url is required' });
-    }
-    const validScopes = ['full', 'category', 'product'];
-    if (!scope || !validScopes.includes(scope)) {
-      return res.status(400).json({ error: `scope must be one of: ${validScopes.join(', ')}` });
-    }
+  // Create a background job and return its ID immediately
+  const jobId = createScanJob();
+  const job = scanJobs.get(jobId);
 
-    let resolvedKey = providerKey;
-    if (!resolvedKey) {
-      resolvedKey = detectProvider(url);
-      if (!resolvedKey) return res.status(400).json({ error: 'Could not auto-detect provider from URL. Please specify provider.' });
-    }
-
-    let provider;
+  // Run the scan asynchronously (do NOT await — this is intentional)
+  (async () => {
     try {
-      provider = getProvider(resolvedKey);
-    } catch (e) {
-      return res.status(400).json({ error: e.message });
-    }
-
-    // Scrape — only a fully-unreachable initial URL is a hard failure (502).
-    // Individual product/page failures are captured in stats and never abort the scan.
-    let scrapeResult;
-    try {
-      scrapeResult = await provider.scrape(url, scope, { delayMs });
-    } catch (e) {
-      if (/unreachable/i.test(e.message)) return res.status(502).json({ error: e.message });
-      // Any other unexpected error — still return a structured response, not a 500 crash
-      console.error('[scraper/scan] unexpected scrape error:', e);
-      return res.status(200).json({
-        provider: resolvedKey,
-        products: [],
-        stats: { total: 0, totalFound: 0, successful: 0, failed: 0, pagesFetched: 0, error: e.message },
+      const scrapeResult = await provider.scrape(url, scope, {
+        delayMs,
+        onProgress: (pagesScanned, productsFound) => {
+          if (scanJobs.has(jobId)) {
+            job.pagesScanned = pagesScanned;
+            job.productsFound = productsFound;
+          }
+        },
       });
-    }
 
-    const { products: scraped, failedUrls, pagesFetched, pageErrors, stats: scrapeStats } = scrapeResult;
+      const { products: scraped, failedUrls, pagesFetched, pageErrors, stats: scrapeStats } = scrapeResult;
 
-    // Duplicate detection — per-product try/catch so a DB hiccup on one
-    // product never aborts the whole enrichment.
-    const enriched = await Promise.all(scraped.map(async (p) => {
-      let duplicateStatus = 'new';
-      let duplicateMatch = null;
-
-      try {
-        // 1. source + sourceId
-        if (p.sourceId) {
-          const existing = await prisma.product.findFirst({
-            where: { source: resolvedKey, sourceId: p.sourceId },
-            select: { name: true, slug: true },
-          });
-          if (existing) {
-            duplicateStatus = 'already-imported';
-            duplicateMatch = { name: existing.name, slug: existing.slug };
+      // Duplicate detection — run in batches of 20 to avoid overwhelming the DB
+      const enriched = [];
+      const BATCH = 20;
+      for (let i = 0; i < scraped.length; i += BATCH) {
+        const batch = scraped.slice(i, i + BATCH);
+        const batchResults = await Promise.all(batch.map(async (p) => {
+          let duplicateStatus = 'new';
+          let duplicateMatch = null;
+          try {
+            if (p.sourceId) {
+              const existing = await prisma.product.findFirst({
+                where: { source: resolvedKey, sourceId: p.sourceId },
+                select: { name: true, slug: true },
+              });
+              if (existing) { duplicateStatus = 'already-imported'; duplicateMatch = { name: existing.name, slug: existing.slug }; }
+            }
+            if (duplicateStatus === 'new' && p.name) {
+              const slug = slugify(p.name) + (p.sourceId ? `-${p.sourceId}` : '');
+              const existing = await prisma.product.findFirst({ where: { slug }, select: { name: true, slug: true } });
+              if (existing) { duplicateStatus = 'slug-duplicate'; duplicateMatch = { name: existing.name, slug: existing.slug }; }
+            }
+            if (duplicateStatus === 'new' && p.name) {
+              const existing = await prisma.product.findFirst({ where: { name: { equals: p.name, mode: 'insensitive' } }, select: { name: true, slug: true } });
+              if (existing) { duplicateStatus = 'possible-duplicate'; duplicateMatch = { name: existing.name, slug: existing.slug }; }
+            }
+          } catch (dupErr) {
+            console.error(`[scraper/scan] dup check failed for ${p.sourceId}: ${dupErr.message}`);
           }
-        }
-
-        // 2. slug
-        if (duplicateStatus === 'new' && p.name) {
-          const slug = slugify(p.name) + (p.sourceId ? `-${p.sourceId}` : '');
-          const existing = await prisma.product.findFirst({
-            where: { slug },
-            select: { name: true, slug: true },
-          });
-          if (existing) {
-            duplicateStatus = 'slug-duplicate';
-            duplicateMatch = { name: existing.name, slug: existing.slug };
-          }
-        }
-
-        // 3. name fuzzy (case-insensitive exact for now)
-        if (duplicateStatus === 'new' && p.name) {
-          const existing = await prisma.product.findFirst({
-            where: { name: { equals: p.name, mode: 'insensitive' } },
-            select: { name: true, slug: true },
-          });
-          if (existing) {
-            duplicateStatus = 'possible-duplicate';
-            duplicateMatch = { name: existing.name, slug: existing.slug };
-          }
-        }
-      } catch (dupErr) {
-        console.error(`[scraper/scan] duplicate check failed for ${p.sourceId}: ${dupErr.message}`);
-        // Default to 'new' on error — admin can still review
+          return { ...p, duplicateStatus, duplicateMatch };
+        }));
+        enriched.push(...batchResults);
       }
 
-      return { ...p, duplicateStatus, duplicateMatch };
-    }));
+      // Mark job complete
+      if (scanJobs.has(jobId)) {
+        job.status = 'done';
+        job.products = enriched;
+        job.productsFound = enriched.length;
+        job.completedAt = new Date().toISOString();
+        job.provider = resolvedKey;
+        job.stats = {
+          productsFound: scrapeStats?.productsFound ?? enriched.length,
+          productsReturned: enriched.length,
+          duplicateCount: enriched.filter(p => p.duplicateStatus !== 'new').length,
+          failedCount: (scrapeStats?.failedCount || 0),
+          pagesFetched: scrapeStats?.pagesFetched || pagesFetched || 0,
+          scanDuration: scrapeStats?.scanDuration || 0,
+          total: enriched.length,
+          failed: scrapeStats?.failedCount || 0,
+          failedUrls: failedUrls || [],
+        };
+      }
+    } catch (err) {
+      console.error('[scraper/scan background]', err);
+      if (scanJobs.has(jobId)) {
+        job.status = 'error';
+        job.error = err.message;
+        job.completedAt = new Date().toISOString();
+      }
+    }
+  })();
 
-    res.json({
-      provider: resolvedKey,
-      products: enriched,
-      stats: {
-        productsFound: scrapeStats?.productsFound ?? enriched.length,
-        productsReturned: enriched.length,
-        duplicateCount: enriched.filter(p => p.duplicateStatus !== 'new').length,
-        failedCount: (scrapeStats?.failedCount || 0) + (scrapeStats?.pageErrors || 0),
-        pagesFetched: scrapeStats?.pagesFetched || pagesFetched || 0,
-        scanDuration: scrapeStats?.scanDuration || 0,
-        // legacy fields for frontend compatibility
-        total: enriched.length,
-        failed: scrapeStats?.failedCount || 0,
-        pageErrors: scrapeStats?.pageErrors || 0,
-        failedUrls: failedUrls || [],
-      },
+  // Respond immediately with the job ID — client polls for progress
+  res.json({ jobId, status: 'running' });
+});
+
+// GET /api/admin/scraper/scan/status/:jobId — poll for scan progress
+app.get('/api/admin/scraper/scan/status/:jobId', adminAuth, (req, res) => {
+  const job = scanJobs.get(req.params.jobId);
+  if (!job) return res.status(404).json({ error: 'Job not found or expired' });
+
+  if (job.status === 'running') {
+    return res.json({
+      status: 'running',
+      pagesScanned: job.pagesScanned,
+      productsFound: job.productsFound,
     });
-  } catch (error) {
-    console.error('[scraper/scan]', error);
-    // Never return 500/502 for a partial-failure situation — return what we have.
-    res.status(200).json({ provider: req.body?.provider || null, products: [], stats: { total: 0, totalFound: 0, successful: 0, failed: 0, error: error.message } });
   }
+
+  if (job.status === 'error') {
+    return res.json({ status: 'error', error: job.error });
+  }
+
+  // status === 'done'
+  res.json({
+    status: 'done',
+    provider: job.provider,
+    products: job.products,
+    stats: job.stats,
+    completedAt: job.completedAt,
+  });
+
+  // Clean up completed job after it's been fetched
+  scanJobs.delete(req.params.jobId);
 });
 
 // POST /api/admin/scraper/import

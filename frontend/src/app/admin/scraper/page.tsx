@@ -116,6 +116,9 @@ export default function ScraperPage() {
   const [delayMs, setDelayMs] = useState(500);
   const [scanning, setScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
+  const [scanPagesScanned, setScanPagesScanned] = useState(0);
+  const [scanProductsLive, setScanProductsLive] = useState(0);
+  const scanAbortRef = useRef(false);
   const [scannedProducts, setScannedProducts] = useState<ScrapedProduct[]>([]);
   const [scanStats, setScanStats] = useState<{ total: number; failed: number; productsFound?: number; productsReturned?: number; duplicateCount?: number; failedCount?: number; pagesFetched?: number; scanDuration?: number } | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -196,24 +199,98 @@ export default function ScraperPage() {
                   </div>
                 ))}
               </div>
-              {step === 1 && <ScannerStep url={url} setUrl={setUrl} scope={scope} setScope={setScope} delayMs={delayMs} setDelayMs={setDelayMs} scanning={scanning} scanProgress={scanProgress} scanStats={scanStats} providerKey={providerKey} setProviderKey={setProviderKey}
+              {step === 1 && <ScannerStep url={url} setUrl={setUrl} scope={scope} setScope={setScope} delayMs={delayMs} setDelayMs={setDelayMs} scanning={scanning} scanProgress={scanProgress} scanPagesScanned={scanPagesScanned} scanProductsLive={scanProductsLive} scanStats={scanStats} providerKey={providerKey} setProviderKey={setProviderKey}
+                onCancelScan={() => { scanAbortRef.current = true; }}
                 onScan={async () => {
                   if (!url.trim()) { show('Enter a supplier URL', 'err'); return; }
-                  setScanning(true); setScanProgress(10); setScannedProducts([]); setScanStats(null);
+                  setScanning(true);
+                  setScanProgress(5);
+                  setScanPagesScanned(0);
+                  setScanProductsLive(0);
+                  setScannedProducts([]);
+                  setScanStats(null);
+                  scanAbortRef.current = false;
+
                   try {
-                    const r = await api('/api/admin/scraper/scan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url, scope, provider: providerKey, delayMs }) });
-                    setScanProgress(90);
-                    const d = await r.json();
-                    if (!r.ok) { show(d.error || 'Scan failed', 'err'); return; }
-                    setScannedProducts(d.products || []);
-                    setScanStats({ total: d.stats?.productsReturned || d.stats?.total || 0, failed: d.stats?.failedCount || d.stats?.failed || 0, productsFound: d.stats?.productsFound, productsReturned: d.stats?.productsReturned, duplicateCount: d.stats?.duplicateCount, failedCount: d.stats?.failedCount, pagesFetched: d.stats?.pagesFetched, scanDuration: d.stats?.scanDuration });
-                    setSelectedIds(new Set((d.products || []).filter((p: ScrapedProduct) => p.duplicateStatus === 'new').map((p: ScrapedProduct) => p.sourceId)));
-                    setScanProgress(100);
-                    const dur = d.stats?.scanDuration ? ` in ${(d.stats.scanDuration / 1000).toFixed(1)}s` : '';
-                    const failMsg = (d.stats?.failedCount || 0) > 0 ? ` (${d.stats.failedCount} failed)` : '';
-                    show(`Found ${d.stats?.productsReturned || d.stats?.total || 0} products${dur}${failMsg}`);
-                    setTimeout(() => { setStep(2); setScanProgress(0); }, 500);
-                  } catch (e) { show('Scan failed', 'err'); } finally { setScanning(false); }
+                    // 1. Start the background scan job
+                    const startRes = await api('/api/admin/scraper/scan', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ url, scope, provider: providerKey, delayMs }),
+                    });
+
+                    let startData: { jobId?: string; error?: string } = {};
+                    try {
+                      startData = await startRes.json();
+                    } catch {
+                      // Backend returned non-JSON (e.g. HTML 500 page)
+                      throw new Error(`Backend error (HTTP ${startRes.status}) — check server logs`);
+                    }
+                    if (!startRes.ok) { show(startData.error || `Server error ${startRes.status}`, 'err'); return; }
+                    const jobId = startData.jobId;
+                    if (!jobId) { show('No job ID returned from server', 'err'); return; }
+
+                    // 2. Poll until done
+                    let pollInterval: ReturnType<typeof setInterval> | null = null;
+                    await new Promise<void>((resolve, reject) => {
+                      pollInterval = setInterval(async () => {
+                        // User cancelled
+                        if (scanAbortRef.current) {
+                          if (pollInterval) clearInterval(pollInterval);
+                          reject(new Error('Scan cancelled'));
+                          return;
+                        }
+                        try {
+                          const statusRes = await api(`/api/admin/scraper/scan/status/${jobId}`);
+                          const statusData = await statusRes.json();
+
+                          if (statusData.status === 'running') {
+                            setScanPagesScanned(statusData.pagesScanned || 0);
+                            setScanProductsLive(statusData.productsFound || 0);
+                            // Indeterminate progress — animate up to 90%
+                            setScanProgress(p => Math.min(p + 2, 90));
+                            return;
+                          }
+
+                          if (pollInterval) clearInterval(pollInterval);
+
+                          if (statusData.status === 'error') {
+                            reject(new Error(statusData.error || 'Scan failed'));
+                            return;
+                          }
+
+                          // status === 'done'
+                          setScanProgress(100);
+                          setScannedProducts(statusData.products || []);
+                          setScanStats({
+                            total: statusData.stats?.productsReturned || statusData.stats?.total || 0,
+                            failed: statusData.stats?.failedCount || statusData.stats?.failed || 0,
+                            productsFound: statusData.stats?.productsFound,
+                            productsReturned: statusData.stats?.productsReturned,
+                            duplicateCount: statusData.stats?.duplicateCount,
+                            failedCount: statusData.stats?.failedCount,
+                            pagesFetched: statusData.stats?.pagesFetched,
+                            scanDuration: statusData.stats?.scanDuration,
+                          });
+                          setSelectedIds(new Set((statusData.products || []).filter((p: ScrapedProduct) => p.duplicateStatus === 'new').map((p: ScrapedProduct) => p.sourceId)));
+                          const dur = statusData.stats?.scanDuration ? ` in ${(statusData.stats.scanDuration / 1000).toFixed(1)}s` : '';
+                          const failMsg = (statusData.stats?.failedCount || 0) > 0 ? ` (${statusData.stats.failedCount} failed)` : '';
+                          show(`Found ${statusData.stats?.productsReturned || statusData.stats?.total || 0} products${dur}${failMsg}`);
+                          setTimeout(() => { setStep(2); setScanProgress(0); }, 500);
+                          resolve();
+                        } catch (pollErr) {
+                          if (pollInterval) clearInterval(pollInterval);
+                          reject(pollErr);
+                        }
+                      }, 2000);
+                    });
+                  } catch (e: unknown) {
+                    const msg = e instanceof Error ? e.message : 'Scan failed';
+                    if (msg !== 'Scan cancelled') show(msg, 'err');
+                    else show('Scan cancelled', 'err');
+                  } finally {
+                    setScanning(false);
+                  }
                 }} />}
               {step === 2 && <PreviewStep products={scannedProducts} selectedIds={selectedIds} setSelectedIds={setSelectedIds} dupResolutions={dupResolutions} setDupResolutions={setDupResolutions} onNext={() => setStep(3)} />}
               {step === 3 && <BrandMappingStep products={selectedProducts} brands={brands} brandResolutions={brandResolutions} setBrandResolutions={setBrandResolutions} providerKey={providerKey} show={show} onNext={() => setStep(4)} />}
@@ -263,17 +340,18 @@ export default function ScraperPage() {
 }
 
 // ── Step 1: Scanner ───────────────────────────────────────────
-function ScannerStep({ url, setUrl, scope, setScope, delayMs, setDelayMs, scanning, scanProgress, scanStats, providerKey, setProviderKey, onScan }: {
+function ScannerStep({ url, setUrl, scope, setScope, delayMs, setDelayMs, scanning, scanProgress, scanPagesScanned, scanProductsLive, scanStats, providerKey, setProviderKey, onScan, onCancelScan }: {
   url: string; setUrl: (v: string) => void; scope: 'full' | 'category' | 'product'; setScope: (v: 'full' | 'category' | 'product') => void;
   delayMs: number; setDelayMs: (v: number) => void; scanning: boolean; scanProgress: number;
+  scanPagesScanned: number; scanProductsLive: number;
   scanStats: { total: number; failed: number; productsFound?: number; productsReturned?: number; duplicateCount?: number; failedCount?: number; pagesFetched?: number; scanDuration?: number } | null;
-  providerKey: string; setProviderKey: (v: string) => void; onScan: () => void;
+  providerKey: string; setProviderKey: (v: string) => void; onScan: () => void; onCancelScan: () => void;
 }) {
   return (
     <div>
-      <div className={styles.stepHeader}><div className={styles.stepTitle}>SCAN SUPPLIER WEBSITE</div><div className={styles.stepDesc}>Enter a CartPe URL to extract products</div></div>
+      <div className={styles.stepHeader}><div className={styles.stepTitle}>SCAN SUPPLIER WEBSITE</div><div className={styles.stepDesc}>Enter any <strong>*.cartpe.in</strong> store URL to extract products. Scans run in the background — safe for 1000+ products.</div></div>
       <div className={adminStyles.formStack} style={{ maxWidth: 600 }}>
-        <div className={adminStyles.formGroup}><label>Supplier URL *</label><input className={adminStyles.formGroup} value={url} onChange={e => setUrl(e.target.value)} placeholder="https://urbanex.cartpe.in/mens-watch.html" style={{ background: '#111', border: '1px solid #333', color: '#fff', padding: '10px 12px', fontSize: 14, outline: 'none', width: '100%' }} /></div>
+        <div className={adminStyles.formGroup}><label>Supplier URL *</label><input className={adminStyles.formGroup} value={url} onChange={e => setUrl(e.target.value)} placeholder="https://yourstore.cartpe.in/allproduct.html" style={{ background: '#111', border: '1px solid #333', color: '#fff', padding: '10px 12px', fontSize: 14, outline: 'none', width: '100%' }} /></div>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           <div className={adminStyles.formGroup} style={{ flex: 1 }}><label>Scope</label>
             <select className={styles.selectInput} value={scope} onChange={e => setScope(e.target.value as 'full' | 'category' | 'product')}>
@@ -287,9 +365,21 @@ function ScannerStep({ url, setUrl, scope, setScope, delayMs, setDelayMs, scanni
           </div>
           <div className={adminStyles.formGroup}><label>Delay (ms)</label><input type="number" className={styles.numInput} value={delayMs} min={100} max={10000} onChange={e => setDelayMs(Number(e.target.value))} /></div>
         </div>
-        <button className={adminStyles.btnPrimary} onClick={onScan} disabled={scanning} style={{ alignSelf: 'flex-start' }}>{scanning ? 'SCANNING…' : 'SCAN WEBSITE'}</button>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <button className={adminStyles.btnPrimary} onClick={onScan} disabled={scanning} style={{ alignSelf: 'flex-start' }}>{scanning ? 'SCANNING…' : 'SCAN WEBSITE'}</button>
+          {scanning && <button className={adminStyles.btnSecondary} onClick={onCancelScan} style={{ alignSelf: 'flex-start' }}>CANCEL</button>}
+        </div>
       </div>
-      {(scanning || scanProgress > 0) && <div className={styles.progressWrap} style={{ marginTop: 16 }}><div className={styles.progressFill} style={{ width: `${scanProgress}%` }} /></div>}
+      {scanning && (
+        <div style={{ marginTop: 20 }}>
+          <div className={styles.progressWrap}><div className={styles.progressFill} style={{ width: `${scanProgress}%`, transition: 'width 0.5s ease' }} /></div>
+          <div style={{ marginTop: 10, display: 'flex', gap: 24, fontSize: 14, color: '#aaa' }}>
+            <span>📄 Pages scanned: <strong style={{ color: '#fff' }}>{scanPagesScanned}</strong></span>
+            <span>📦 Products found: <strong style={{ color: '#22C55E' }}>{scanProductsLive}</strong></span>
+            <span style={{ color: '#555', fontSize: 12 }}>Scanning in background — safe to wait...</span>
+          </div>
+        </div>
+      )}
       {scanStats && (
         <div className={styles.scanStats}>
           <div><strong>{scanStats.productsFound ?? scanStats.total}</strong>Products Found</div>

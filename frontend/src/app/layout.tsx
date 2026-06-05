@@ -11,11 +11,9 @@ export const metadata: Metadata = {
   title: 'UrbanEx | Premium Streetwear & Sneakers',
   description: '100% Premium Streetwear - Nike, Adidas, Jordan, and more',
   icons: {
-    icon: [
-      { url: '/favicon.png', type: 'image/png' },
-    ],
-    apple: '/favicon.png',
+    icon: '/favicon.png',
     shortcut: '/favicon.png',
+    apple: '/apple-icon.png',
   },
 };
 
