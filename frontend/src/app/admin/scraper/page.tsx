@@ -669,6 +669,10 @@ function BrandAssignmentStep({ products, brands, brandResolutions, brandAssignme
   const [brandSearch, setBrandSearch] = useState<Record<string, string>>({});
   const [tab, setTab] = useState<'all' | 'assigned' | 'unassigned' | 'skipped'>('all');
   const [localBrands, setLocalBrands] = useState(brands);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const toggleSelect = (id: string) => setSelectedIds(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
+  const clearSelection = () => setSelectedIds(new Set());
 
   // Keep localBrands in sync when parent brands change
   useEffect(() => setLocalBrands(brands), [brands]);
@@ -724,6 +728,12 @@ function BrandAssignmentStep({ products, brands, brandResolutions, brandAssignme
   const unassigned = products.filter(p => getAssignment(p) === undefined);
 
   const tabProducts = tab === 'assigned' ? assigned : tab === 'skipped' ? skipped : tab === 'unassigned' ? unassigned : products;
+  // Reset selection when tab changes
+  useEffect(() => setSelectedIds(new Set()), [tab]);
+  const toggleSelectAll = () => {
+    if (selectedIds.size === tabProducts.length && tabProducts.length > 0) setSelectedIds(new Set());
+    else setSelectedIds(new Set(tabProducts.map(p => p.sourceId)));
+  };
 
   const handleNext = () => {
     if (unassigned.length > 0) {
@@ -789,7 +799,13 @@ function BrandAssignmentStep({ products, brands, brandResolutions, brandAssignme
               <option value="no-brand">⊘ Skip (no brand)</option>
             </select>
             <button className={adminStyles.btnSmall} onClick={applyBulk} disabled={!bulkBrandId || products.length === 0}>Apply to All</button>
-            {tab !== 'all' && tabProducts.length > 0 && (
+            {selectedIds.size > 0 && (
+              <button className={adminStyles.btnSmall} style={{ background: '#1a2a1a', border: '1px solid #22C55E', color: '#22C55E', fontWeight: 700 }}
+                onClick={() => { if (!bulkBrandId) { show('Select a brand first', 'err'); return; } applyBulkToSelected([...selectedIds], bulkBrandId === 'no-brand' ? 'no-brand' : parseInt(bulkBrandId)); clearSelection(); show(`Applied to ${selectedIds.size} selected products`, 'ok'); }}>
+                ✓ Apply to Selected ({selectedIds.size})
+              </button>
+            )}
+            {tab !== 'all' && tabProducts.length > 0 && selectedIds.size === 0 && (
               <button className={adminStyles.btnSmall} style={{ background: '#1a1a2e' }}
                 onClick={() => bulkBrandId && applyBulkToSelected(tabProducts.map(p => p.sourceId), bulkBrandId === 'no-brand' ? 'no-brand' : parseInt(bulkBrandId))}>
                 Apply to {tab} ({tabProducts.length})
@@ -806,10 +822,40 @@ function BrandAssignmentStep({ products, brands, brandResolutions, brandAssignme
       </div>
 
       {/* ── Product Table ── */}
+      {/* ── Floating Selection Bar ── */}
+      {selectedIds.size > 0 && (
+        <div style={{ position: 'sticky', top: 0, zIndex: 20, background: '#1a2a1a', border: '1px solid #22C55E', borderRadius: 6, padding: '10px 16px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <span style={{ color: '#22C55E', fontWeight: 700, fontSize: 13 }}>☑ {selectedIds.size} product{selectedIds.size !== 1 ? 's' : ''} selected</span>
+          <select className={styles.selectInput} style={{ minWidth: 160 }} value={bulkBrandId} onChange={e => setBulkBrandId(e.target.value)}>
+            <option value="">Pick brand to assign…</option>
+            {localBrands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+            <option value="no-brand">⊘ Skip (no brand)</option>
+          </select>
+          <button className={adminStyles.btnPrimary} style={{ padding: '6px 14px', fontSize: 12 }}
+            onClick={() => { if (!bulkBrandId) { show('Select a brand first', 'err'); return; } applyBulkToSelected([...selectedIds], bulkBrandId === 'no-brand' ? 'no-brand' : parseInt(bulkBrandId)); clearSelection(); show(`Brand applied to ${selectedIds.size} products`, 'ok'); }}>
+            ASSIGN BRAND
+          </button>
+          <button className={adminStyles.btnSmall} style={{ color: '#CC0000', border: '1px solid #CC0000', background: 'transparent' }}
+            onClick={() => { applyBulkToSelected([...selectedIds], 'no-brand'); clearSelection(); }}>
+            Skip Selected
+          </button>
+          <button className={adminStyles.btnSmall} style={{ marginLeft: 'auto', color: '#666', border: '1px solid #333', background: 'transparent' }} onClick={clearSelection}>
+            ✕ Clear
+          </button>
+        </div>
+      )}
+
       <div className={adminStyles.tableWrap}>
         <table className={adminStyles.table}>
           <thead><tr>
-            <th style={{ width: 36 }}></th>
+            <th style={{ width: 36 }}>
+              <input type="checkbox"
+                checked={tabProducts.length > 0 && selectedIds.size === tabProducts.length}
+                ref={el => { if (el) el.indeterminate = selectedIds.size > 0 && selectedIds.size < tabProducts.length; }}
+                onChange={toggleSelectAll}
+                style={{ cursor: 'pointer', width: 15, height: 15 }} />
+            </th>
+            <th style={{ width: 28 }}></th>
             <th>Product</th>
             <th>Detected</th>
             <th>Assign Brand</th>
@@ -820,9 +866,17 @@ function BrandAssignmentStep({ products, brands, brandResolutions, brandAssignme
               const current = getAssignment(p);
               const currentBrand = typeof current === 'number' ? localBrands.find(b => b.id === current) : null;
               const status = current === 'no-brand' ? 'skipped' : typeof current === 'number' ? 'assigned' : 'unassigned';
-              const rowStyle = status === 'assigned' ? { borderLeft: '3px solid #22C55E' } : status === 'skipped' ? { borderLeft: '3px solid #444', opacity: 0.65 } : { borderLeft: '3px solid #F59E0B' };
+              const isSelected = selectedIds.has(p.sourceId);
+              const rowStyle = {
+                ...(status === 'assigned' ? { borderLeft: '3px solid #22C55E' } : status === 'skipped' ? { borderLeft: '3px solid #444', opacity: 0.65 } : { borderLeft: '3px solid #F59E0B' }),
+                ...(isSelected ? { background: 'rgba(34,197,94,0.07)' } : {}),
+              };
               return (
                 <tr key={p.sourceId} style={rowStyle}>
+                  <td style={{ textAlign: 'center' }}>
+                    <input type="checkbox" checked={isSelected} onChange={() => toggleSelect(p.sourceId)}
+                      style={{ cursor: 'pointer', width: 15, height: 15 }} />
+                  </td>
                   <td>
                     {status === 'assigned' && <span style={{ color: '#22C55E', fontSize: 16 }}>✓</span>}
                     {status === 'skipped' && <span style={{ color: '#555', fontSize: 16 }}>⊘</span>}
@@ -873,7 +927,7 @@ function BrandAssignmentStep({ products, brands, brandResolutions, brandAssignme
               );
             })}
             {tabProducts.length === 0 && (
-              <tr><td colSpan={5} style={{ textAlign: 'center', color: '#555', padding: 24 }}>No products in this filter</td></tr>
+              <tr><td colSpan={6} style={{ textAlign: 'center', color: '#555', padding: 24 }}>No products in this filter</td></tr>
             )}
           </tbody>
         </table>
