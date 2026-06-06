@@ -513,6 +513,7 @@ function parseAllProductLinks($, base) {
  * @param {string} options.searchKey  - Search keyword
  * @param {number} options.delayMs    - Delay between pages
  * @param {function} options.onProgress - (pageNo, total) => void
+ * @param {string} options.pageUrl    - Original page URL (to check if category page)
  */
 async function scanListings(options = {}) {
   const {
@@ -535,6 +536,27 @@ async function scanListings(options = {}) {
   let consecutiveEmpty = 0;
   let consecutiveErrors = 0;
   const pageErrors = [];
+
+  // CATEGORY PAGE DETECTION: Check if this is a category page (not allproduct)
+  const isCategoryPage = pageUrl && !/allproduct/i.test(pageUrl);
+  let expectedProductCount = null;
+  
+  if (isCategoryPage) {
+    console.log(`[CartPe] Category page detected, checking product count...`);
+    try {
+      const { data: html } = await axios.get(pageUrl, {
+        headers: { 'User-Agent': UA, 'Cookie': cookie },
+        timeout: 15000,
+      });
+      const countMatch = html.match(/(\d+)\s*Products?/i);
+      if (countMatch) {
+        expectedProductCount = parseInt(countMatch[1]);
+        console.log(`[CartPe] Category page shows ${expectedProductCount} products total`);
+      }
+    } catch (err) {
+      console.warn(`[CartPe] Could not fetch category page for count: ${err.message}`);
+    }
+  }
 
   console.log(`[CartPe] SCAN — base="${base}" cat_ids="${catIds}" searchKey="${searchKey}"`);
 
@@ -572,6 +594,12 @@ async function scanListings(options = {}) {
 
       console.log(`[CartPe] Page ${pagesFetched} (row_no=${rowNo}): ${newCount} new (total: ${products.length})`);
       if (onProgress) onProgress(pagesFetched, products.length);
+
+      // CATEGORY PAGE LIMIT: Stop if we've exceeded expected count
+      if (isCategoryPage && expectedProductCount && products.length >= expectedProductCount) {
+        console.log(`[CartPe] Reached expected category product count (${expectedProductCount}) — stopping AJAX pagination`);
+        break;
+      }
 
       if (newCount === 0) {
         consecutiveEmpty++;
@@ -835,41 +863,6 @@ async function scrape(url, scope, options = {}) {
       console.log(`[CartPe] Fallback found ${products.length} products`);
     } catch (err) {
       console.error(`[CartPe] Fallback also failed: ${err.message}`);
-    }
-  }
-
-  // CATEGORY PAGE FIX: If this is a category page (not /allproduct.html),
-  // and AJAX returned MORE products than visible on the page,
-  // it means AJAX ignored the category filter.
-  // Solution: Parse the static HTML from the category page instead.
-  if (!/allproduct/i.test(url) && products.length > 0) {
-    try {
-      const { data: html } = await fetchWithRetry(url, { retries: 2, timeout: 20000, cookie });
-      const $ = cheerio.load(html);
-      
-      // Check if page shows product count (e.g. "Showing results of 319 Products")
-      const countText = $('body').text();
-      const countMatch = countText.match(/(\d+)\s*Products?/i);
-      
-      if (countMatch) {
-        const pageProductCount = parseInt(countMatch[1]);
-        console.log(`[CartPe] Category page shows ${pageProductCount} products, but AJAX returned ${products.length}`);
-        
-        // If AJAX returned significantly more (>20% more), it's ignoring the category
-        if (products.length > pageProductCount * 1.2) {
-          console.log(`[CartPe] AJAX is ignoring category filter! Parsing static HTML instead...`);
-          products.length = 0; // Clear AJAX results
-          
-          const seen = new Set();
-          const categoryProducts = parseAllProductLinks($, base);
-          for (const p of categoryProducts) {
-            if (!seen.has(p.sourceId)) { seen.add(p.sourceId); products.push(p); }
-          }
-          console.log(`[CartPe] Static parse found ${products.length} products from category page`);
-        }
-      }
-    } catch (err) {
-      console.log(`[CartPe] Category verification failed: ${err.message}`);
     }
   }
 
