@@ -41,9 +41,11 @@ export function validateProductData(data) {
   if (!data.price || isNaN(price) || price <= 0) {
     return { valid: false, error: 'price must be a positive number' };
   }
-  const brandId = Number(data.brandId);
-  if (!data.brandId || isNaN(brandId) || brandId <= 0 || !Number.isInteger(brandId)) {
-    return { valid: false, error: 'brandId must be a positive integer' };
+  if (data.brandId != null) {
+    const brandId = Number(data.brandId);
+    if (isNaN(brandId) || brandId <= 0 || !Number.isInteger(brandId)) {
+      return { valid: false, error: 'brandId must be a positive integer' };
+    }
   }
   if (!data.category || !VALID_CATEGORIES.includes(data.category)) {
     return { valid: false, error: `category must be one of: ${VALID_CATEGORIES.join(', ')}` };
@@ -86,7 +88,7 @@ export function buildProductData(data) {
     description:   data.description || null,
     price,
     originalPrice,
-    brandId:       Number(data.brandId),
+    brandId:       data.brandId != null ? Number(data.brandId) : null,
     sizes:         normaliseSizes(data.sizes),
     colors:        data.colors || [],
     inStock:       data.inStock ?? true,
