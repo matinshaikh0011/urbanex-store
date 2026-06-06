@@ -549,12 +549,40 @@ async function scanListings(options = {}) {
         headers: { 'User-Agent': UA, 'Cookie': cookie },
         timeout: 15000,
       });
-      const countMatch = html.match(/(\d+)\s*Products?/i);
-      if (countMatch) {
-        expectedProductCount = parseInt(countMatch[1]);
-        console.log(`[CartPe] 🎯 Category limit set: ${expectedProductCount} products (will stop when reached)`);
-      } else {
-        console.log(`[CartPe] ⚠️  Could not find product count in page, will scan all`);
+      
+      // Try multiple patterns to extract product count
+      const patterns = [
+        /Showing\s+results?\s+of\s+<strong[^>]*>(\d+)<\/strong>/i,  // "Showing results of <strong>319</strong>"
+        /results?\s+of\s+<strong[^>]*>(\d+)<\/strong>\s*Products?/i, // "results of <strong>319</strong> Products"
+        /(\d+)\s*Products?/i,                    // "319 Products"
+        /Showing.*?of\s+(\d+)\s+Products?/i,     // "Showing results of 319 Products"
+        /Total.*?(\d+)\s+Products?/i,            // "Total 319 Products"
+        /(\d+)\s+items?/i,                       // "319 items"
+        /results?\s+of\s+(\d+)/i,                // "results of 319"
+      ];
+      
+      for (const pattern of patterns) {
+        const match = html.match(pattern);
+        if (match) {
+          expectedProductCount = parseInt(match[1]);
+          console.log(`[CartPe] 🎯 Category limit set: ${expectedProductCount} products (pattern: ${pattern})`);
+          break;
+        }
+      }
+      
+      if (!expectedProductCount) {
+        console.log(`[CartPe] ⚠️  Could not extract product count from page HTML`);
+        console.log(`[CartPe] Will scan all pages until no more products found (may scan entire store)`);
+        // Try to count actual product links in the page as fallback estimate
+        const $ = cheerio.load(html);
+        let linkCount = 0;
+        $('a[href]').each((_, el) => {
+          const href = $(el).attr('href') || '';
+          if (idFromUrl(href)) linkCount++;
+        });
+        if (linkCount > 0) {
+          console.log(`[CartPe] Initial page has ${linkCount} product links visible`);
+        }
       }
     } catch (err) {
       console.warn(`[CartPe] ❌ Could not fetch category page for count: ${err.message}`);
@@ -602,7 +630,7 @@ async function scanListings(options = {}) {
 
       // CATEGORY PAGE LIMIT: Stop if we've exceeded expected count
       if (isCategoryPage && expectedProductCount && products.length >= expectedProductCount) {
-        console.log(`[CartPe] Reached expected category product count (${expectedProductCount}) — stopping AJAX pagination`);
+        console.log(`[CartPe] ✅ Reached expected category product count (${expectedProductCount}) — stopping AJAX pagination`);
         break;
       }
 
@@ -837,11 +865,13 @@ async function scrape(url, scope, options = {}) {
   } catch { /* ignore */ }
 
   // ═══════════════════════════════════════════════════════════════
-  // CATEGORY PAGE FIX: Parse HTML directly instead of using AJAX
+  // CATEGORY PAGE FIX: Use AJAX but with smart limit detection
   // ═══════════════════════════════════════════════════════════════
-  // CartPe's AJAX endpoint (/allproductoadmore) does NOT respect
-  // category filters. It returns ALL products regardless of cat_ids.
-  // For category pages, we must parse the HTML directly.
+  // CartPe category pages are paginated via AJAX. The initial HTML
+  // only shows 12-24 products. We need to:
+  // 1. Fetch the category page to get total product count
+  // 2. Use AJAX to paginate, but STOP when we reach that count
+  // 3. This prevents scanning the entire store (2000+ products)
   // ═══════════════════════════════════════════════════════════════
   
   const isCategoryPage = !/allproduct/i.test(url);
@@ -849,74 +879,49 @@ async function scrape(url, scope, options = {}) {
   let pagesFetched = 0;
   const pageErrors = [];
 
+  // Fetch fresh web_token + session cookie + cat_ids
+  let webToken = '';
+  let cookie = '';
+  let catIds = '';
+  try {
+    const tokenData = await fetchWebToken(url);
+    webToken = tokenData.token;
+    cookie = tokenData.cookie;
+    catIds = tokenData.catIds || '';
+  } catch (err) {
+    console.error(`[CartPe] Failed to fetch web_token: ${err.message}`);
+  }
+
   if (isCategoryPage) {
-    console.log(`[CartPe] 🎯 CATEGORY PAGE — parsing HTML directly (NOT using AJAX)`);
+    console.log(`[CartPe] 🎯 CATEGORY PAGE — will use AJAX with smart limit`);
     console.log(`[CartPe] URL: ${url}`);
-    
+  } else {
+    console.log(`[CartPe] 📋 FULL CATALOG SCAN — using AJAX pagination`);
+  }
+
+  const scanResult = await scanListings({
+    base, webToken, cookie, catIds, searchKey, delayMs: delay, onProgress, pageUrl: url,
+  });
+  
+  products.push(...scanResult.products);
+  pagesFetched = scanResult.pagesFetched;
+  pageErrors.push(...scanResult.pageErrors);
+
+  // Fallback: if AJAX returned nothing, parse the initial page HTML directly.
+  // This handles stores where the AJAX endpoint requires authentication we can't replicate.
+  if (products.length === 0) {
+    console.log('[CartPe] AJAX returned 0 products — parsing initial page HTML as fallback…');
     try {
-      const { data: html, headers: resHeaders } = await fetchWithRetry(url, { retries: 2, timeout: 20000 });
+      const { data: html } = await fetchWithRetry(url, { retries: 2, timeout: 20000, cookie });
       const $ = cheerio.load(html);
       const seen = new Set();
-      
-      const categoryProducts = parseAllProductLinks($, base);
-      for (const p of categoryProducts) {
-        if (!seen.has(p.sourceId)) {
-          seen.add(p.sourceId);
-          products.push(p);
-        }
+      const fallbackProducts = parseAllProductLinks($, base);
+      for (const p of fallbackProducts) {
+        if (!seen.has(p.sourceId)) { seen.add(p.sourceId); products.push(p); }
       }
-      
-      pagesFetched = 1;
-      console.log(`[CartPe] ✅ Category page parsed: ${products.length} products found`);
-      
-      if (onProgress) {
-        onProgress(pagesFetched, products.length);
-      }
+      console.log(`[CartPe] Fallback found ${products.length} products`);
     } catch (err) {
-      console.error(`[CartPe] ❌ Category page parsing failed: ${err.message}`);
-      pageErrors.push({ page: 1, error: err.message });
-    }
-  } else {
-    // Full catalog scan using AJAX pagination
-    console.log(`[CartPe] 📋 FULL CATALOG SCAN — using AJAX pagination`);
-    
-    // Fetch fresh web_token + session cookie + cat_ids
-    let webToken = '';
-    let cookie = '';
-    let catIds = '';
-    try {
-      const tokenData = await fetchWebToken(url);
-      webToken = tokenData.token;
-      cookie = tokenData.cookie;
-      catIds = tokenData.catIds || '';
-    } catch (err) {
-      console.error(`[CartPe] Failed to fetch web_token: ${err.message}`);
-    }
-
-    const scanResult = await scanListings({
-      base, webToken, cookie, catIds, searchKey, delayMs: delay, onProgress, pageUrl: url,
-    });
-    
-    products.push(...scanResult.products);
-    pagesFetched = scanResult.pagesFetched;
-    pageErrors.push(...scanResult.pageErrors);
-
-    // Fallback: if AJAX returned nothing, parse the initial page HTML directly.
-    // This handles stores where the AJAX endpoint requires authentication we can't replicate.
-    if (products.length === 0) {
-      console.log('[CartPe] AJAX returned 0 products — parsing initial page HTML as fallback…');
-      try {
-        const { data: html } = await fetchWithRetry(url, { retries: 2, timeout: 20000, cookie });
-        const $ = cheerio.load(html);
-        const seen = new Set();
-        const fallbackProducts = parseAllProductLinks($, base);
-        for (const p of fallbackProducts) {
-          if (!seen.has(p.sourceId)) { seen.add(p.sourceId); products.push(p); }
-        }
-        console.log(`[CartPe] Fallback found ${products.length} products`);
-      } catch (err) {
-        console.error(`[CartPe] Fallback also failed: ${err.message}`);
-      }
+      console.error(`[CartPe] Fallback also failed: ${err.message}`);
     }
   }
 
