@@ -1121,18 +1121,43 @@ function BrandsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
   };
 
   const deleteBrand = async (id: number, name: string) => {
-    if (!confirm(`Delete brand "${name}"?`)) return;
     try {
+      // First attempt - check if confirmation needed
       const res = await api(`/api/brands/${id}`, { method: 'DELETE' });
-      if (res.ok) { 
-        setBrands(b => b.filter(x => x.id !== id)); 
-        show('Deleted'); 
+      
+      if (res.status === 409) {
+        // Confirmation required
+        const errorData = await res.json();
+        if (errorData.error === 'confirmation_required') {
+          const productCount = errorData.productCount || 0;
+          const confirmMsg = `⚠️ WARNING: This brand "${name}" has ${productCount} product(s).\n\nDeleting this brand will PERMANENTLY DELETE all ${productCount} products.\n\nDo you want to continue?`;
+          
+          if (confirm(confirmMsg)) {
+            // User confirmed - delete with confirmation
+            const confirmRes = await api(`/api/brands/${id}?confirm=true`, { method: 'DELETE' });
+            if (confirmRes.ok) {
+              const result = await confirmRes.json();
+              setBrands(b => b.filter(x => x.id !== id));
+              show(`Deleted brand and ${result.deletedProducts} product(s)`);
+            } else {
+              const errData = await confirmRes.json().catch(() => ({}));
+              show(errData.error || 'Failed to delete', 'err');
+            }
+          }
+          return;
+        }
+      }
+      
+      if (res.ok) {
+        // No products, deleted directly
+        setBrands(b => b.filter(x => x.id !== id));
+        show('Brand deleted');
       } else {
         const errorData = await res.json().catch(() => ({}));
-        const errorMsg = errorData.error || 'Failed to delete';
-        show(errorMsg, 'err');
+        show(errorData.error || errorData.message || 'Failed to delete', 'err');
       }
     } catch (err) {
+      console.error('Delete brand error:', err);
       show('Failed to delete', 'err');
     }
   };

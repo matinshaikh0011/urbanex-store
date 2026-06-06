@@ -345,18 +345,33 @@ app.delete('/api/brands/:id', adminAuth, async (req, res) => {
   const id = parseInt(req.params.id);
   if (isNaN(id)) return res.status(400).json({ error: 'Invalid brand ID' });
   try {
-    // Check if this brand has products — refuse if so (safer than silent cascade)
+    // Check if this brand has products
     const productCount = await prisma.product.count({ where: { brandId: id } });
-    if (productCount > 0) {
+    
+    // Return the count for frontend confirmation
+    // Frontend will send ?confirm=true after user confirms
+    const confirmed = req.query.confirm === 'true';
+    
+    if (productCount > 0 && !confirmed) {
       return res.status(409).json({
-        error: `Cannot delete brand — ${productCount} product(s) are assigned to it. Reassign or delete those products first.`,
+        error: 'confirmation_required',
+        productCount,
+        message: `This brand has ${productCount} product(s). Deleting the brand will also delete all these products.`,
       });
     }
-    // Delete associated BrandMappings first (FK constraint)
+    
+    // Delete associated products first (cascade)
+    if (productCount > 0) {
+      await prisma.product.deleteMany({ where: { brandId: id } });
+    }
+    
+    // Delete associated BrandMappings
     await prisma.brandMapping.deleteMany({ where: { brandId: id } });
-    // Now delete the brand itself
+    
+    // Delete the brand itself
     await prisma.brand.delete({ where: { id } });
-    res.json({ success: true });
+    
+    res.json({ success: true, deletedProducts: productCount });
   } catch (error) {
     console.error('[DELETE /api/brands/:id]', error);
     res.status(500).json({ error: error.message || 'Failed to delete brand' });
