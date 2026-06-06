@@ -667,9 +667,13 @@ function BrandAssignmentStep({ products, brands, brandResolutions, brandAssignme
   const [newBrandSlug, setNewBrandSlug] = useState('');
   const [creatingFor, setCreatingFor] = useState<string | 'bulk' | null>(null);
   const [brandSearch, setBrandSearch] = useState<Record<string, string>>({});
+  const [openTypeahead, setOpenTypeahead] = useState<string | null>(null); // sourceId with open typeahead
   const [tab, setTab] = useState<'all' | 'assigned' | 'unassigned' | 'skipped'>('all');
   const [localBrands, setLocalBrands] = useState(brands);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [productSearch, setProductSearch] = useState(''); // global name filter
+
+  const selectionMode = selectedIds.size > 0; // once any row checked, whole row is clickable
 
   const toggleSelect = (id: string) => setSelectedIds(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
   const clearSelection = () => setSelectedIds(new Set());
@@ -728,11 +732,15 @@ function BrandAssignmentStep({ products, brands, brandResolutions, brandAssignme
   const unassigned = products.filter(p => getAssignment(p) === undefined);
 
   const tabProducts = tab === 'assigned' ? assigned : tab === 'skipped' ? skipped : tab === 'unassigned' ? unassigned : products;
+  // Apply global product name search
+  const displayProducts = productSearch.trim()
+    ? tabProducts.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase()))
+    : tabProducts;
   // Reset selection when tab changes
   useEffect(() => setSelectedIds(new Set()), [tab]);
   const toggleSelectAll = () => {
-    if (selectedIds.size === tabProducts.length && tabProducts.length > 0) setSelectedIds(new Set());
-    else setSelectedIds(new Set(tabProducts.map(p => p.sourceId)));
+    if (selectedIds.size === displayProducts.length && displayProducts.length > 0) setSelectedIds(new Set());
+    else setSelectedIds(new Set(displayProducts.map(p => p.sourceId)));
   };
 
   const handleNext = () => {
@@ -762,6 +770,22 @@ function BrandAssignmentStep({ products, brands, brandResolutions, brandAssignme
         <div className={styles.stepDesc}>
           Assign a brand to each product — brand is optional. Unassigned products will be skipped on import.
         </div>
+      </div>
+
+      {/* ── Global Product Search + Tabs row ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 0, flexWrap: 'wrap' }}>
+        <div style={{ position: 'relative', flex: '0 0 280px' }}>
+          <input
+            style={{ width: '100%', background: '#111', border: '1px solid #333', color: '#fff', padding: '7px 12px 7px 32px', fontSize: 13, outline: 'none', borderRadius: 4 }}
+            placeholder="🔍 Search products…"
+            value={productSearch}
+            onChange={e => setProductSearch(e.target.value)}
+          />
+          {productSearch && (
+            <button onClick={() => setProductSearch('')} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 16 }}>✕</button>
+          )}
+        </div>
+        {productSearch && <span style={{ fontSize: 12, color: '#888' }}>{displayProducts.length} of {tabProducts.length} shown</span>}
       </div>
 
       {/* ── Filter Tabs ── */}
@@ -832,13 +856,14 @@ function BrandAssignmentStep({ products, brands, brandResolutions, brandAssignme
             <option value="no-brand">⊘ Skip (no brand)</option>
           </select>
           <button className={adminStyles.btnPrimary} style={{ padding: '6px 14px', fontSize: 12 }}
-            onClick={() => { if (!bulkBrandId) { show('Select a brand first', 'err'); return; } applyBulkToSelected([...selectedIds], bulkBrandId === 'no-brand' ? 'no-brand' : parseInt(bulkBrandId)); clearSelection(); show(`Brand applied to ${selectedIds.size} products`, 'ok'); }}>
+            onClick={() => { if (!bulkBrandId) { show('Select a brand first', 'err'); return; } applyBulkToSelected([...selectedIds], bulkBrandId === 'no-brand' ? 'no-brand' : parseInt(bulkBrandId)); show(`Brand applied to ${selectedIds.size} products`, 'ok'); clearSelection(); }}>
             ASSIGN BRAND
           </button>
           <button className={adminStyles.btnSmall} style={{ color: '#CC0000', border: '1px solid #CC0000', background: 'transparent' }}
             onClick={() => { applyBulkToSelected([...selectedIds], 'no-brand'); clearSelection(); }}>
             Skip Selected
           </button>
+          <span style={{ fontSize: 12, color: '#666', marginLeft: 4 }}>← click any row to (de)select</span>
           <button className={adminStyles.btnSmall} style={{ marginLeft: 'auto', color: '#666', border: '1px solid #333', background: 'transparent' }} onClick={clearSelection}>
             ✕ Clear
           </button>
@@ -850,29 +875,42 @@ function BrandAssignmentStep({ products, brands, brandResolutions, brandAssignme
           <thead><tr>
             <th style={{ width: 36 }}>
               <input type="checkbox"
-                checked={tabProducts.length > 0 && selectedIds.size === tabProducts.length}
-                ref={el => { if (el) el.indeterminate = selectedIds.size > 0 && selectedIds.size < tabProducts.length; }}
+                checked={displayProducts.length > 0 && selectedIds.size === displayProducts.length}
+                ref={el => { if (el) el.indeterminate = selectedIds.size > 0 && selectedIds.size < displayProducts.length; }}
                 onChange={toggleSelectAll}
                 style={{ cursor: 'pointer', width: 15, height: 15 }} />
             </th>
             <th style={{ width: 28 }}></th>
-            <th>Product</th>
+            <th>Product {productSearch && <span style={{ color: '#888', fontSize: 11, fontWeight: 400 }}>({displayProducts.length})</span>}</th>
             <th>Detected</th>
             <th>Assign Brand</th>
             <th style={{ width: 80, textAlign: 'center' }}>Status</th>
           </tr></thead>
           <tbody>
-            {tabProducts.map(p => {
+            {displayProducts.map(p => {
               const current = getAssignment(p);
               const currentBrand = typeof current === 'number' ? localBrands.find(b => b.id === current) : null;
               const status = current === 'no-brand' ? 'skipped' : typeof current === 'number' ? 'assigned' : 'unassigned';
               const isSelected = selectedIds.has(p.sourceId);
-              const rowStyle = {
+              const rowStyle: React.CSSProperties = {
                 ...(status === 'assigned' ? { borderLeft: '3px solid #22C55E' } : status === 'skipped' ? { borderLeft: '3px solid #444', opacity: 0.65 } : { borderLeft: '3px solid #F59E0B' }),
-                ...(isSelected ? { background: 'rgba(34,197,94,0.07)' } : {}),
+                ...(isSelected ? { background: 'rgba(34,197,94,0.1)' } : {}),
+                ...(selectionMode ? { cursor: 'pointer' } : {}),
               };
+              // Brand typeahead state
+              const bSearch = brandSearch[p.sourceId] || '';
+              const matchingBrands = bSearch ? localBrands.filter(b => b.name.toLowerCase().includes(bSearch.toLowerCase())) : localBrands;
+              const isTypeaheadOpen = openTypeahead === p.sourceId;
+
+              const handleRowClick = (e: React.MouseEvent) => {
+                // In selection mode: clicking anywhere on the row (except interactive elements) toggles selection
+                const tag = (e.target as HTMLElement).tagName;
+                const isInteractive = ['INPUT', 'SELECT', 'BUTTON', 'OPTION', 'LABEL'].includes(tag);
+                if (selectionMode && !isInteractive) { e.preventDefault(); toggleSelect(p.sourceId); }
+              };
+
               return (
-                <tr key={p.sourceId} style={rowStyle}>
+                <tr key={p.sourceId} style={rowStyle} onClick={handleRowClick}>
                   <td style={{ textAlign: 'center' }}>
                     <input type="checkbox" checked={isSelected} onChange={() => toggleSelect(p.sourceId)}
                       style={{ cursor: 'pointer', width: 15, height: 15 }} />
@@ -895,26 +933,50 @@ function BrandAssignmentStep({ products, brands, brandResolutions, brandAssignme
                         <button className={adminStyles.btnSecondary} style={{ padding: '5px 10px', fontSize: 12 }} onClick={() => setCreatingFor(null)}>✕</button>
                       </div>
                     ) : (
-                      <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-                        <input className={styles.textInput} style={{ width: 120 }} placeholder="Search…"
-                          value={brandSearch[p.sourceId] || ''}
-                          onChange={e => setBrandSearch(prev => ({ ...prev, [p.sourceId]: e.target.value }))} />
-                        <select className={styles.selectInput} style={{ minWidth: 120 }}
-                          value={typeof current === 'number' ? current : current === 'no-brand' ? 'no-brand' : ''}
-                          onChange={e => {
-                            if (e.target.value === '') clearAssignment(p.sourceId);
-                            else setAssignment(p.sourceId, e.target.value === 'no-brand' ? 'no-brand' : parseInt(e.target.value));
-                          }}>
-                          <option value="">— none —</option>
-                          {filteredBrands(brandSearch[p.sourceId] || '').map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-                        </select>
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', position: 'relative' }}>
+                        {/* Typeahead: single input that both searches and shows assignment */}
+                        <div style={{ position: 'relative', minWidth: 160 }}>
+                          <input
+                            className={styles.textInput}
+                            style={{ width: '100%', paddingRight: currentBrand ? 20 : 8 }}
+                            placeholder="Type to search brand…"
+                            value={isTypeaheadOpen ? bSearch : (currentBrand?.name || (current === 'no-brand' ? '⊘ Skipped' : ''))}
+                            onFocus={() => { setOpenTypeahead(p.sourceId); setBrandSearch(prev => ({ ...prev, [p.sourceId]: '' })); }}
+                            onChange={e => setBrandSearch(prev => ({ ...prev, [p.sourceId]: e.target.value }))}
+                            onBlur={() => setTimeout(() => setOpenTypeahead(null), 180)}
+                          />
+                          {currentBrand && !isTypeaheadOpen && (
+                            <span style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', color: '#22C55E', fontSize: 12 }}>✓</span>
+                          )}
+                          {/* Dropdown list */}
+                          {isTypeaheadOpen && (
+                            <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#1a1a1a', border: '1px solid #333', zIndex: 50, maxHeight: 200, overflowY: 'auto', borderRadius: '0 0 4px 4px' }}>
+                              {matchingBrands.length === 0 && (
+                                <div style={{ padding: '8px 12px', color: '#555', fontSize: 12 }}>No brands match</div>
+                              )}
+                              {matchingBrands.map(b => (
+                                <div key={b.id}
+                                  onMouseDown={() => { setAssignment(p.sourceId, b.id); setBrandSearch(prev => ({ ...prev, [p.sourceId]: '' })); setOpenTypeahead(null); }}
+                                  style={{ padding: '8px 12px', fontSize: 13, cursor: 'pointer', background: current === b.id ? 'rgba(34,197,94,0.1)' : 'transparent', color: current === b.id ? '#22C55E' : '#ddd', display: 'flex', justifyContent: 'space-between' }}
+                                  onMouseEnter={e => (e.currentTarget.style.background = '#2a2a2a')}
+                                  onMouseLeave={e => (e.currentTarget.style.background = current === b.id ? 'rgba(34,197,94,0.1)' : 'transparent')}>
+                                  {b.name} {current === b.id && <span style={{ fontSize: 11 }}>✓</span>}
+                                </div>
+                              ))}
+                              <div style={{ borderTop: '1px solid #222', padding: '6px 12px' }}>
+                                <button style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 12, width: '100%', textAlign: 'left' }}
+                                  onMouseDown={() => { skipProduct(p.sourceId); setOpenTypeahead(null); }}>⊘ Skip this product</button>
+                              </div>
+                              {current && current !== 'no-brand' && (
+                                <div style={{ padding: '0 12px 6px' }}>
+                                  <button style={{ background: 'none', border: 'none', color: '#F59E0B', cursor: 'pointer', fontSize: 12, width: '100%', textAlign: 'left' }}
+                                    onMouseDown={() => { clearAssignment(p.sourceId); setOpenTypeahead(null); }}>✕ Clear assignment</button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                         <button className={adminStyles.btnSmall} style={{ fontSize: 11, padding: '4px 8px' }} onClick={() => setCreatingFor(p.sourceId)} title="Create new brand">+ New</button>
-                        <button className={adminStyles.btnSmall} style={{ fontSize: 11, padding: '4px 8px', background: '#1a1a1a', border: '1px solid #444', color: '#888' }}
-                          onClick={() => skipProduct(p.sourceId)} title="Skip this product">Skip</button>
-                        {current === 'no-brand' && (
-                          <button className={adminStyles.btnSmall} style={{ fontSize: 11, padding: '4px 8px', color: '#F59E0B', border: '1px solid #F59E0B', background: 'transparent' }}
-                            onClick={() => clearAssignment(p.sourceId)}>Undo</button>
-                        )}
                       </div>
                     )}
                   </td>
@@ -926,8 +988,10 @@ function BrandAssignmentStep({ products, brands, brandResolutions, brandAssignme
                 </tr>
               );
             })}
-            {tabProducts.length === 0 && (
-              <tr><td colSpan={6} style={{ textAlign: 'center', color: '#555', padding: 24 }}>No products in this filter</td></tr>
+            {displayProducts.length === 0 && (
+              <tr><td colSpan={6} style={{ textAlign: 'center', color: '#555', padding: 24 }}>
+                {productSearch ? `No products matching "${productSearch}"` : 'No products in this filter'}
+              </td></tr>
             )}
           </tbody>
         </table>
