@@ -1120,15 +1120,15 @@ function ImportStep({ products, categoryAssignments, brandAssignments, pricingRu
   importing: boolean; importResult: { successCount: number; updatedCount: number; failureCount: number; skippedCount: number; log: Array<{ sourceId: string; operation: string; errorMessage?: string }> } | null;
   show: (m: string, t?: 'ok' | 'err') => void; onImport: () => void; onViewHistory: () => void;
 }) {
-  const toImport = products.filter(p => brandAssignments.get(p.sourceId) !== 'no-brand');
-  const toSkip = products.filter(p => brandAssignments.get(p.sourceId) === 'no-brand');
+  const toImport = products;
+  const unbranded = products.filter(p => brandAssignments.get(p.sourceId) === 'no-brand');
 
   return (
     <div>
       <div className={styles.stepHeader}><div className={styles.stepTitle}>CONFIRM IMPORT</div><div className={styles.stepDesc}>Review and confirm the import</div></div>
       <div className={styles.resultGrid} style={{ marginBottom: 20 }}>
         <div className={styles.resultCard}><strong className={styles.resultNum}>{toImport.length}</strong><span className={styles.resultLabel}>To Import</span></div>
-        <div className={styles.resultCard}><strong className={styles.resultNum} style={{ color: '#F5C400' }}>{toSkip.length}</strong><span className={styles.resultLabel}>To Skip</span></div>
+        <div className={styles.resultCard}><strong className={styles.resultNum} style={{ color: '#F5C400' }}>{unbranded.length}</strong><span className={styles.resultLabel}>No Brand</span></div>
         <div className={styles.resultCard}><strong className={styles.resultNum} style={{ color: '#888' }}>{source}</strong><span className={styles.resultLabel}>Provider</span></div>
         <div className={styles.resultCard}><strong className={styles.resultNum} style={{ color: '#888' }}>{imageMode === 'cloudinary' ? '☁' : '🔗'}</strong><span className={styles.resultLabel}>Images</span></div>
       </div>
