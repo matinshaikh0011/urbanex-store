@@ -463,7 +463,7 @@ function parseAllProductLinks($, base) {
 
     // Name: link text > heading inside container > URL slug
     const rawName = $(a).text().trim()
-      || ctx.find('h3,h4,h5,.product-name,.prod-name,.title').first().text().trim()
+      || ctx.find('h3,h4,h5,h6,.product-name,.prod-name,.title').first().text().trim()
       || cleanUrl.split('/').pop()
           .replace(/-((?:npi|lpi)?\d{6,})-[a-z0-9-]+\.html$/i, '')
           .replace(/-/g, ' ').trim();
@@ -835,6 +835,56 @@ async function scrape(url, scope, options = {}) {
       console.log(`[CartPe] Fallback found ${products.length} products`);
     } catch (err) {
       console.error(`[CartPe] Fallback also failed: ${err.message}`);
+    }
+  }
+
+  // Final fallback: if still no products, try scraping without selectors
+  // by finding ALL product links anywhere in the page
+  if (products.length === 0) {
+    console.log('[CartPe] Final fallback: extracting all product links from page…');
+    try {
+      const { data: html } = await fetchWithRetry(url, { retries: 2, timeout: 20000, cookie });
+      const $ = cheerio.load(html);
+      const seen = new Set();
+      
+      // Find all links that match CartPe product URL pattern
+      $('a[href]').each((_, el) => {
+        const href = $(el).attr('href') || '';
+        const fullUrl = href.startsWith('http') ? href 
+          : href.startsWith('/') ? `${base}${href}` 
+          : `${base}/${href}`;
+        
+        const sourceId = idFromUrl(fullUrl);
+        if (!sourceId || seen.has(sourceId)) return;
+        seen.add(sourceId);
+        
+        const linkText = $(el).text().trim();
+        const name = linkText || fullUrl.split('/').pop()
+          .replace(/-((?:npi|lpi)?\d{6,})-[a-z0-9-]+\.html$/i, '')
+          .replace(/-/g, ' ').trim();
+        
+        if (name && name.length > 3 && name.length < 200) {
+          products.push({
+            name: name.replace(/\s+/g, ' '),
+            sourcePrice: 0, // Will be enriched from detail page during import
+            originalPrice: null,
+            thumbnail: null,
+            images: [],
+            brandName: extractBrand(name),
+            productUrl: fullUrl.split('?')[0],
+            sourceId,
+            suggestedCategory: mapCategory(name).category,
+            suggestedSubcategory: mapCategory(name).subcategory,
+            description: null,
+            sizes: {},
+            inStock: true,
+          });
+        }
+      });
+      
+      console.log(`[CartPe] Final fallback found ${products.length} product links`);
+    } catch (err) {
+      console.error(`[CartPe] Final fallback failed: ${err.message}`);
     }
   }
 
