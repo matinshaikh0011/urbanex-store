@@ -1122,9 +1122,19 @@ function BrandsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
 
   const deleteBrand = async (id: number, name: string) => {
     if (!confirm(`Delete brand "${name}"?`)) return;
-    const res = await api(`/api/brands/${id}`, { method: 'DELETE' });
-    if (res.ok) { setBrands(b => b.filter(x => x.id !== id)); show('Deleted'); }
-    else show('Failed to delete', 'err');
+    try {
+      const res = await api(`/api/brands/${id}`, { method: 'DELETE' });
+      if (res.ok) { 
+        setBrands(b => b.filter(x => x.id !== id)); 
+        show('Deleted'); 
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        const errorMsg = errorData.error || 'Failed to delete';
+        show(errorMsg, 'err');
+      }
+    } catch (err) {
+      show('Failed to delete', 'err');
+    }
   };
 
   return (
