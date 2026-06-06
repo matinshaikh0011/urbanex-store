@@ -333,7 +333,7 @@ export default function ScraperPage() {
                     let lastHistoryId: string | null = null;
 
                     for (let bi = 0; bi < batches.length; bi++) {
-                      show(`Importing batch ${bi + 1}/${batches.length} (${batches[bi].length} products)…`, 'info');
+                      show(`Importing batch ${bi + 1}/${batches.length} (${batches[bi].length} products)…`, 'ok');
                       const r = await api('/api/admin/scraper/import', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -350,7 +350,7 @@ export default function ScraperPage() {
                       if (d.historyId) lastHistoryId = d.historyId;
                     }
 
-                    const combined = { successCount: totalSuccess, updatedCount: totalUpdated, failureCount: totalFailed, skippedCount: totalSkipped, historyId: lastHistoryId, log: allLogs, imageFailures: allImageFailures };
+                    const combined = { successCount: totalSuccess, updatedCount: totalUpdated, failureCount: totalFailed, skippedCount: totalSkipped, log: allLogs as Array<{ sourceId: string; operation: string; errorMessage?: string }> };
                     setImportResult(combined);
                     show(`Import complete: ${totalSuccess} created, ${totalUpdated} updated, ${totalFailed} failed`);
                   } catch { show('Import failed', 'err'); } finally { setImporting(false); }
