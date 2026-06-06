@@ -356,17 +356,37 @@ function parseListingCard($, el, base) {
   if (!sourceId) return null;
 
   // Name: heading link > heading > URL slug fallback
-  const nameFromEl = card.find('h5 a, h4 a, h3 a, .product-name a').first().text().trim()
-    || card.find('h5, h4, h3, .product-name, .prod-name').first().text().trim();
+  const nameFromEl = card.find('h5 a, h4 a, h3 a, h6 a, .product-name a').first().text().trim()
+    || card.find('h5, h4, h3, h6, .product-name, .prod-name').first().text().trim();
   const nameFromUrl = productUrl.split('/').pop()
     .replace(/-((?:npi|lpi)?\d{6,})-[a-z0-9-]+\.html$/i, '')
     .replace(/-/g, ' ').trim();
   const name = (nameFromEl || nameFromUrl).replace(/\s+/g, ' ');
   if (!name) return null;
 
-  // Image: use extractImgSrc for all lazy-load variants
+  // Image: Try to extract from card first
+  let thumbnail = null;
   const imgEl = card.find('img').first();
-  const thumbnail = imgEl.length ? extractImgSrc(imgEl) : null;
+  if (imgEl.length) {
+    thumbnail = extractImgSrc(imgEl);
+  }
+
+  // If no image in card, look for nearest image sibling
+  // (Some CartPe themes separate images from product details)
+  if (!thumbnail) {
+    const parent = card.parent();
+    const siblings = parent.siblings();
+    siblings.each((_, sibling) => {
+      const sibImg = $(sibling).find('img').first();
+      if (sibImg.length) {
+        const src = extractImgSrc(sibImg);
+        if (src && !/(logo|banner|icon)/i.test(src)) {
+          thumbnail = src;
+          return false; // break
+        }
+      }
+    });
+  }
 
   // Prices: use extractCardPrices helper
   const { sourcePrice, originalPrice } = extractCardPrices($, card);
@@ -820,6 +840,41 @@ async function scrape(url, scope, options = {}) {
 
   const scanDuration = Date.now() - scanStart;
   console.log(`[CartPe] SCAN complete: ${products.length} products in ${scanDuration}ms (${pagesFetched} AJAX pages)`);
+
+  // ── Image enrichment: fetch detail pages for products without thumbnails ──
+  const productsWithoutImages = products.filter(p => !p.thumbnail || p.thumbnail.length < 10);
+  if (productsWithoutImages.length > 0) {
+    console.log(`[CartPe] ${productsWithoutImages.length} products missing images — enriching from detail pages…`);
+    let enriched = 0;
+    let enrichFailed = 0;
+    
+    for (const product of productsWithoutImages) {
+      try {
+        const detail = await fetchProductDetail(product.productUrl);
+        if (detail.images && detail.images.length > 0) {
+          product.thumbnail = detail.images[0];
+          product.images = detail.images;
+          product.description = product.description || detail.description;
+          enriched++;
+        }
+        // Rate limit: wait between detail page fetches
+        if (enriched % 5 === 0) {
+          await sleep(delay);
+        }
+      } catch (err) {
+        enrichFailed++;
+        console.warn(`[CartPe] Failed to enrich ${product.sourceId}: ${err.message}`);
+      }
+      
+      // Limit enrichment to avoid excessive detail page fetches (max 50 products)
+      if (enriched + enrichFailed >= 50) {
+        console.log(`[CartPe] Image enrichment limit reached (50 products)`);
+        break;
+      }
+    }
+    
+    console.log(`[CartPe] Image enrichment complete: ${enriched} enriched, ${enrichFailed} failed`);
+  }
 
   return {
     products,
