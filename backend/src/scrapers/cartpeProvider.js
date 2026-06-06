@@ -838,6 +838,41 @@ async function scrape(url, scope, options = {}) {
     }
   }
 
+  // CATEGORY PAGE FIX: If this is a category page (not /allproduct.html),
+  // and AJAX returned MORE products than visible on the page,
+  // it means AJAX ignored the category filter.
+  // Solution: Parse the static HTML from the category page instead.
+  if (!/allproduct/i.test(url) && products.length > 0) {
+    try {
+      const { data: html } = await fetchWithRetry(url, { retries: 2, timeout: 20000, cookie });
+      const $ = cheerio.load(html);
+      
+      // Check if page shows product count (e.g. "Showing results of 319 Products")
+      const countText = $('body').text();
+      const countMatch = countText.match(/(\d+)\s*Products?/i);
+      
+      if (countMatch) {
+        const pageProductCount = parseInt(countMatch[1]);
+        console.log(`[CartPe] Category page shows ${pageProductCount} products, but AJAX returned ${products.length}`);
+        
+        // If AJAX returned significantly more (>20% more), it's ignoring the category
+        if (products.length > pageProductCount * 1.2) {
+          console.log(`[CartPe] AJAX is ignoring category filter! Parsing static HTML instead...`);
+          products.length = 0; // Clear AJAX results
+          
+          const seen = new Set();
+          const categoryProducts = parseAllProductLinks($, base);
+          for (const p of categoryProducts) {
+            if (!seen.has(p.sourceId)) { seen.add(p.sourceId); products.push(p); }
+          }
+          console.log(`[CartPe] Static parse found ${products.length} products from category page`);
+        }
+      }
+    } catch (err) {
+      console.log(`[CartPe] Category verification failed: ${err.message}`);
+    }
+  }
+
   // Final fallback: if still no products, try scraping without selectors
   // by finding ALL product links anywhere in the page
   if (products.length === 0) {
