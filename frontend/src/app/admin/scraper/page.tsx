@@ -321,11 +321,38 @@ export default function ScraperPage() {
                     };
                   });
                   try {
-                    const r = await api('/api/admin/scraper/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ products: payload, source: providerKey, sourceUrl: url, imageMode }) });
-                    const d = await r.json();
-                    if (!r.ok) { show(d.error || 'Import failed', 'err'); return; }
-                    setImportResult(d);
-                    show(`Import complete: ${d.successCount} created, ${d.updatedCount} updated`);
+                    const BATCH_SIZE = 50;
+                    const batches: typeof payload[] = [];
+                    for (let i = 0; i < payload.length; i += BATCH_SIZE) {
+                      batches.push(payload.slice(i, i + BATCH_SIZE));
+                    }
+
+                    let totalSuccess = 0, totalUpdated = 0, totalFailed = 0, totalSkipped = 0;
+                    const allLogs: unknown[] = [];
+                    const allImageFailures: unknown[] = [];
+                    let lastHistoryId: string | null = null;
+
+                    for (let bi = 0; bi < batches.length; bi++) {
+                      show(`Importing batch ${bi + 1}/${batches.length} (${batches[bi].length} products)…`, 'info');
+                      const r = await api('/api/admin/scraper/import', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ products: batches[bi], source: providerKey, sourceUrl: url, imageMode }),
+                      });
+                      const d = await r.json();
+                      if (!r.ok) { show(d.error || `Batch ${bi + 1} failed`, 'err'); setImporting(false); return; }
+                      totalSuccess += d.successCount ?? 0;
+                      totalUpdated += d.updatedCount ?? 0;
+                      totalFailed += d.failureCount ?? 0;
+                      totalSkipped += d.skippedCount ?? 0;
+                      if (d.log) allLogs.push(...d.log);
+                      if (d.imageFailures) allImageFailures.push(...d.imageFailures);
+                      if (d.historyId) lastHistoryId = d.historyId;
+                    }
+
+                    const combined = { successCount: totalSuccess, updatedCount: totalUpdated, failureCount: totalFailed, skippedCount: totalSkipped, historyId: lastHistoryId, log: allLogs, imageFailures: allImageFailures };
+                    setImportResult(combined);
+                    show(`Import complete: ${totalSuccess} created, ${totalUpdated} updated, ${totalFailed} failed`);
                   } catch { show('Import failed', 'err'); } finally { setImporting(false); }
                 }}
                 onViewHistory={() => setActiveTab('history')} />}
