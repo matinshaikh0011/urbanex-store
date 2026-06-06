@@ -586,55 +586,55 @@ async function fetchProductDetail(productUrl) {
   const $ = cheerio.load(html);
 
   // ── Images ──────────────────────────────────────────────────────
-  // CartPe stores use many different carousel/gallery structures.
-  // Strategy: collect ALL img tags on the page that look like product images,
-  // ranked by specificity. Filter out logos, banners, icons, and tiny thumbnails.
+  // CartPe product detail pages use STATIC HTML (not JS-loaded) images.
+  // Two common slider structures across CartPe themes:
+  //   1. FlexSlider: .slides li img  (timescorner, many others)
+  //   2. Bootstrap Carousel: #carousel-custom .carousel-inner .item img  (UrbanEx)
+  // We try each structure, de-duplicate by URL, skip logos/icons.
   const imageSet = new Set();
 
-  // Priority 1: carousel images (any carousel, any theme)
-  const carouselSelectors = [
-    '#carousel-custom .carousel-inner .item img',
-    '#carousel-custom .items img',
-    '.carousel .carousel-inner .item img',
-    '.owl-carousel .item img',
-    '.product-gallery img',
-    '.product-images img',
-    '[id*="carousel"] img',
-    '[class*="carousel"] img',
-    '[class*="gallery"] img',
-    '[class*="slider"] img',
-  ];
-  for (const sel of carouselSelectors) {
-    $(sel).each((_, el) => {
+  const SKIP_RE = /logo|banner|icon|avatar|user|review|placeholder|blank|loading/i;
+
+  // Priority 1 — FlexSlider (most common CartPe theme after default)
+  $('.slides li img, .flexslider .slides img, ul.slides img').each((_, el) => {
+    const src = extractImgSrc($(el));
+    if (src && !SKIP_RE.test(src)) imageSet.add(src);
+  });
+
+  // Priority 2 — Bootstrap Carousel (UrbanEx default theme)
+  if (imageSet.size === 0) {
+    $('#carousel-custom .carousel-inner .item img, #carousel-custom .items img, [id*="carousel"] .item img').each((_, el) => {
       const src = extractImgSrc($(el));
-      if (src && !/logo|banner|icon|avatar|user|review/i.test(src)) {
-        imageSet.add(src);
-      }
+      if (src && !SKIP_RE.test(src)) imageSet.add(src);
     });
-    if (imageSet.size >= 2) break; // found enough from a specific selector
   }
 
-  // Priority 2: any img on the page that points to cdn.cartpe.in
+  // Priority 3 — Owl Carousel / generic sliders
+  if (imageSet.size === 0) {
+    $('.owl-carousel .item img, .slick-slider .slick-slide img, [class*="slider"] li img, [class*="gallery"] li img').each((_, el) => {
+      const src = extractImgSrc($(el));
+      if (src && !SKIP_RE.test(src)) imageSet.add(src);
+    });
+  }
+
+  // Priority 4 — ANY img anywhere on the page with a CDN-looking URL
+  // (covers stores hosted on any CDN, not just cdn.cartpe.in)
   if (imageSet.size === 0) {
     $('img').each((_, el) => {
       const src = extractImgSrc($(el));
-      if (src && /cdn\.cartpe\.in|cartpe\.in/i.test(src) && !/logo|banner|icon|avatar|user|review/i.test(src)) {
+      if (src && !SKIP_RE.test(src) && src.startsWith('http')) {
         imageSet.add(src);
       }
     });
   }
 
-  // Priority 3: any product-section img (catches stores not on CDN)
-  if (imageSet.size === 0) {
-    $('section#products img, .product-detail img, #product-detail img, .product-view img, main img').each((_, el) => {
-      const src = extractImgSrc($(el));
-      if (src && !/logo|banner|icon|avatar|user|review/i.test(src)) {
-        imageSet.add(src);
-      }
-    });
-  }
+  // Deduplicate: gallery_sm and gallery_md are the same image as gallery_lg
+  // Prefer gallery_lg. If no gallery_lg found, upgrade all sm/md URLs.
+  const images = [...imageSet]
+    .map(s => s.replace('/gallery_sm/', '/gallery_lg/').replace('/gallery_md/', '/gallery_lg/'))
+    .filter((s, i, a) => a.indexOf(s) === i) // de-dup after upgrade
+    .slice(0, MAX_IMAGES);
 
-  const images = Array.from(imageSet).slice(0, MAX_IMAGES);
 
   // ── Sizes ────────────────────────────────────────────────────────
   const sizeValues = [];
