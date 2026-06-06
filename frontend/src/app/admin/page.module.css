@@ -33,6 +33,7 @@
 .toast { padding: 12px 18px; font-size: 14px; font-weight: 600; border-radius: 2px; animation: slideIn 0.3s ease; }
 .toastOk { background: #22C55E; color: #fff; }
 .toastErr { background: #CC0000; color: #fff; }
+.toastInfo { background: #B45309; color: #fff; }
 @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
 /* ── Section headers ── */

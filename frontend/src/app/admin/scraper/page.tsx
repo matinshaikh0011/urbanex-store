@@ -42,8 +42,8 @@ interface ImportHistoryRecord {
 
 // ── Helpers ───────────────────────────────────────────────────
 function useToast() {
-  const [toasts, setToasts] = useState<{ id: number; msg: string; type: 'ok' | 'err' }[]>([]);
-  const show = useCallback((msg: string, type: 'ok' | 'err' = 'ok') => {
+  const [toasts, setToasts] = useState<{ id: number; msg: string; type: 'ok' | 'err' | 'info' }[]>([]);
+  const show = useCallback((msg: string, type: 'ok' | 'err' | 'info' = 'ok') => {
     const id = Date.now();
     setToasts(t => [...t, { id, msg, type }]);
     setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3500);
@@ -152,7 +152,7 @@ export default function ScraperPage() {
   return (
     <div className={adminStyles.shell}>
       <div className={adminStyles.toastStack}>
-        {toasts.map(t => <div key={t.id} className={`${adminStyles.toast} ${t.type === 'err' ? adminStyles.toastErr : adminStyles.toastOk}`}>{t.msg}</div>)}
+        {toasts.map(t => <div key={t.id} className={`${adminStyles.toast} ${t.type === 'err' ? adminStyles.toastErr : t.type === 'info' ? adminStyles.toastInfo : adminStyles.toastOk}`}>{t.msg}</div>)}
       </div>
       <aside className={adminStyles.sidebar}>
         <div className={adminStyles.sidebarLogo}>URBAN<span className={adminStyles.red}>EX</span></div>
