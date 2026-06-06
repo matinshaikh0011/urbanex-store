@@ -1,8 +1,16 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import styles from './WhatsAppButton.module.css';
 
 export default function WhatsAppButton() {
+  const pathname = usePathname();
+  
+  // Hide WhatsApp button on admin pages
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+  
   return (
     <a
       href="https://wa.me/919898285850"
