@@ -660,13 +660,18 @@ function CategoryStep({ products, categoryAssignments, setCategoryAssignments, o
 function BrandAssignmentStep({ products, brands, brandResolutions, brandAssignments, setBrandAssignments, show, onNext }: {
   products: ScrapedProduct[]; brands: Brand[]; brandResolutions: Map<string, number | 'skip'>;
   brandAssignments: Map<string, number | 'no-brand'>; setBrandAssignments: (m: Map<string, number | 'no-brand'>) => void;
-  show: (m: string, t?: 'ok' | 'err') => void; onNext: () => void;
+  show: (m: string, t?: 'ok' | 'err' | 'info') => void; onNext: () => void;
 }) {
   const [bulkBrandId, setBulkBrandId] = useState('');
   const [newBrandName, setNewBrandName] = useState('');
   const [newBrandSlug, setNewBrandSlug] = useState('');
-  const [creatingFor, setCreatingFor] = useState<string | null>(null);
+  const [creatingFor, setCreatingFor] = useState<string | 'bulk' | null>(null);
   const [brandSearch, setBrandSearch] = useState<Record<string, string>>({});
+  const [tab, setTab] = useState<'all' | 'assigned' | 'unassigned' | 'skipped'>('all');
+  const [localBrands, setLocalBrands] = useState(brands);
+
+  // Keep localBrands in sync when parent brands change
+  useEffect(() => setLocalBrands(brands), [brands]);
 
   const getAssignment = (p: ScrapedProduct): number | 'no-brand' | undefined => {
     if (brandAssignments.has(p.sourceId)) return brandAssignments.get(p.sourceId);
@@ -681,86 +686,215 @@ function BrandAssignmentStep({ products, brands, brandResolutions, brandAssignme
     const m = new Map(brandAssignments); m.set(sourceId, val); setBrandAssignments(m);
   };
 
+  const skipProduct = (sourceId: string) => setAssignment(sourceId, 'no-brand');
+  const clearAssignment = (sourceId: string) => {
+    const m = new Map(brandAssignments); m.delete(sourceId); setBrandAssignments(m);
+  };
+
   const applyBulk = () => {
     if (!bulkBrandId) return;
     const m = new Map(brandAssignments);
     products.forEach(p => m.set(p.sourceId, bulkBrandId === 'no-brand' ? 'no-brand' : parseInt(bulkBrandId)));
     setBrandAssignments(m);
+    show(`Applied to all ${products.length} products`, 'ok');
   };
 
-  const createBrand = async (sourceId: string) => {
+  const applyBulkToSelected = (ids: string[], val: number | 'no-brand') => {
+    const m = new Map(brandAssignments);
+    ids.forEach(id => m.set(id, val));
+    setBrandAssignments(m);
+  };
+
+  const createBrand = async (targetSourceId: string | 'bulk') => {
     if (!newBrandName.trim() || !newBrandSlug.trim()) { show('Name and slug required', 'err'); return; }
     const r = await api('/api/brands', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: newBrandName, slug: newBrandSlug }) });
     const d = await r.json();
     if (!r.ok) { show(d.error || 'Failed to create brand', 'err'); return; }
-    setAssignment(sourceId, d.id);
+    // Add to local list immediately (parent refresh happens on next render cycle)
+    setLocalBrands(prev => [...prev, d]);
+    if (targetSourceId !== 'bulk') setAssignment(targetSourceId, d.id);
+    else { setBulkBrandId(String(d.id)); }
     setCreatingFor(null); setNewBrandName(''); setNewBrandSlug('');
-    show(`Brand "${newBrandName}" created and assigned`);
+    show(`Brand "${d.name}" created${targetSourceId !== 'bulk' ? ' and assigned' : ''}`, 'ok');
   };
 
+  // Stats
+  const assigned = products.filter(p => { const a = getAssignment(p); return typeof a === 'number'; });
+  const skipped = products.filter(p => getAssignment(p) === 'no-brand');
+  const unassigned = products.filter(p => getAssignment(p) === undefined);
+
+  const tabProducts = tab === 'assigned' ? assigned : tab === 'skipped' ? skipped : tab === 'unassigned' ? unassigned : products;
+
   const handleNext = () => {
-    const unresolved = products.filter(p => getAssignment(p) === undefined);
-    if (unresolved.length > 0) { show(`${unresolved.length} products need a brand decision`, 'err'); return; }
+    if (unassigned.length > 0) {
+      show(`Proceeding — ${unassigned.length} unassigned product(s) will be auto-skipped`, 'info');
+      // Auto-mark all unassigned as no-brand
+      const m = new Map(brandAssignments);
+      unassigned.forEach(p => m.set(p.sourceId, 'no-brand'));
+      setBrandAssignments(m);
+    }
     onNext();
   };
 
-  const filteredBrands = (search: string) => brands.filter(b => !search || b.name.toLowerCase().includes(search.toLowerCase()));
+  const filteredBrands = (search: string) => localBrands.filter(b => !search || b.name.toLowerCase().includes(search.toLowerCase()));
+
+  const TABS: Array<{ key: typeof tab; label: string; count: number; color?: string }> = [
+    { key: 'all', label: 'All', count: products.length },
+    { key: 'assigned', label: 'Assigned', count: assigned.length, color: '#22C55E' },
+    { key: 'unassigned', label: 'Unassigned', count: unassigned.length, color: unassigned.length > 0 ? '#F59E0B' : '#888' },
+    { key: 'skipped', label: 'Skipped', count: skipped.length, color: '#888' },
+  ];
 
   return (
     <div>
-      <div className={styles.stepHeader}><div className={styles.stepTitle}>BRAND ASSIGNMENT</div><div className={styles.stepDesc}>Assign a brand to each product before import</div></div>
-      <div className={styles.bulkBar}>
-        <span className={styles.bulkLabel}>Bulk Apply:</span>
-        <select className={styles.selectInput} value={bulkBrandId} onChange={e => setBulkBrandId(e.target.value)}>
-          <option value="">Select brand…</option>
-          {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-          <option value="no-brand">No Brand (skip)</option>
-        </select>
-        <button className={adminStyles.btnSmall} onClick={applyBulk} disabled={!bulkBrandId || products.length === 0}>Apply to All</button>
+      <div className={styles.stepHeader}>
+        <div className={styles.stepTitle}>BRAND ASSIGNMENT</div>
+        <div className={styles.stepDesc}>
+          Assign a brand to each product — brand is optional. Unassigned products will be skipped on import.
+        </div>
       </div>
+
+      {/* ── Filter Tabs ── */}
+      <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid #222', marginBottom: 16 }}>
+        {TABS.map(t => (
+          <button key={t.key} onClick={() => setTab(t.key)} style={{
+            background: 'none', border: 'none', borderBottom: tab === t.key ? '2px solid #CC0000' : '2px solid transparent',
+            color: tab === t.key ? '#fff' : '#666', cursor: 'pointer', padding: '8px 18px', fontSize: 13,
+            fontWeight: tab === t.key ? 700 : 400, letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 6,
+          }}>
+            {t.label}
+            <span style={{ background: tab === t.key ? '#CC0000' : '#222', color: t.color || '#aaa', fontSize: 11, borderRadius: 10, padding: '1px 7px', fontWeight: 700 }}>{t.count}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* ── Bulk Toolbar ── */}
+      <div style={{ background: '#111', border: '1px solid #222', borderRadius: 6, padding: '12px 16px', marginBottom: 16 }}>
+        {creatingFor === 'bulk' ? (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 13, color: '#aaa', fontWeight: 600 }}>NEW BRAND:</span>
+            <input className={styles.textInput} style={{ width: 160 }} placeholder="Brand name" value={newBrandName}
+              onChange={e => { setNewBrandName(e.target.value); setNewBrandSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-')); }} />
+            <input className={styles.textInput} style={{ width: 140 }} placeholder="Slug (auto)" value={newBrandSlug}
+              onChange={e => setNewBrandSlug(e.target.value)} />
+            <button className={adminStyles.btnPrimary} style={{ padding: '6px 14px', fontSize: 12 }} onClick={() => createBrand('bulk')}>CREATE</button>
+            <button className={adminStyles.btnSecondary} style={{ padding: '6px 14px', fontSize: 12 }} onClick={() => setCreatingFor(null)}>Cancel</button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 12, color: '#888', fontWeight: 600, letterSpacing: 1 }}>BULK APPLY:</span>
+            <select className={styles.selectInput} value={bulkBrandId} onChange={e => setBulkBrandId(e.target.value)}>
+              <option value="">Select brand…</option>
+              {localBrands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+              <option value="no-brand">⊘ Skip (no brand)</option>
+            </select>
+            <button className={adminStyles.btnSmall} onClick={applyBulk} disabled={!bulkBrandId || products.length === 0}>Apply to All</button>
+            {tab !== 'all' && tabProducts.length > 0 && (
+              <button className={adminStyles.btnSmall} style={{ background: '#1a1a2e' }}
+                onClick={() => bulkBrandId && applyBulkToSelected(tabProducts.map(p => p.sourceId), bulkBrandId === 'no-brand' ? 'no-brand' : parseInt(bulkBrandId))}>
+                Apply to {tab} ({tabProducts.length})
+              </button>
+            )}
+            <div style={{ height: 20, width: 1, background: '#333' }} />
+            <button className={adminStyles.btnSmall} style={{ background: '#0a1628', border: '1px solid #22C55E', color: '#22C55E' }} onClick={() => setCreatingFor('bulk')}>+ Add Brand</button>
+            <button className={adminStyles.btnSmall} style={{ background: '#1a0a0a', border: '1px solid #555', color: '#888' }}
+              onClick={() => applyBulkToSelected(unassigned.map(p => p.sourceId), 'no-brand')} disabled={unassigned.length === 0}>
+              Skip Unassigned ({unassigned.length})
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ── Product Table ── */}
       <div className={adminStyles.tableWrap}>
         <table className={adminStyles.table}>
-          <thead><tr><th>Product</th><th>Detected Brand</th><th>Assign Brand</th></tr></thead>
+          <thead><tr>
+            <th style={{ width: 36 }}></th>
+            <th>Product</th>
+            <th>Detected</th>
+            <th>Assign Brand</th>
+            <th style={{ width: 80, textAlign: 'center' }}>Status</th>
+          </tr></thead>
           <tbody>
-            {products.map(p => {
+            {tabProducts.map(p => {
               const current = getAssignment(p);
-              const currentBrand = typeof current === 'number' ? brands.find(b => b.id === current) : null;
+              const currentBrand = typeof current === 'number' ? localBrands.find(b => b.id === current) : null;
+              const status = current === 'no-brand' ? 'skipped' : typeof current === 'number' ? 'assigned' : 'unassigned';
+              const rowStyle = status === 'assigned' ? { borderLeft: '3px solid #22C55E' } : status === 'skipped' ? { borderLeft: '3px solid #444', opacity: 0.65 } : { borderLeft: '3px solid #F59E0B' };
               return (
-                <tr key={p.sourceId}>
-                  <td style={{ maxWidth: 200 }}>{p.name}</td>
+                <tr key={p.sourceId} style={rowStyle}>
+                  <td>
+                    {status === 'assigned' && <span style={{ color: '#22C55E', fontSize: 16 }}>✓</span>}
+                    {status === 'skipped' && <span style={{ color: '#555', fontSize: 16 }}>⊘</span>}
+                    {status === 'unassigned' && <span style={{ color: '#F59E0B', fontSize: 16 }}>·</span>}
+                  </td>
+                  <td style={{ maxWidth: 220, fontSize: 13 }}>{p.name}</td>
                   <td style={{ fontSize: 12, color: '#888' }}>{p.brandName || '—'}</td>
                   <td>
                     {creatingFor === p.sourceId ? (
                       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                        <input className={styles.textInput} style={{ width: 130 }} placeholder="Brand name" value={newBrandName} onChange={e => { setNewBrandName(e.target.value); setNewBrandSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-')); }} />
-                        <input className={styles.textInput} style={{ width: 130 }} placeholder="Slug" value={newBrandSlug} onChange={e => setNewBrandSlug(e.target.value)} />
-                        <button className={adminStyles.btnPrimary} style={{ padding: '6px 12px', fontSize: 12 }} onClick={() => createBrand(p.sourceId)}>CREATE</button>
-                        <button className={adminStyles.btnSecondary} style={{ padding: '6px 12px', fontSize: 12 }} onClick={() => setCreatingFor(null)}>Cancel</button>
+                        <input className={styles.textInput} style={{ width: 130 }} placeholder="Brand name" value={newBrandName}
+                          onChange={e => { setNewBrandName(e.target.value); setNewBrandSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-')); }} />
+                        <input className={styles.textInput} style={{ width: 120 }} placeholder="Slug" value={newBrandSlug}
+                          onChange={e => setNewBrandSlug(e.target.value)} />
+                        <button className={adminStyles.btnPrimary} style={{ padding: '5px 10px', fontSize: 12 }} onClick={() => createBrand(p.sourceId)}>CREATE</button>
+                        <button className={adminStyles.btnSecondary} style={{ padding: '5px 10px', fontSize: 12 }} onClick={() => setCreatingFor(null)}>✕</button>
                       </div>
                     ) : (
                       <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-                        <input className={styles.textInput} style={{ width: 140 }} placeholder="Search brand…" value={brandSearch[p.sourceId] || ''} onChange={e => setBrandSearch(prev => ({ ...prev, [p.sourceId]: e.target.value }))} />
-                        <select className={styles.selectInput} value={typeof current === 'number' ? current : current === 'no-brand' ? 'no-brand' : ''} onChange={e => setAssignment(p.sourceId, e.target.value === 'no-brand' ? 'no-brand' : parseInt(e.target.value))}>
-                          <option value="">Select…</option>
+                        <input className={styles.textInput} style={{ width: 120 }} placeholder="Search…"
+                          value={brandSearch[p.sourceId] || ''}
+                          onChange={e => setBrandSearch(prev => ({ ...prev, [p.sourceId]: e.target.value }))} />
+                        <select className={styles.selectInput} style={{ minWidth: 120 }}
+                          value={typeof current === 'number' ? current : current === 'no-brand' ? 'no-brand' : ''}
+                          onChange={e => {
+                            if (e.target.value === '') clearAssignment(p.sourceId);
+                            else setAssignment(p.sourceId, e.target.value === 'no-brand' ? 'no-brand' : parseInt(e.target.value));
+                          }}>
+                          <option value="">— none —</option>
                           {filteredBrands(brandSearch[p.sourceId] || '').map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-                          <option value="no-brand">No Brand (skip)</option>
                         </select>
-                        <button className={adminStyles.btnSmall} onClick={() => setCreatingFor(p.sourceId)}>+ New</button>
-                        {current === 'no-brand' && <span className={styles.inlineWarning}>⚠ Will be skipped</span>}
-                        {currentBrand && <span style={{ fontSize: 12, color: '#22C55E' }}>✓ {currentBrand.name}</span>}
+                        <button className={adminStyles.btnSmall} style={{ fontSize: 11, padding: '4px 8px' }} onClick={() => setCreatingFor(p.sourceId)} title="Create new brand">+ New</button>
+                        <button className={adminStyles.btnSmall} style={{ fontSize: 11, padding: '4px 8px', background: '#1a1a1a', border: '1px solid #444', color: '#888' }}
+                          onClick={() => skipProduct(p.sourceId)} title="Skip this product">Skip</button>
+                        {current === 'no-brand' && (
+                          <button className={adminStyles.btnSmall} style={{ fontSize: 11, padding: '4px 8px', color: '#F59E0B', border: '1px solid #F59E0B', background: 'transparent' }}
+                            onClick={() => clearAssignment(p.sourceId)}>Undo</button>
+                        )}
                       </div>
                     )}
+                  </td>
+                  <td style={{ textAlign: 'center', fontSize: 11 }}>
+                    {status === 'assigned' && <span style={{ color: '#22C55E', fontWeight: 700 }}>{currentBrand?.name}</span>}
+                    {status === 'skipped' && <span style={{ color: '#555' }}>SKIP</span>}
+                    {status === 'unassigned' && <span style={{ color: '#F59E0B' }}>PENDING</span>}
                   </td>
                 </tr>
               );
             })}
+            {tabProducts.length === 0 && (
+              <tr><td colSpan={5} style={{ textAlign: 'center', color: '#555', padding: 24 }}>No products in this filter</td></tr>
+            )}
           </tbody>
         </table>
       </div>
-      <button className={adminStyles.btnPrimary} onClick={handleNext} style={{ marginTop: 16 }}>PROCEED TO SETTINGS →</button>
+
+      {/* ── Summary + CTA ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 16, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 12, fontSize: 13 }}>
+          <span style={{ color: '#22C55E' }}>✓ {assigned.length} assigned</span>
+          <span style={{ color: '#F59E0B' }}>· {unassigned.length} pending</span>
+          <span style={{ color: '#555' }}>⊘ {skipped.length} skipped</span>
+        </div>
+        <button className={adminStyles.btnPrimary} onClick={handleNext} style={{ marginLeft: 'auto' }}>
+          PROCEED TO SETTINGS →
+          {unassigned.length > 0 && <span style={{ fontSize: 11, marginLeft: 8, opacity: 0.7 }}>({unassigned.length} will be skipped)</span>}
+        </button>
+      </div>
     </div>
   );
 }
+
 
 // ── Step 6: Import Settings ───────────────────────────────────
 function ImportSettingsStep({ products, pricingRule, setPricingRule, rounding, setRounding, imageMode, setImageMode, manualPrices, setManualPrices, onNext }: {
