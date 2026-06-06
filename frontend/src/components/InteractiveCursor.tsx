@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import styles from './InteractiveCursor.module.css';
 
 export default function InteractiveCursor() {
+  const pathname = usePathname();
   const dotRef   = useRef<HTMLDivElement>(null);
   const ringRef  = useRef<HTMLDivElement>(null);
   const [cursorText, setCursorText] = useState('');
@@ -19,6 +21,11 @@ export default function InteractiveCursor() {
   const ringPosRef  = useRef({ x: 0, y: 0 });
   const dotPosRef   = useRef({ x: 0, y: 0 });
   const isTouchRef  = useRef(false);
+
+  // Don't render custom cursor on admin pages
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   // Detect touch
   useEffect(() => {
