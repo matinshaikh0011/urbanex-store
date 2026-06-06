@@ -891,40 +891,9 @@ async function scrape(url, scope, options = {}) {
   const scanDuration = Date.now() - scanStart;
   console.log(`[CartPe] SCAN complete: ${products.length} products in ${scanDuration}ms (${pagesFetched} AJAX pages)`);
 
-  // ── Image enrichment: fetch detail pages for products without thumbnails ──
-  const productsWithoutImages = products.filter(p => !p.thumbnail || p.thumbnail.length < 10);
-  if (productsWithoutImages.length > 0) {
-    console.log(`[CartPe] ${productsWithoutImages.length} products missing images — enriching from detail pages…`);
-    let enriched = 0;
-    let enrichFailed = 0;
-    
-    for (const product of productsWithoutImages) {
-      try {
-        const detail = await fetchProductDetail(product.productUrl);
-        if (detail.images && detail.images.length > 0) {
-          product.thumbnail = detail.images[0];
-          product.images = detail.images;
-          product.description = product.description || detail.description;
-          enriched++;
-        }
-        // Rate limit: wait between detail page fetches
-        if (enriched % 5 === 0) {
-          await sleep(delay);
-        }
-      } catch (err) {
-        enrichFailed++;
-        console.warn(`[CartPe] Failed to enrich ${product.sourceId}: ${err.message}`);
-      }
-      
-      // Limit enrichment to avoid excessive detail page fetches (max 50 products)
-      if (enriched + enrichFailed >= 50) {
-        console.log(`[CartPe] Image enrichment limit reached (50 products)`);
-        break;
-      }
-    }
-    
-    console.log(`[CartPe] Image enrichment complete: ${enriched} enriched, ${enrichFailed} failed`);
-  }
+  // NOTE: Image enrichment is DISABLED during scan to avoid timeouts and memory issues.
+  // Images will be fetched during the import phase when products are actually selected.
+  // This keeps the scan phase fast and reliable.
 
   return {
     products,
