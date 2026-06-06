@@ -30,6 +30,7 @@ model Brand {
   logoUrl       String?        @map("logo_url")
   products      Product[]
   brandMappings BrandMapping[]
+  isFeatured    Boolean        @default(false) @map("is_featured")
   createdAt     DateTime       @default(now()) @map("created_at")
 }
 
@@ -37,8 +38,8 @@ model Product {
   id            Int        @id @default(autoincrement())
   name          String
   slug          String     @unique
-  brand         Brand      @relation(fields: [brandId], references: [id])
-  brandId       Int        @map("brand_id")
+  brand         Brand?     @relation(fields: [brandId], references: [id])
+  brandId       Int?       @map("brand_id")
   description   String?
   price         Decimal    @db.Decimal(10, 2)
   originalPrice Decimal?   @map("original_price") @db.Decimal(10, 2)

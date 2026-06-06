@@ -313,7 +313,8 @@ app.post('/api/coupons/validate', async (req, res) => {
 
 app.get('/api/brands', async (req, res) => {
   try {
-    const brands = await prisma.brand.findMany({ include: { _count: { select: { products: true } } } });
+    const where = req.query.featured === 'true' ? { isFeatured: true } : {};
+    const brands = await prisma.brand.findMany({ where, include: { _count: { select: { products: true } } }, orderBy: { id: 'asc' } });
     res.json(brands);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch brands' });
@@ -322,7 +323,7 @@ app.get('/api/brands', async (req, res) => {
 
 app.post('/api/brands', adminAuth, async (req, res) => {
   try {
-    const brand = await prisma.brand.create({ data: { name: req.body.name, slug: req.body.slug, logoUrl: req.body.logoUrl } });
+    const brand = await prisma.brand.create({ data: { name: req.body.name, slug: req.body.slug, logoUrl: req.body.logoUrl, isFeatured: req.body.isFeatured || false } });
     res.status(201).json(brand);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create brand' });
@@ -333,7 +334,7 @@ app.put('/api/brands/:id', adminAuth, async (req, res) => {
   try {
     const brand = await prisma.brand.update({
       where: { id: parseInt(req.params.id) },
-      data: { name: req.body.name, slug: req.body.slug, logoUrl: req.body.logoUrl },
+      data: { name: req.body.name, slug: req.body.slug, logoUrl: req.body.logoUrl, isFeatured: req.body.isFeatured },
     });
     res.json(brand);
   } catch (error) {
@@ -819,10 +820,9 @@ app.post('/api/admin/scraper/import', adminAuth, async (req, res) => {
   // Phase 1 — Pre-validation (deferred price check: price is enriched from detail page)
   const validProducts = [];
   for (const p of incoming) {
-    if (p.brandId === 'no-brand' || p.brandId == null) {
-      skippedCount++;
-      log.push({ sourceId: p.sourceId, operation: 'skipped', errorMessage: 'no-brand-assigned' });
-      continue;
+    let finalBrandId = p.brandId;
+    if (finalBrandId === 'no-brand' || finalBrandId == null) {
+      finalBrandId = null;
     }
     if (!p.name || !String(p.name).trim()) {
       failureCount++;
@@ -831,6 +831,7 @@ app.post('/api/admin/scraper/import', adminAuth, async (req, res) => {
     }
     const productData = {
       ...p,
+      brandId: finalBrandId,
       source,
       sourceId: p.sourceId,
       sourceUrl: p.productUrl || null,

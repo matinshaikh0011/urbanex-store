@@ -190,7 +190,7 @@ export default function Home() {
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/brands').then(res => res.json()).catch(() => []),
+      fetch('/api/brands?featured=true').then(res => res.json()).catch(() => []),
       fetch('/api/products').then(res => res.json()).catch(() => [])
     ])
     .then(([brandsData, productsData]) => {

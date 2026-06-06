@@ -20,7 +20,7 @@ interface Product {
   subcategory?: string | null;
   source?: string | null; sourceId?: string | null; lastSync?: string | null;
 }
-interface Brand { id: number; name: string; slug: string; logoUrl?: string | null; _count?: { products: number }; }
+interface Brand { id: number; name: string; slug: string; logoUrl?: string | null; isFeatured?: boolean; _count?: { products: number } }
 interface Category {
   id: number; name: string; slug: string; description?: string | null;
   image?: string | null; parentId?: number | null; featured: boolean;
@@ -1100,7 +1100,7 @@ function CategoryForm({ categories, initial, onSave, onClose }: {
 function BrandsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ name: '', slug: '', logoUrl: '' });
+  const [form, setForm] = useState({ name: '', slug: '', logoUrl: '', isFeatured: false });
   const [editing, setEditing] = useState<Brand | null>(null);
   const [showForm, setShowForm] = useState(false);
 
@@ -1110,8 +1110,8 @@ function BrandsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
 
   useEffect(() => { load(); }, [load]);
 
-  const openAdd = () => { setForm({ name: '', slug: '', logoUrl: '' }); setEditing(null); setShowForm(true); };
-  const openEdit = (b: Brand) => { setForm({ name: b.name, slug: b.slug, logoUrl: b.logoUrl || '' }); setEditing(b); setShowForm(true); };
+  const openAdd = () => { setForm({ name: '', slug: '', logoUrl: '', isFeatured: false }); setEditing(null); setShowForm(true); };
+  const openEdit = (b: Brand) => { setForm({ name: b.name, slug: b.slug, logoUrl: b.logoUrl || '', isFeatured: b.isFeatured || false }); setEditing(b); setShowForm(true); };
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1175,6 +1175,16 @@ function BrandsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
               <img src={b.logoUrl || ''} alt={b.name} className={styles.brandLogo} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               <div className={styles.brandName}>{b.name}</div>
               <div className={styles.brandCount}>{b._count?.products || 0} products</div>
+              <div className={styles.actionRow} style={{ marginTop: 8 }}>
+                <button
+                  className={`${styles.toggle} ${b.isFeatured ? styles.toggleOn : ''}`}
+                  onClick={async () => {
+                    const res = await api(`/api/brands/${b.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...b, isFeatured: !b.isFeatured }) });
+                    if (res.ok) setBrands(prev => prev.map(x => x.id === b.id ? { ...x, isFeatured: !x.isFeatured } : x));
+                  }}
+                  style={{ width: '100%', marginBottom: 8 }}
+                >{b.isFeatured ? '\u2605 Featured' : '\u2606 Feature'}</button>
+              </div>
               <div className={styles.actionRow}>
                 <button className={styles.btnSmall} onClick={() => openEdit(b)}>Edit</button>
                 <button className={styles.btnDanger} onClick={() => deleteBrand(b.id, b.name)}>Delete</button>
@@ -1192,6 +1202,7 @@ function BrandsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
               <div className={styles.formGroup}><label>Slug *</label><input value={form.slug} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))} required /></div>
               <div className={styles.formGroup}><label>Logo URL</label><input value={form.logoUrl} onChange={e => setForm(f => ({ ...f, logoUrl: e.target.value }))} placeholder="https://…" /></div>
               {form.logoUrl && <img src={form.logoUrl} alt="preview" className={styles.logoPreview} />}
+              <div className={styles.formGroup}><label className={styles.toggleLabel}><input type="checkbox" checked={form.isFeatured} onChange={e => setForm(f => ({ ...f, isFeatured: e.target.checked }))} /> Featured</label></div>
               <div className={styles.modalActions}>
                 <button type="submit" className={styles.btnPrimary}>SAVE</button>
                 <button type="button" className={styles.btnSecondary} onClick={() => setShowForm(false)}>CANCEL</button>
