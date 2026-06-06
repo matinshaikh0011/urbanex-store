@@ -272,45 +272,68 @@ function extractImgSrc(imgEl) {
 }
 
 /**
+ * Get the FIRST valid price-like number from a text string.
+ * Critical: we must NOT strip all non-digits and concatenate, because
+ * "₹ 2,149 ₹ 1,01,199" → strip → "2149101199" (wrong!).
+ * Instead we split on any non-digit-comma sequence and take the first match.
+ */
+function firstPrice(text) {
+  if (!text) return 0;
+  // Split on currency symbols, spaces, parentheses etc — each segment is a candidate number
+  const segments = text.split(/[₹$€£¥Rs.\s()%]+/).filter(Boolean);
+  for (const seg of segments) {
+    // Segment may be "2,149" or "1,01,199" — comma is Indian thousands separator
+    const clean = seg.replace(/,/g, '').replace(/[^\d.]/g, '');
+    if (!clean) continue;
+    const v = parseFloat(clean);
+    if (v >= 10 && v <= 9999999) return v; // valid product price range
+  }
+  return 0;
+}
+
+/**
  * Extract selling price and MRP from a card container.
- * Handles: ₹999, Rs.999, "999 1299" (two prices = selling + MRP).
+ * Works across all CartPe store themes.
  */
 function extractCardPrices($, card) {
   let sourcePrice = 0;
   let originalPrice = null;
 
-  // Try struck-through/muted child for MRP first
-  const mrpEl = card.find('.old-price, .text-muted, strike, del, s, [style*="line-through"], .mrp-price').first();
-  const mrpVal = parseFloat((mrpEl.text() || '').replace(/[^\d.]/g, ''));
-  if (mrpVal >= 1) originalPrice = mrpVal;
+  // Step 1: Extract MRP from struck-through/muted elements first
+  const mrpEl = card.find('.old-price, .text-muted, strike, del, s, [style*="line-through"], .mrp-price, small').first();
+  if (mrpEl.length) {
+    const v = firstPrice(mrpEl.text());
+    if (v >= 10) originalPrice = v;
+  }
 
-  // Price container: h4, .price, known CartPe classes
-  const priceEl = card.find('h4, .price, [class*="price"], [class*="amount"], .product-price').first();
+  // Step 2: Extract selling price from the price container
+  // Remove the MRP element from a clone, then take the FIRST number from remaining text
+  const priceEl = card.find('h4, .price, [class*="price"], .product-price, h3').first();
   if (priceEl.length) {
     const clone = priceEl.clone();
-    clone.find('.old-price, .text-muted, strike, del, s, [style*="line-through"], .mrp-price').remove();
-    const sellingVal = parseFloat(clone.text().replace(/[^\d.]/g, ''));
-    if (sellingVal >= 1) sourcePrice = sellingVal;
+    clone.find('.old-price, .text-muted, strike, del, s, [style*="line-through"], .mrp-price, small').remove();
+    const v = firstPrice(clone.text());
+    if (v >= 10) sourcePrice = v;
   }
 
-  // Numeric fallback: collect all numbers in card, pick lowest as selling price
+  // Step 3: If still no price, scan individual leaf elements (no children) for first price
   if (sourcePrice === 0) {
-    const nums = [];
-    card.find('h3,h4,h5,p,span').each((_, el) => {
-      const t = $(el).clone().children().remove().end().text();
-      (t.match(/[\d,]+\.?\d*/g) || []).forEach(n => {
-        const v = parseFloat(n.replace(/,/g, ''));
-        if (v >= 10 && v <= 999999) nums.push(v);
-      });
+    card.find('h3, h4, h5, span, p').each((_, el) => {
+      const jEl = $(el);
+      // Only leaf-ish elements (not containers with many children)
+      if (jEl.children().length > 3) return;
+      const clone = jEl.clone();
+      clone.children().remove();
+      const v = firstPrice(clone.text());
+      if (v >= 10) { sourcePrice = v; return false; } // break
     });
-    const sorted = [...new Set(nums)].sort((a, b) => a - b);
-    if (sorted.length >= 2) { sourcePrice = sorted[0]; if (!originalPrice) originalPrice = sorted[sorted.length - 1]; }
-    else if (sorted.length === 1) sourcePrice = sorted[0];
   }
 
+  // Sanity: MRP must be strictly greater than selling price
   if (originalPrice !== null && originalPrice <= sourcePrice) originalPrice = null;
   return { sourcePrice, originalPrice };
 }
+
 
 // ── SCAN PHASE: Parse listing card ───────────────────────────────
 
@@ -645,12 +668,10 @@ async function fetchProductDetail(productUrl) {
   const inStock = !/out\s*of\s*stock|sold\s*out/i.test($('body').text());
 
   // ── Prices ───────────────────────────────────────────────────────
-  // Use the broad extractCardPrices helper first (works for any theme),
-  // then fall back to page-level numeric scan restricted to the product section.
   let sourcePrice = 0;
   let originalPrice = null;
 
-  // Try known CartPe price containers
+  // Try known CartPe price containers (broad list for any theme)
   const priceContainer = $([
     '#price_div',
     'h3.price-area',
@@ -665,29 +686,30 @@ async function fetchProductDetail(productUrl) {
   ].join(', ')).first();
 
   if (priceContainer.length) {
-    const mrpEl = priceContainer.find('span[style*="line-through"], .text-muted, strike, del, s, .old-price, .mrp').first();
-    const mrpVal = parseFloat((mrpEl.text() || '').replace(/[^\d.]/g, ''));
-    if (mrpVal >= 1) originalPrice = mrpVal;
+    const mrpEl = priceContainer.find('span[style*="line-through"], .text-muted, strike, del, s, .old-price, .mrp, small').first();
+    if (mrpEl.length) {
+      const v = firstPrice(mrpEl.text());
+      if (v >= 10) originalPrice = v;
+    }
 
     const clone = priceContainer.clone();
-    clone.find('span[style*="line-through"], .text-muted, strike, del, s, .old-price, .mrp').remove();
-    const sellingVal = parseFloat(clone.text().replace(/[^\d.]/g, ''));
-    if (sellingVal >= 1) sourcePrice = sellingVal;
+    clone.find('span[style*="line-through"], .text-muted, strike, del, s, .old-price, .mrp, small').remove();
+    const v = firstPrice(clone.text());
+    if (v >= 10) sourcePrice = v;
   }
 
-  // Numeric fallback: scan the product section for any price-like number
+  // Numeric fallback: scan product section leaf elements for price-like numbers
   if (sourcePrice === 0) {
     const productSection = $('section#products, #page-start, .product-detail, main').first();
-    const allPrices = [];
-    productSection.find('h2, h3, h4, h5, .price, [class*="price"], span').each((_, el) => {
+    const candidates = [];
+    productSection.find('h2, h3, h4, h5, span, p').each((_, el) => {
       if ($(el).closest('#best-seller, .best-seller, .related-products, .owl-carousel, nav, header, footer').length) return;
-      const nums = $(el).text().match(/[\d,]+\.?\d*/g);
-      if (nums) nums.forEach(n => {
-        const v = parseFloat(n.replace(/,/g, ''));
-        if (v >= 50 && v <= 9999999) allPrices.push(v);
-      });
+      const jEl = $(el);
+      if (jEl.children().length > 3) return; // skip containers
+      const v = firstPrice(jEl.clone().children().remove().end().text());
+      if (v >= 50 && v <= 9999999) candidates.push(v);
     });
-    const sorted = [...new Set(allPrices)].sort((a, b) => a - b);
+    const sorted = [...new Set(candidates)].sort((a, b) => a - b);
     if (sorted.length >= 2) { sourcePrice = sorted[0]; if (!originalPrice) originalPrice = sorted[sorted.length - 1]; }
     else if (sorted.length === 1) sourcePrice = sorted[0];
   }
