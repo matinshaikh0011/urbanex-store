@@ -255,9 +255,13 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
               ← Back to {product.category}
             </Link>
 
-            <Link href={`/products?brand=${product.brand.slug}`} className={styles.brand}>
-              {product.brand.name}
-            </Link>
+            {product.brand ? (
+              <Link href={`/products?brand=${product.brand.slug}`} className={styles.brand}>
+                {product.brand.name}
+              </Link>
+            ) : (
+              <span className={styles.brand}>Unbranded</span>
+            )}
 
             <h1 className={styles.name}>{product.name}</h1>
 

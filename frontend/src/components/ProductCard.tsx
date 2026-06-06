@@ -14,7 +14,7 @@ interface Product {
   price: number;
   originalPrice?: number | null;
   images: string[];
-  brand: { name: string; slug: string };
+  brand?: { name: string; slug: string } | null;
   category?: string;
 }
 
@@ -63,7 +63,7 @@ export default function ProductCard({ product, index = 0 }: { product: Product; 
       price: product.price,
       originalPrice: product.originalPrice ?? null,
       image: product.images[0],
-      brand: product.brand.name,
+      brand: product.brand?.name || 'Unbranded',
       category: product.category,
     });
   };
@@ -139,7 +139,7 @@ export default function ProductCard({ product, index = 0 }: { product: Product; 
         </div>
       </div>
       <div className={styles.info}>
-        <span className={styles.brand}>{product.brand.name}</span>
+        {product.brand && <span className={styles.brand}>{product.brand.name}</span>}
         <h3 className={styles.name}>{product.name}</h3>
         <div className={styles.priceRow}>
           <span className={styles.price}>{formatPrice(product.price)}</span>

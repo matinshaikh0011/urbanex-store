@@ -134,12 +134,12 @@ function ProductsPageContent() {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(p =>
         p.name.toLowerCase().includes(query) ||
-        p.brand.name.toLowerCase().includes(query)
+        p.brand?.name?.toLowerCase().includes(query)
       );
     }
 
     if (selectedBrand) {
-      filtered = filtered.filter(p => p.brand.slug === selectedBrand);
+      filtered = filtered.filter(p => p.brand?.slug === selectedBrand);
     }
 
     filtered = filtered.filter(p => p.price >= priceMin && p.price <= priceMax);
