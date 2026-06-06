@@ -786,12 +786,17 @@ app.post('/api/admin/scraper/import', adminAuth, async (req, res) => {
   const log = [];
   let successCount = 0, updatedCount = 0, failureCount = 0, skippedCount = 0;
 
-  // Phase 1 — Pre-validation
+  // Phase 1 — Pre-validation (deferred price check: price is enriched from detail page)
   const validProducts = [];
   for (const p of incoming) {
     if (p.brandId === 'no-brand' || p.brandId == null) {
       skippedCount++;
       log.push({ sourceId: p.sourceId, operation: 'skipped', errorMessage: 'no-brand-assigned' });
+      continue;
+    }
+    if (!p.name || !String(p.name).trim()) {
+      failureCount++;
+      log.push({ sourceId: p.sourceId, operation: 'failed', errorMessage: 'name is required' });
       continue;
     }
     const productData = {
@@ -801,12 +806,6 @@ app.post('/api/admin/scraper/import', adminAuth, async (req, res) => {
       sourceUrl: p.productUrl || null,
       slug: p.slug || (slugify(p.name) + (p.sourceId ? `-${p.sourceId}` : '')),
     };
-    const validation = validateProductData(productData);
-    if (!validation.valid) {
-      failureCount++;
-      log.push({ sourceId: p.sourceId, operation: 'failed', errorMessage: validation.error });
-      continue;
-    }
     validProducts.push(productData);
   }
 
@@ -831,32 +830,21 @@ app.post('/api/admin/scraper/import', adminAuth, async (req, res) => {
           const detail = result.value;
           const p = validProducts[globalIdx];
 
-          // ── Price assignment (correct direction) ──────────────────────────
-          // detail.sourcePrice = CartPe's selling price (what they charge)
-          // detail.originalPrice = CartPe's MRP (struck-through price)
-          // The admin UI may have added a margin to sourcePrice before import.
-          // p.sourcePrice (from scan listing) is the CartPe selling price.
-          // p.price (set by admin in the import UI) = sourcePrice + margin = our selling price.
-          //
-          // We want:
-          //   price         = p.price (admin-set, already includes margin)
-          //   originalPrice = detail.originalPrice (CartPe MRP) if it's > p.price,
-          //                   else Math.round(p.price * 1.4)
-          //
-          // We do NOT overwrite p.price here — the admin already set it.
-          // We only update originalPrice from the detail page's MRP.
-          if (detail.originalPrice && detail.originalPrice > p.price) {
+          // If the listing scan had no price (price=0), use the detail page's price
+          if ((!p.price || Number(p.price) <= 0) && detail.sourcePrice > 0) {
+            p.price = detail.sourcePrice;
+          }
+
+          // Update originalPrice from CartPe's MRP only if it's higher than our price
+          if (detail.originalPrice && detail.originalPrice > Number(p.price)) {
             p.originalPrice = detail.originalPrice;
           }
-          // If detail has no valid MRP, leave p.originalPrice as-is;
-          // buildProductData will enforce originalPrice > price via its own rule.
 
-          console.log(`[PRICE DEBUG] name="${p.name}" sourcePrice=${detail.sourcePrice} margin=${p.price - detail.sourcePrice} finalPrice=${p.price} originalPrice=${p.originalPrice}`);
+          console.log(`[PRICE DEBUG] "${p.name}" finalPrice=${p.price} originalPrice=${p.originalPrice}`);
 
           if (detail.images && detail.images.length > 0) p.images = detail.images;
           if (detail.description) p.description = detail.description;
           p.inStock = detail.inStock;
-          // Always apply sizes from detail page — listing scan returns {} which breaks purchase flow
           if (detail.sizes && Object.keys(detail.sizes).length > 0) p.sizes = detail.sizes;
         } else if (result.status === 'rejected') {
           const p = batch[batchIdx];
@@ -900,10 +888,23 @@ app.post('/api/admin/scraper/import', adminAuth, async (req, res) => {
   }
   // supplier-url mode: images already set from detail fetch, no uploads needed
 
+  // Phase 2.5 — Final price validation (now that detail pages have enriched prices)
+  const finalValidProducts = [];
+  for (const p of validProducts) {
+    const validation = validateProductData(p);
+    if (!validation.valid) {
+      failureCount++;
+      log.push({ sourceId: p.sourceId, operation: 'failed', errorMessage: validation.error });
+      console.warn(`[import] Validation failed after detail fetch for ${p.sourceId}: ${validation.error}`);
+      continue;
+    }
+    finalValidProducts.push(p);
+  }
+
   // Phase 3 — Transaction
   try {
     await prisma.$transaction(async (tx) => {
-      for (const p of validProducts) {
+      for (const p of finalValidProducts) {
         const data = buildProductData({ ...p, lastSync: new Date() });
         const existing = p.sourceId
           ? await tx.product.findFirst({ where: { source, sourceId: p.sourceId } })

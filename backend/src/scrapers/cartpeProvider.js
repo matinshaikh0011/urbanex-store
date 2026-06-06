@@ -559,84 +559,149 @@ async function scanListings(options = {}) {
 // ── IMPORT PHASE: Fetch detail page ──────────────────────────────
 
 async function fetchProductDetail(productUrl) {
-  const { data: html } = await fetchWithRetry(productUrl, { retries: 3, timeout: 20000 });
+  const { data: html } = await fetchWithRetry(productUrl, { retries: 3, timeout: 25000 });
   const $ = cheerio.load(html);
 
+  // ── Images ──────────────────────────────────────────────────────
+  // CartPe stores use many different carousel/gallery structures.
+  // Strategy: collect ALL img tags on the page that look like product images,
+  // ranked by specificity. Filter out logos, banners, icons, and tiny thumbnails.
   const imageSet = new Set();
-  $('#carousel-custom .carousel-inner .item img, #carousel-custom .items img').each((_, el) => {
-    const src = $(el).attr('src') || $(el).attr('data-src') || $(el).attr('data-lazy') || '';
-    if (src && /cdn\.cartpe\.in/i.test(src) && !/logo|banner|icon/i.test(src)) {
-      imageSet.add(src.replace('/gallery_sm/', '/gallery_lg/').replace('/gallery_md/', '/gallery_lg/'));
-    }
-  });
 
-  const galleryImages = Array.from(imageSet);
-  if (galleryImages.length === 0) {
-    const firstImg = $('section#products .category-img img, section#products #carousel-custom img').first();
-    const src = firstImg.attr('src') || firstImg.attr('data-src') || '';
-    if (src && /cdn\.cartpe\.in/i.test(src)) {
-      imageSet.add(src.replace('/gallery_sm/', '/gallery_lg/').replace('/gallery_md/', '/gallery_lg/'));
-    }
+  // Priority 1: carousel images (any carousel, any theme)
+  const carouselSelectors = [
+    '#carousel-custom .carousel-inner .item img',
+    '#carousel-custom .items img',
+    '.carousel .carousel-inner .item img',
+    '.owl-carousel .item img',
+    '.product-gallery img',
+    '.product-images img',
+    '[id*="carousel"] img',
+    '[class*="carousel"] img',
+    '[class*="gallery"] img',
+    '[class*="slider"] img',
+  ];
+  for (const sel of carouselSelectors) {
+    $(sel).each((_, el) => {
+      const src = extractImgSrc($(el));
+      if (src && !/logo|banner|icon|avatar|user|review/i.test(src)) {
+        imageSet.add(src);
+      }
+    });
+    if (imageSet.size >= 2) break; // found enough from a specific selector
+  }
+
+  // Priority 2: any img on the page that points to cdn.cartpe.in
+  if (imageSet.size === 0) {
+    $('img').each((_, el) => {
+      const src = extractImgSrc($(el));
+      if (src && /cdn\.cartpe\.in|cartpe\.in/i.test(src) && !/logo|banner|icon|avatar|user|review/i.test(src)) {
+        imageSet.add(src);
+      }
+    });
+  }
+
+  // Priority 3: any product-section img (catches stores not on CDN)
+  if (imageSet.size === 0) {
+    $('section#products img, .product-detail img, #product-detail img, .product-view img, main img').each((_, el) => {
+      const src = extractImgSrc($(el));
+      if (src && !/logo|banner|icon|avatar|user|review/i.test(src)) {
+        imageSet.add(src);
+      }
+    });
   }
 
   const images = Array.from(imageSet).slice(0, MAX_IMAGES);
 
-  // Sizes
+  // ── Sizes ────────────────────────────────────────────────────────
   const sizeValues = [];
-  $('section#products .size_click, .size-setup .size_click').each((_, el) => {
+  $([
+    'section#products .size_click',
+    '.size-setup .size_click',
+    '[class*="size"] .size_click',
+    '.size_click',
+    '[class*="size-option"]',
+    '[class*="variant"] button',
+    '[class*="size"] li',
+  ].join(', ')).each((_, el) => {
     const s = $(el).text().trim();
-    if (s) sizeValues.push(s);
+    if (s && s.length <= 10 && !/sold|out/i.test(s)) sizeValues.push(s);
   });
-  const sizes = sizeValues.length > 0 ? { US: sizeValues } : { oneSize: ['One Size'] };
+  const sizes = sizeValues.length > 0 ? { US: [...new Set(sizeValues)] } : { oneSize: ['One Size'] };
 
-  // Description
-  const description = $('.product-description, .description, #description, [class*="desc"]')
-    .first().text().trim().slice(0, 1000) || null;
+  // ── Description ──────────────────────────────────────────────────
+  const description = $([
+    '.product-description',
+    '#product-description',
+    '.description',
+    '#description',
+    '[class*="desc"]',
+    '.product-details-content',
+    '.product-info',
+    'section#products p',
+  ].join(', ')).first().text().trim().slice(0, 1000) || null;
 
-  // Stock
+  // ── Stock ────────────────────────────────────────────────────────
   const inStock = !/out\s*of\s*stock|sold\s*out/i.test($('body').text());
 
-  // Prices
+  // ── Prices ───────────────────────────────────────────────────────
+  // Use the broad extractCardPrices helper first (works for any theme),
+  // then fall back to page-level numeric scan restricted to the product section.
   let sourcePrice = 0;
   let originalPrice = null;
 
-  const priceContainer = $('#price_div, h3.price-area, .price-area').first();
-  if (priceContainer.length) {
-    const clone = priceContainer.clone();
-    clone.find('span[style*="line-through"], .text-muted, strike, del, s').remove();
-    const sellingText = clone.text().replace(/[^\d.]/g, '');
-    const sellingVal = parseFloat(sellingText);
-    if (sellingVal >= 1) sourcePrice = sellingVal;
+  // Try known CartPe price containers
+  const priceContainer = $([
+    '#price_div',
+    'h3.price-area',
+    '.price-area',
+    '.product-price',
+    '[class*="price-box"]',
+    '[class*="price-wrap"]',
+    'section#products h3',
+    'section#products h4',
+    '.product-detail h3',
+    '.product-detail h4',
+  ].join(', ')).first();
 
-    const mrpSpan = priceContainer.find('span[style*="line-through"], .text-muted').first();
-    const mrpText = mrpSpan.text().replace(/[^\d.]/g, '');
-    const mrpVal = parseFloat(mrpText);
+  if (priceContainer.length) {
+    const mrpEl = priceContainer.find('span[style*="line-through"], .text-muted, strike, del, s, .old-price, .mrp').first();
+    const mrpVal = parseFloat((mrpEl.text() || '').replace(/[^\d.]/g, ''));
     if (mrpVal >= 1) originalPrice = mrpVal;
+
+    const clone = priceContainer.clone();
+    clone.find('span[style*="line-through"], .text-muted, strike, del, s, .old-price, .mrp').remove();
+    const sellingVal = parseFloat(clone.text().replace(/[^\d.]/g, ''));
+    if (sellingVal >= 1) sourcePrice = sellingVal;
   }
 
+  // Numeric fallback: scan the product section for any price-like number
   if (sourcePrice === 0) {
-    const productSection = $('section#products, #page-start');
+    const productSection = $('section#products, #page-start, .product-detail, main').first();
     const allPrices = [];
-    productSection.find('h3, h4, .price, [class*="price"]').each((_, el) => {
-      if ($(el).closest('#best-seller, .best-seller, .related-products, .owl-carousel').length) return;
+    productSection.find('h2, h3, h4, h5, .price, [class*="price"], span').each((_, el) => {
+      if ($(el).closest('#best-seller, .best-seller, .related-products, .owl-carousel, nav, header, footer').length) return;
       const nums = $(el).text().match(/[\d,]+\.?\d*/g);
       if (nums) nums.forEach(n => {
         const v = parseFloat(n.replace(/,/g, ''));
-        if (v >= 100 && v <= 9999999) allPrices.push(v);
+        if (v >= 50 && v <= 9999999) allPrices.push(v);
       });
     });
     const sorted = [...new Set(allPrices)].sort((a, b) => a - b);
-    if (sorted.length >= 2) { sourcePrice = sorted[0]; originalPrice = sorted[sorted.length - 1]; }
-    else if (sorted.length === 1) { sourcePrice = sorted[0]; }
+    if (sorted.length >= 2) { sourcePrice = sorted[0]; if (!originalPrice) originalPrice = sorted[sorted.length - 1]; }
+    else if (sorted.length === 1) sourcePrice = sorted[0];
   }
 
   if (!originalPrice || originalPrice <= sourcePrice) {
     originalPrice = Math.round(sourcePrice * 1.4);
   }
 
-  // Category from breadcrumb
+  // ── Category from breadcrumb ─────────────────────────────────────
   const breadcrumbs = [];
-  $('ol.breadcrumb li, .breadcrumb li').each((_, el) => breadcrumbs.push($(el).text().trim()));
+  $('ol.breadcrumb li, .breadcrumb li, [class*="breadcrumb"] li, [class*="breadcrumb"] a').each((_, el) => {
+    const t = $(el).text().trim();
+    if (t) breadcrumbs.push(t);
+  });
   const cartpeCategory = breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2] : null;
 
   return { images, description, inStock, sourcePrice, originalPrice, cartpeCategory, sizes };
