@@ -542,7 +542,8 @@ async function scanListings(options = {}) {
   let expectedProductCount = null;
   
   if (isCategoryPage) {
-    console.log(`[CartPe] Category page detected, checking product count...`);
+    console.log(`[CartPe] ⚠️  CATEGORY PAGE DETECTED: ${pageUrl}`);
+    console.log(`[CartPe] Will limit scan to category product count`);
     try {
       const { data: html } = await axios.get(pageUrl, {
         headers: { 'User-Agent': UA, 'Cookie': cookie },
@@ -551,11 +552,15 @@ async function scanListings(options = {}) {
       const countMatch = html.match(/(\d+)\s*Products?/i);
       if (countMatch) {
         expectedProductCount = parseInt(countMatch[1]);
-        console.log(`[CartPe] Category page shows ${expectedProductCount} products total`);
+        console.log(`[CartPe] 🎯 Category limit set: ${expectedProductCount} products (will stop when reached)`);
+      } else {
+        console.log(`[CartPe] ⚠️  Could not find product count in page, will scan all`);
       }
     } catch (err) {
-      console.warn(`[CartPe] Could not fetch category page for count: ${err.message}`);
+      console.warn(`[CartPe] ❌ Could not fetch category page for count: ${err.message}`);
     }
+  } else {
+    console.log(`[CartPe] Full catalog scan (not a category page)`);
   }
 
   console.log(`[CartPe] SCAN — base="${base}" cat_ids="${catIds}" searchKey="${searchKey}"`);
@@ -831,93 +836,92 @@ async function scrape(url, scope, options = {}) {
     searchKey = parsed.searchParams.get('searchkeyword') || parsed.searchParams.get('search') || '';
   } catch { /* ignore */ }
 
-  // Fetch fresh web_token + session cookie + cat_ids
-  let webToken = '';
-  let cookie = '';
-  let catIds = '';
-  try {
-    const tokenData = await fetchWebToken(url);
-    webToken = tokenData.token;
-    cookie = tokenData.cookie;
-    catIds = tokenData.catIds || '';
-  } catch (err) {
-    console.error(`[CartPe] Failed to fetch web_token: ${err.message}`);
-  }
+  // ═══════════════════════════════════════════════════════════════
+  // CATEGORY PAGE FIX: Parse HTML directly instead of using AJAX
+  // ═══════════════════════════════════════════════════════════════
+  // CartPe's AJAX endpoint (/allproductoadmore) does NOT respect
+  // category filters. It returns ALL products regardless of cat_ids.
+  // For category pages, we must parse the HTML directly.
+  // ═══════════════════════════════════════════════════════════════
+  
+  const isCategoryPage = !/allproduct/i.test(url);
+  const products = [];
+  let pagesFetched = 0;
+  const pageErrors = [];
 
-  const { products, pagesFetched, pageErrors } = await scanListings({
-    base, webToken, cookie, catIds, searchKey, delayMs: delay, onProgress, pageUrl: url,
-  });
-
-  // Fallback: if AJAX returned nothing, parse the initial page HTML directly.
-  // This handles stores where the AJAX endpoint requires authentication we can't replicate.
-  if (products.length === 0) {
-    console.log('[CartPe] AJAX returned 0 products — parsing initial page HTML as fallback…');
+  if (isCategoryPage) {
+    console.log(`[CartPe] 🎯 CATEGORY PAGE — parsing HTML directly (NOT using AJAX)`);
+    console.log(`[CartPe] URL: ${url}`);
+    
     try {
-      const { data: html } = await fetchWithRetry(url, { retries: 2, timeout: 20000, cookie });
-      const $ = cheerio.load(html);
-      const seen = new Set();
-      const fallbackProducts = parseAllProductLinks($, base);
-      for (const p of fallbackProducts) {
-        if (!seen.has(p.sourceId)) { seen.add(p.sourceId); products.push(p); }
-      }
-      console.log(`[CartPe] Fallback found ${products.length} products`);
-    } catch (err) {
-      console.error(`[CartPe] Fallback also failed: ${err.message}`);
-    }
-  }
-
-  // Final fallback: if still no products, try scraping without selectors
-  // by finding ALL product links anywhere in the page
-  if (products.length === 0) {
-    console.log('[CartPe] Final fallback: extracting all product links from page…');
-    try {
-      const { data: html } = await fetchWithRetry(url, { retries: 2, timeout: 20000, cookie });
+      const { data: html, headers: resHeaders } = await fetchWithRetry(url, { retries: 2, timeout: 20000 });
       const $ = cheerio.load(html);
       const seen = new Set();
       
-      // Find all links that match CartPe product URL pattern
-      $('a[href]').each((_, el) => {
-        const href = $(el).attr('href') || '';
-        const fullUrl = href.startsWith('http') ? href 
-          : href.startsWith('/') ? `${base}${href}` 
-          : `${base}/${href}`;
-        
-        const sourceId = idFromUrl(fullUrl);
-        if (!sourceId || seen.has(sourceId)) return;
-        seen.add(sourceId);
-        
-        const linkText = $(el).text().trim();
-        const name = linkText || fullUrl.split('/').pop()
-          .replace(/-((?:npi|lpi)?\d{6,})-[a-z0-9-]+\.html$/i, '')
-          .replace(/-/g, ' ').trim();
-        
-        if (name && name.length > 3 && name.length < 200) {
-          products.push({
-            name: name.replace(/\s+/g, ' '),
-            sourcePrice: 0, // Will be enriched from detail page during import
-            originalPrice: null,
-            thumbnail: null,
-            images: [],
-            brandName: extractBrand(name),
-            productUrl: fullUrl.split('?')[0],
-            sourceId,
-            suggestedCategory: mapCategory(name).category,
-            suggestedSubcategory: mapCategory(name).subcategory,
-            description: null,
-            sizes: {},
-            inStock: true,
-          });
+      const categoryProducts = parseAllProductLinks($, base);
+      for (const p of categoryProducts) {
+        if (!seen.has(p.sourceId)) {
+          seen.add(p.sourceId);
+          products.push(p);
         }
-      });
+      }
       
-      console.log(`[CartPe] Final fallback found ${products.length} product links`);
+      pagesFetched = 1;
+      console.log(`[CartPe] ✅ Category page parsed: ${products.length} products found`);
+      
+      if (onProgress) {
+        onProgress(pagesFetched, products.length);
+      }
     } catch (err) {
-      console.error(`[CartPe] Final fallback failed: ${err.message}`);
+      console.error(`[CartPe] ❌ Category page parsing failed: ${err.message}`);
+      pageErrors.push({ page: 1, error: err.message });
+    }
+  } else {
+    // Full catalog scan using AJAX pagination
+    console.log(`[CartPe] 📋 FULL CATALOG SCAN — using AJAX pagination`);
+    
+    // Fetch fresh web_token + session cookie + cat_ids
+    let webToken = '';
+    let cookie = '';
+    let catIds = '';
+    try {
+      const tokenData = await fetchWebToken(url);
+      webToken = tokenData.token;
+      cookie = tokenData.cookie;
+      catIds = tokenData.catIds || '';
+    } catch (err) {
+      console.error(`[CartPe] Failed to fetch web_token: ${err.message}`);
+    }
+
+    const scanResult = await scanListings({
+      base, webToken, cookie, catIds, searchKey, delayMs: delay, onProgress, pageUrl: url,
+    });
+    
+    products.push(...scanResult.products);
+    pagesFetched = scanResult.pagesFetched;
+    pageErrors.push(...scanResult.pageErrors);
+
+    // Fallback: if AJAX returned nothing, parse the initial page HTML directly.
+    // This handles stores where the AJAX endpoint requires authentication we can't replicate.
+    if (products.length === 0) {
+      console.log('[CartPe] AJAX returned 0 products — parsing initial page HTML as fallback…');
+      try {
+        const { data: html } = await fetchWithRetry(url, { retries: 2, timeout: 20000, cookie });
+        const $ = cheerio.load(html);
+        const seen = new Set();
+        const fallbackProducts = parseAllProductLinks($, base);
+        for (const p of fallbackProducts) {
+          if (!seen.has(p.sourceId)) { seen.add(p.sourceId); products.push(p); }
+        }
+        console.log(`[CartPe] Fallback found ${products.length} products`);
+      } catch (err) {
+        console.error(`[CartPe] Fallback also failed: ${err.message}`);
+      }
     }
   }
 
   const scanDuration = Date.now() - scanStart;
-  console.log(`[CartPe] SCAN complete: ${products.length} products in ${scanDuration}ms (${pagesFetched} AJAX pages)`);
+  console.log(`[CartPe] SCAN complete: ${products.length} products in ${scanDuration}ms (${pagesFetched} pages)`);
 
   // NOTE: Image enrichment is DISABLED during scan to avoid timeouts and memory issues.
   // Images will be fetched during the import phase when products are actually selected.
