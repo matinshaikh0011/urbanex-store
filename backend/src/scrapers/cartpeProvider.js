@@ -67,9 +67,31 @@ function idFromUrl(url) {
 
 /**
  * Build the Load More AJAX URL for a given store base.
+ * For category pages, returns the category-specific endpoint.
+ * For full catalog, returns the general product loadmore endpoint.
  */
-function loadMoreUrl(base) {
+function loadMoreUrl(base, isCategoryPage = false) {
+  if (isCategoryPage) {
+    return `${base}/store_product_loadmore`;
+  }
   return `${base}/allproductoadmore`;
+}
+
+/**
+ * Extract category slug from CartPe category URL.
+ * E.g., "https://timescorner.cartpe.in/track-pants.html" → "track-pants"
+ */
+function categorySlugFromUrl(url) {
+  try {
+    const pathname = new URL(url).pathname;
+    // Remove leading slash and .html extension
+    const slug = pathname.replace(/^\//, '').replace(/\.html$/i, '');
+    // Ignore allproduct - that's not a category
+    if (/allproduct/i.test(slug)) return null;
+    return slug;
+  } catch {
+    return null;
+  }
 }
 
 /** Sleep with ±20% jitter */
@@ -521,24 +543,27 @@ async function scanListings(options = {}) {
     webToken,
     cookie = '',
     catIds = '',
+    categorySlug = '',  // NEW: for category-specific endpoint
     searchKey = '',
     delayMs = DEFAULT_DELAY,
     onProgress = null,
     pageUrl = null,
   } = options;
   const delay = clampDelay(delayMs);
-  const ajaxUrl = loadMoreUrl(base);
+  
+  // CATEGORY PAGE DETECTION
+  const isCategoryPage = pageUrl && !/allproduct/i.test(pageUrl);
+  const ajaxUrl = loadMoreUrl(base, isCategoryPage);
+  
   const seen = new Set();
   const products = [];
   let rowNo = 0;
-  const pageSize = 24;
+  const pageSize = 12;  // Category endpoint uses 12 per page
   let pagesFetched = 0;
   let consecutiveEmpty = 0;
   let consecutiveErrors = 0;
   const pageErrors = [];
 
-  // CATEGORY PAGE DETECTION: Check if this is a category page (not allproduct)
-  const isCategoryPage = pageUrl && !/allproduct/i.test(pageUrl);
   let expectedProductCount = null;
   
   if (isCategoryPage) {
@@ -591,21 +616,43 @@ async function scanListings(options = {}) {
     console.log(`[CartPe] Full catalog scan (not a category page)`);
   }
 
-  console.log(`[CartPe] SCAN — base="${base}" cat_ids="${catIds}" searchKey="${searchKey}"`);
+  if (isCategoryPage && categorySlug) {
+    console.log(`[CartPe] SCAN — Category="${categorySlug}" searchKey="${searchKey}"`);
+  } else {
+    console.log(`[CartPe] SCAN — base="${base}" cat_ids="${catIds}" searchKey="${searchKey}"`);
+  }
 
   while (true) {
     try {
-      const params = new URLSearchParams({
-        getresult:      String(rowNo),
-        searchkey:      searchKey,
-        web_token:      webToken,
-        orderby:        '',
-        cat_ids:        catIds,
-        min_price:      '0',
-        max_price:      '0',
-        size_ids:       '',
-        variant_status: '0',
-      });
+      let params;
+      
+      if (isCategoryPage && categorySlug) {
+        // Category-specific endpoint parameters
+        params = new URLSearchParams({
+          getresult:      String(rowNo),
+          category_slug:  categorySlug,
+          searchkeyword:  searchKey,
+          web_token:      webToken,
+          orderby:        '',
+          min_price:      '0',
+          max_price:      '0',
+          size_ids:       '',
+          variant_status: '0',
+        });
+      } else {
+        // Full catalog endpoint parameters
+        params = new URLSearchParams({
+          getresult:      String(rowNo),
+          searchkey:      searchKey,
+          web_token:      webToken,
+          orderby:        '',
+          cat_ids:        catIds,
+          min_price:      '0',
+          max_price:      '0',
+          size_ids:       '',
+          variant_status: '0',
+        });
+      }
 
       const { data: html } = await postWithRetry(ajaxUrl, params.toString(), {
         retries: 3, timeout: 20000, referer: pageUrl || base, cookie,
@@ -893,14 +940,20 @@ async function scrape(url, scope, options = {}) {
   }
 
   if (isCategoryPage) {
-    console.log(`[CartPe] 🎯 CATEGORY PAGE — will use AJAX with smart limit`);
+    console.log(`[CartPe] 🎯 CATEGORY PAGE — will use category-specific AJAX endpoint`);
     console.log(`[CartPe] URL: ${url}`);
   } else {
     console.log(`[CartPe] 📋 FULL CATALOG SCAN — using AJAX pagination`);
   }
 
+  // Extract category slug for category pages
+  const categorySlug = isCategoryPage ? categorySlugFromUrl(url) : '';
+  if (isCategoryPage && categorySlug) {
+    console.log(`[CartPe] Category slug: "${categorySlug}"`);
+  }
+
   const scanResult = await scanListings({
-    base, webToken, cookie, catIds, searchKey, delayMs: delay, onProgress, pageUrl: url,
+    base, webToken, cookie, catIds, categorySlug, searchKey, delayMs: delay, onProgress, pageUrl: url,
   });
   
   products.push(...scanResult.products);
