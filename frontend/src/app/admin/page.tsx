@@ -1022,7 +1022,35 @@ function CategoryForm({ categories, initial, onSave, onClose }: {
     sortOrder: initial?.sortOrder ?? 0,
   });
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }));
+
+  const uploadToCloudinary = async (file: File) => {
+    const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const preset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+    if (!cloud || !preset) {
+      alert('Image upload isn\\'t configured yet. Cloudinary environment variables are missing on this deployment. For now, paste an image URL below instead.');
+      return;
+    }
+    if (!file.type.startsWith('image/')) { alert('Please choose an image file.'); return; }
+    if (file.size > 10 * 1024 * 1024) { alert('Image is too large (max 10MB).'); return; }
+    setUploading(true);
+    const fd = new FormData(); fd.append('file', file); fd.append('upload_preset', preset);
+    try {
+      const r = await fetch(`https://api.cloudinary.com/v1_1/${cloud}/image/upload`, { method: 'POST', body: fd });
+      const d = await r.json();
+      if (d.secure_url) {
+        set('image', d.secure_url);
+      } else {
+        const msg = d?.error?.message || 'Unknown error';
+        alert(`Upload failed: ${msg}. Check that your upload preset is set to "Unsigned" in Cloudinary.`);
+      }
+    } catch {
+      alert('Upload failed: could not reach Cloudinary. Check your internet connection.');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();

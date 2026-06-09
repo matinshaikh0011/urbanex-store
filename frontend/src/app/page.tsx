@@ -267,8 +267,8 @@ export default function Home() {
               <h2 className={styles.catTitle}>SHOP BY <span className={styles.accent}>CATEGORY</span></h2>
             </div>
             <div className={styles.catGrid}>
-              {categories.filter((c: any) => c.active).length > 0 ? (
-                categories.filter((c: any) => c.active).slice(0, 8).map((cat: any) => (
+              {categories.filter((c: any) => c.active && c.featured).length > 0 ? (
+                categories.filter((c: any) => c.active && c.featured).slice(0, 8).map((cat: any) => (
                   <Link key={cat.id} href={`/products?category=${cat.slug}`} className={styles.catCard} data-cursor="view">
                     <div className={styles.catImgWrap}>
                       <img 
