@@ -1,136 +1,245 @@
 /* ================================================================
-   LOADER — 3D spinning UrbanEx cube + orbit rings + kinetic label
+   LOADER — Streetwear Shipping Tag / Barcode Scanner 
    ================================================================ */
 .wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 26px;
   min-height: 50vh;
   padding: 60px 20px;
-  perspective: 800px;
+  background-color: transparent;
 }
 
-.scene {
+.shippingTag {
+  width: 100%;
+  max-width: 320px;
+  background: var(--bg-secondary, #F4F0EA);
+  border: 3px solid var(--border-color, #111);
+  box-shadow: 8px 8px 0 var(--border-color, #111);
+  padding: 24px;
   position: relative;
-  width: 120px;
-  height: 120px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Orbit rings */
-.ring, .ring2 {
-  position: absolute;
-  border-radius: 50%;
-  border: 3px dashed var(--accent-primary, #CC0000);
-  opacity: 0.5;
-}
-.ring {
-  width: 120px; height: 120px;
-  animation: spin 3s linear infinite;
-}
-.ring2 {
-  width: 84px; height: 84px;
-  border-style: dotted;
-  border-color: var(--border-color, #111);
-  animation: spin 2s linear infinite reverse;
-}
-
-/* The rotating cube */
-.cube {
-  position: relative;
-  width: 54px;
-  height: 54px;
-  transform-style: preserve-3d;
-  animation: cubeSpin 2.6s cubic-bezier(0.6, 0.05, 0.3, 0.95) infinite;
-}
-.face {
-  position: absolute;
-  width: 54px;
-  height: 54px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Oswald', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: #fff;
-  background: #111;
-  border: 2px solid #fff;
-  box-shadow: inset 0 0 0 2px #111;
-}
-.face[data-f='front']  { transform: translateZ(27px); background: var(--accent-primary, #CC0000); }
-.face[data-f='back']   { transform: rotateY(180deg) translateZ(27px); background: var(--accent-primary, #CC0000); }
-.face[data-f='right']  { transform: rotateY(90deg) translateZ(27px); background: #111; }
-.face[data-f='left']   { transform: rotateY(-90deg) translateZ(27px); background: #111; }
-.face[data-f='top']    { transform: rotateX(90deg) translateZ(27px); background: var(--accent-tag, #F5C400); color: #111; }
-.face[data-f='bottom'] { transform: rotateX(-90deg) translateZ(27px); background: var(--accent-tag, #F5C400); color: #111; }
-
-/* Pulsing ground shadow */
-.shadow {
-  position: absolute;
-  bottom: -22px;
-  width: 60px;
-  height: 12px;
-  background: rgba(0,0,0,0.25);
-  border-radius: 50%;
-  filter: blur(3px);
-  animation: shadowPulse 2.6s ease-in-out infinite;
-}
-
-/* Kinetic label */
-.label {
-  display: flex;
-  gap: 1px;
-  font-family: 'Oswald', sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 6px;
-  color: var(--text-primary, #111);
-}
-.label span {
-  display: inline-block;
-  animation: letterBounce 1.1s ease-in-out infinite;
-}
-
-/* Loading bar */
-.bar {
-  width: 200px;
-  height: 8px;
-  background: var(--bg-tertiary, #C8C3BB);
-  border: 2px solid var(--border-color, #111);
+  flex-direction: column;
+  gap: 20px;
   overflow: hidden;
 }
-.bar span {
-  display: block;
-  height: 100%;
-  width: 40%;
+
+.shippingTag::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 60px;
+  height: 60px;
   background: var(--accent-primary, #CC0000);
-  animation: barSlide 1.3s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  transform: rotate(45deg);
+  border-bottom: 3px solid var(--border-color, #111);
+  z-index: 10;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes cubeSpin {
-  0%   { transform: rotateX(-25deg) rotateY(0deg); }
-  100% { transform: rotateX(-25deg) rotateY(360deg); }
+.tagHeader {
+  display: flex;
+  justify-content: space-between;
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #666;
+  border-bottom: 2px dashed #ccc;
+  padding-bottom: 8px;
 }
-@keyframes shadowPulse {
-  0%,100% { transform: scale(1); opacity: 0.25; }
-  50%     { transform: scale(0.7); opacity: 0.4; }
+
+.barcodeWrap {
+  position: relative;
+  height: 60px;
+  background: #fff;
+  border: 2px solid #111;
+  padding: 4px;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
 }
-@keyframes letterBounce {
-  0%,100% { transform: translateY(0); color: var(--text-primary, #111); }
-  50%     { transform: translateY(-10px); color: var(--accent-primary, #CC0000); }
+
+.barcodeLines {
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    to right,
+    #111 0,
+    #111 4px,
+    #fff 4px,
+    #fff 6px,
+    #111 6px,
+    #111 12px,
+    #fff 12px,
+    #fff 16px,
+    #111 16px,
+    #111 18px,
+    #fff 18px,
+    #fff 24px,
+    #111 24px,
+    #111 32px,
+    #fff 32px,
+    #fff 34px
+  );
 }
-@keyframes barSlide {
-  0%   { transform: translateX(-120%); }
-  100% { transform: translateX(360%); }
+
+.scannerLine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #FF0000;
+  box-shadow: 0 0 8px #FF0000, 0 0 15px #FF0000;
+  animation: scan 1.8s linear infinite alternate;
+  z-index: 2;
+}
+
+.tagBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.glitchText {
+  font-family: 'Oswald', sans-serif;
+  font-size: 36px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: #111;
+  position: relative;
+  text-transform: uppercase;
+  animation: textGlitch 4s infinite;
+  text-align: center;
+}
+
+.glitchText::before, .glitchText::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-secondary, #F4F0EA);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.glitchText::before {
+  left: 2px;
+  text-shadow: -2px 0 red;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+  animation: glitchAnim1 2.5s infinite linear alternate-reverse;
+}
+
+.glitchText::after {
+  left: -2px;
+  text-shadow: -2px 0 blue;
+  clip-path: polygon(0 80%, 100% 20%, 100% 100%, 0 100%);
+  animation: glitchAnim2 3s infinite linear alternate-reverse;
+}
+
+.progressRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.targetLabel {
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #111;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.percentage {
+  font-family: 'Oswald', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent-primary, #CC0000);
+  line-height: 1;
+}
+
+.progressBar {
+  width: 100%;
+  height: 12px;
+  background: var(--bg-tertiary, #C8C3BB);
+  border: 2px solid var(--border-color, #111);
+  padding: 1px;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--accent-primary, #CC0000);
+  transition: width 0.15s ease-out;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 5px,
+    rgba(0,0,0,0.2) 5px,
+    rgba(0,0,0,0.2) 10px
+  );
+}
+
+.tagFooter {
+  display: flex;
+  justify-content: space-between;
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #666;
+  border-top: 2px dashed #ccc;
+  padding-top: 12px;
+  margin-top: 10px;
+}
+
+.blink {
+  color: #CC0000;
+  animation: blinking 1s infinite;
+}
+
+@keyframes scan {
+  0% { transform: translateY(-4px); }
+  100% { transform: translateY(64px); }
+}
+
+@keyframes textGlitch {
+  0%, 100% { transform: none; opacity: 1; }
+  92% { transform: skew(0deg); opacity: 1; }
+  94% { transform: skew(-15deg); opacity: 0.8; }
+  96% { transform: skew(10deg); opacity: 1; }
+  98% { transform: skew(-5deg); opacity: 0.9; }
+}
+
+@keyframes glitchAnim1 {
+  0% { clip-path: inset(20% 0 80% 0); }
+  20% { clip-path: inset(60% 0 10% 0); }
+  40% { clip-path: inset(40% 0 50% 0); }
+  60% { clip-path: inset(80% 0 5% 0); }
+  80% { clip-path: inset(10% 0 70% 0); }
+  100% { clip-path: inset(30% 0 50% 0); }
+}
+
+@keyframes glitchAnim2 {
+  0% { clip-path: inset(10% 0 60% 0); }
+  20% { clip-path: inset(30% 0 20% 0); }
+  40% { clip-path: inset(70% 0 10% 0); }
+  60% { clip-path: inset(20% 0 50% 0); }
+  80% { clip-path: inset(50% 0 30% 0); }
+  100% { clip-path: inset(5% 0 80% 0); }
+}
+
+@keyframes blinking {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ring, .ring2, .cube, .shadow, .label span, .bar span { animation: none; }
+  .scannerLine, .glitchText, .glitchText::before, .glitchText::after, .blink { animation: none; }
 }
