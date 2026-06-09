@@ -1029,7 +1029,7 @@ function CategoryForm({ categories, initial, onSave, onClose }: {
     const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     const preset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
     if (!cloud || !preset) {
-      alert('Image upload isn\\'t configured yet. Cloudinary environment variables are missing on this deployment. For now, paste an image URL below instead.');
+      alert("Image upload isn't configured yet. Cloudinary environment variables are missing on this deployment. For now, paste an image URL below instead.");
       return;
     }
     if (!file.type.startsWith('image/')) { alert('Please choose an image file.'); return; }
