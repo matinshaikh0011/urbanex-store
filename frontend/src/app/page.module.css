@@ -672,46 +672,122 @@
 .marqueeItem span { color: var(--accent-primary); margin: 0 6px; }
 
 /* ================================================================
-   QUICK CATEGORIES
+   PROFESSIONAL CATEGORY SHOWCASE
    ================================================================ */
-.quickCategories {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  padding: 36px 16px;
-  background: var(--bg-primary);
-  flex-wrap: wrap;
-  border-bottom: var(--border);
+.categoryShowcase {
+  padding: 80px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.quickCat {
+.catHeader {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.catTitle {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(30px, 4.5vw, 46px);
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.catTitle .accent {
+  color: var(--accent-primary);
+}
+
+.catGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.catCard {
+  position: relative;
+  display: block;
+  height: 380px;
+  border: var(--border);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--bg-secondary);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.catCard:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-hover);
+}
+
+.catImgWrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.catImgWrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.catCard:hover .catImgWrap img {
+  transform: scale(1.08);
+}
+
+.catOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 50%, transparent 100%);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 18px 22px;
-  background: var(--bg-secondary);
-  border: var(--border);
-  box-shadow: var(--shadow-btn);
-  min-width: 90px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: transform 0.14s var(--ease-spring), box-shadow 0.14s ease;
+  justify-content: flex-end;
+  padding: 30px;
+  transition: background 0.3s ease;
 }
-.quickCat:hover {
-  transform: translate(-3px, -3px) rotate(-1deg);
-  box-shadow: var(--shadow);
-  background: var(--accent-primary);
+
+.catCard:hover .catOverlay {
+  background: linear-gradient(to top, rgba(214, 0, 0, 0.9) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
 }
-.quickCat:hover span:last-child { color: #fff; }
-.quickCat span:first-child { font-size: 28px; }
-.quickCat span:last-child {
+
+.catOverlay h3 {
   font-family: 'Oswald', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  color: var(--text-secondary);
-  transition: color 0.15s ease;
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 3px;
+  margin: 0 0 8px;
+  transform: translateY(10px);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.catOverlay span {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,0.7);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.catCard:hover .catOverlay h3 {
+  transform: translateY(0);
+}
+
+.catCard:hover .catOverlay span {
+  transform: translateY(0);
+  opacity: 1;
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .categoryShowcase { padding: 48px 16px; }
+  .catCard { height: 260px; }
+  .catOverlay h3 { font-size: 24px; }
 }
 
 /* ================================================================

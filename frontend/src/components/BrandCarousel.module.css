@@ -26,16 +26,12 @@
   letter-spacing: 3px;
   line-height: 1;
   color: var(--text-primary);
-  /* Single clean hard shadow — no text-stroke fighting it. Crisp at all sizes. */
-  text-shadow: 4px 4px 0 var(--border-color);
   margin: 0 0 18px;
   text-transform: uppercase;
 }
 
 .accent {
   color: var(--accent-primary);
-  /* Red word gets the inverse: black hard shadow keeps it punchy + legible */
-  text-shadow: 4px 4px 0 var(--border-color);
 }
 
 /* Editorial subtitle — readable, premium, not washed out */

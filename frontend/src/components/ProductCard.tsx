@@ -83,31 +83,8 @@ export default function ProductCard({ product, index = 0 }: { product: Product; 
     setTimeout(() => setAdded(false), 1500);
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!revealed) return;
-    const card = cardRef.current;
-    if (!card) return;
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const xc = rect.width / 2;
-    const yc = rect.height / 2;
-    
-    // Max rotation 12 degrees
-    const rotateX = -((y - yc) / yc) * 12;
-    const rotateY = ((x - xc) / xc) * 12;
-    
-    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px) scale(1.02)`;
-    card.style.transition = 'transform 0.1s ease, border-color 0.4s ease, box-shadow 0.4s ease';
-  };
-
   const handleMouseLeave = () => {
     setIsHovered(false);
-    if (!revealed) return;
-    const card = cardRef.current;
-    if (!card) return;
-    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)';
-    card.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.4s ease, box-shadow 0.4s ease';
   };
 
   return (
@@ -115,14 +92,15 @@ export default function ProductCard({ product, index = 0 }: { product: Product; 
       ref={cardRef}
       href={`/products/${product.slug}`}
       className={`${styles.card} ${styles.reveal} ${revealed ? styles.revealed : ''}`}
-      style={{ transitionDelay: `${(index % 4) * 0.12}s` }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
-      onMouseMove={handleMouseMove}
       data-cursor="view"
     >
       <div className={styles.imageWrapper}>
         <Image src={product.images[0] || '/placeholder.jpg'} alt={product.name} fill className={styles.image} sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+        {product.images[1] && (
+          <Image src={product.images[1]} alt={`${product.name} alternate view`} fill className={`${styles.image} ${styles.secondImage}`} sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+        )}
         {product.originalPrice && <span className={styles.saleTag}>SALE</span>}
         <button
           className={`${styles.wishlistBtn} ${inWishlist ? styles.wishlisted : ''}`}

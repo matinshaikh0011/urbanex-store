@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Script from 'next/script';
 import Header from '@/components/Header';
 import GlobalPopup from '@/components/GlobalPopup';
 import BrandCarousel from '@/components/BrandCarousel';
@@ -186,16 +187,19 @@ function Counter({ end, suffix = '' }: { end: number; suffix?: string }) {
 export default function Home() {
   const [brands, setBrands] = useState<any[]>([]);
   const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       fetch('/api/brands?featured=true').then(res => res.json()).catch(() => []),
-      fetch('/api/products').then(res => res.json()).catch(() => [])
+      fetch('/api/products').then(res => res.json()).catch(() => []),
+      fetch('/api/categories').then(res => res.json()).catch(() => [])
     ])
-    .then(([brandsData, productsData]) => {
+    .then(([brandsData, productsData, categoriesData]) => {
       setBrands(Array.isArray(brandsData) ? brandsData : []);
       setAllProducts(Array.isArray(productsData) ? productsData : []);
+      setCategories(Array.isArray(categoriesData) ? categoriesData : []);
       setLoading(false);
     })
     .catch(() => setLoading(false));
@@ -256,33 +260,89 @@ export default function Home() {
         {/* ===== INFO SLIDER ===== */}
         <InfoSlider />
 
-        {/* Quick Categories - Now Links to Products Page with Category Filter */}
-        <ScrollReveal animation="fadeIn" duration={1000}>
-          <section className={styles.quickCategories}>
-            <Link href="/products?category=sneakers" className={styles.quickCat} data-cursor="view">
-              <span>👟</span>
-              <span>SNEAKERS</span>
-            </Link>
-            <Link href="/products?category=watches" className={styles.quickCat} data-cursor="view">
-              <span>⌚</span>
-              <span>LUXURY WATCHES</span>
-            </Link>
-            <Link href="/products?category=glasses" className={styles.quickCat} data-cursor="view">
-              <span>🕶️</span>
-              <span>GLASSES</span>
-            </Link>
-            <Link href="/products?category=handbags" className={styles.quickCat} data-cursor="view">
-              <span>👜</span>
-              <span>HANDBAGS</span>
-            </Link>
-            <Link href="/products?category=clothing" className={styles.quickCat} data-cursor="view">
-              <span>👕</span>
-              <span>CLOTHING</span>
-            </Link>
-            <Link href="/products?category=ua-batch" className={styles.quickCat} data-cursor="view">
-              <span>🔥</span>
-              <span>UA BATCH</span>
-            </Link>
+        {/* Professional Category Showcase */}
+        <ScrollReveal animation="slideUp" duration={800}>
+          <section className={styles.categoryShowcase}>
+            <div className={styles.catHeader}>
+              <h2 className={styles.catTitle}>SHOP BY <span className={styles.accent}>CATEGORY</span></h2>
+            </div>
+            <div className={styles.catGrid}>
+              {categories.filter((c: any) => c.active).length > 0 ? (
+                categories.filter((c: any) => c.active).slice(0, 8).map((cat: any) => (
+                  <Link key={cat.id} href={`/products?category=${cat.slug}`} className={styles.catCard} data-cursor="view">
+                    <div className={styles.catImgWrap}>
+                      <img 
+                        src={cat.image || 'https://images.unsplash.com/photo-1552346154-21d32810baa3?w=800&q=80'} 
+                        alt={cat.name} 
+                        loading="lazy" 
+                      />
+                    </div>
+                    <div className={styles.catOverlay}>
+                      <h3>{cat.name.toUpperCase()}</h3>
+                      <span>EXPLORE →</span>
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                /* Fallback static categories if none exist in backend */
+                <>
+                  <Link href="/products?category=sneakers" className={styles.catCard} data-cursor="view">
+                    <div className={styles.catImgWrap}>
+                      <img src="https://images.unsplash.com/photo-1552346154-21d32810baa3?w=800&q=80" alt="Sneakers" loading="lazy" />
+                    </div>
+                    <div className={styles.catOverlay}>
+                      <h3>SNEAKERS</h3>
+                      <span>EXPLORE →</span>
+                    </div>
+                  </Link>
+                  <Link href="/products?category=watches" className={styles.catCard} data-cursor="view">
+                    <div className={styles.catImgWrap}>
+                      <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=800&q=80" alt="Luxury Watches" loading="lazy" />
+                    </div>
+                    <div className={styles.catOverlay}>
+                      <h3>LUXURY WATCHES</h3>
+                      <span>EXPLORE →</span>
+                    </div>
+                  </Link>
+                  <Link href="/products?category=glasses" className={styles.catCard} data-cursor="view">
+                    <div className={styles.catImgWrap}>
+                      <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&q=80" alt="Glasses" loading="lazy" />
+                    </div>
+                    <div className={styles.catOverlay}>
+                      <h3>GLASSES</h3>
+                      <span>EXPLORE →</span>
+                    </div>
+                  </Link>
+                  <Link href="/products?category=handbags" className={styles.catCard} data-cursor="view">
+                    <div className={styles.catImgWrap}>
+                      <img src="https://images.unsplash.com/photo-1584916201218-f4242ceb4809?w=800&q=80" alt="Handbags" loading="lazy" />
+                    </div>
+                    <div className={styles.catOverlay}>
+                      <h3>HANDBAGS</h3>
+                      <span>EXPLORE →</span>
+                    </div>
+                  </Link>
+                  <Link href="/products?category=clothing" className={styles.catCard} data-cursor="view">
+                    <div className={styles.catImgWrap}>
+                      <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800&q=80" alt="Clothing" loading="lazy" />
+                    </div>
+                    <div className={styles.catOverlay}>
+                      <h3>CLOTHING</h3>
+                      <span>EXPLORE →</span>
+                    </div>
+                  </Link>
+                  <Link href="/products?category=ua-batch" className={styles.catCard} data-cursor="view">
+                    <div className={styles.catImgWrap}>
+                      <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800&q=80" alt="UA Batch" loading="lazy" />
+                    </div>
+                    <div className={styles.catOverlay}>
+                      <h3>UA BATCH</h3>
+                      <span>EXPLORE →</span>
+                    </div>
+                  </Link>
+                </>
+              )}
+            </div>
           </section>
         </ScrollReveal>
 
@@ -387,32 +447,9 @@ export default function Home() {
               <a href="https://www.instagram.com/urbanex.store/" target="_blank" rel="noopener noreferrer" className={styles.instaHandle}>@urbanex.store</a>
             </div>
           </ScrollReveal>
-          <div className={styles.instaGrid}>
-            {[
-              'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=400',
-              'https://images.unsplash.com/photo-1587563871167-1ee9c731aefb?w=400',
-              'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400',
-              'https://images.unsplash.com/photo-1539185441755-769473a23570?w=400',
-              'https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=400',
-              'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400',
-            ].map((img, i) => (
-              <a
-                key={i}
-                href="https://www.instagram.com/urbanex.store/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.instaCell}
-              >
-                <img src={img} alt={`UrbanEx Instagram post ${i + 1}`} loading="lazy" />
-                <span className={styles.instaOverlay}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="32" height="32">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                  </svg>
-                </span>
-              </a>
-            ))}
+          <div style={{ width: '100%', maxWidth: '1200px', margin: '2rem auto', minHeight: '300px' }}>
+            <Script src="https://elfsightcdn.com/platform.js" strategy="lazyOnload" />
+            <div className="elfsight-app-b08ff70a-db49-4175-90c8-14e852eefad1" data-elfsight-app-lazy></div>
           </div>
           <div className={styles.instaFollowWrap}>
             <a href="https://www.instagram.com/urbanex.store/" target="_blank" rel="noopener noreferrer" className={styles.instaFollowBtn}>
@@ -496,7 +533,7 @@ export default function Home() {
                 <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
               </svg>
-              <span>@shopurbanex</span>
+              <span>@urbanex.store</span>
             </a>
             <a
               href="https://wa.me/919898285850"
