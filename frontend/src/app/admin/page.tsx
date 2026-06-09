@@ -1088,9 +1088,13 @@ function CategoryForm({ categories, initial, onSave, onClose }: {
             <label>Description</label>
             <textarea value={form.description} onChange={e => set('description', e.target.value)} rows={3} />
           </div>
-          <div className={styles.formGroup}>
-            <label>Image URL</label>
-            <input value={form.image} onChange={e => set('image', e.target.value)} placeholder="https://\u2026" />
+          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+            <label>Image (Upload or URL)</label>
+            <div className={styles.imageUploadArea} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files?.[0]) uploadToCloudinary(e.dataTransfer.files[0]); }}>
+              <p>{uploading ? 'Uploading...' : 'Drag & drop image here, or'}</p>
+              <input type="file" accept="image/*" onChange={e => { if (e.target.files?.[0]) uploadToCloudinary(e.target.files[0]); }} className={styles.fileInput} />
+            </div>
+            <input value={form.image || ''} onChange={e => set('image', e.target.value)} placeholder="Or paste image https://..." style={{ marginTop: 8 }} />
             {form.image && <img src={form.image} alt="preview" className={styles.logoPreview} style={{ marginTop: 8 }} />}
           </div>
           <div className={styles.formGroup}>
