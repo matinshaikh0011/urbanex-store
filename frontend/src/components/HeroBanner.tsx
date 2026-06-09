@@ -129,10 +129,10 @@ export default function HeroBanner() {
     });
   }, []);
 
-  // On mount: if we're playing, schedule the ~3s auto-lift; always clean up timers.
+  // On mount: if we're playing, schedule the ~2s auto-lift; always clean up timers.
   useEffect(() => {
     if (shutterState !== 'closed') return;
-    const auto = window.setTimeout(() => liftShutter(), 3000);
+    const auto = window.setTimeout(() => liftShutter(), 2000);
     shutterTimers.current.push(auto);
     const timers = shutterTimers.current;
     return () => { timers.forEach(t => clearTimeout(t)); };
