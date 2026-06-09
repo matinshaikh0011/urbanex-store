@@ -37,6 +37,10 @@ interface Stats {
   totalProducts: number; outOfStock: number; activeCoupons: number;
   recentOrders: Order[]; outOfStockProducts: Product[];
 }
+interface HeroSlide {
+  id: number; image: string; label: string; tagline: string; spec: string;
+  emoji: string; href: string; active: boolean; sortOrder: number;
+}
 
 // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const fmt = (n: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(n);
@@ -73,7 +77,7 @@ async function api(path: string, opts?: RequestInit) {
 export default function AdminPage() {
   const router = useRouter();
   const { toasts, show } = useToast();
-  const [section, setSection] = useState<'overview' | 'orders' | 'products' | 'brands' | 'categories' | 'coupons' | 'inventory' | 'csv'>('overview');
+  const [section, setSection] = useState<'overview' | 'orders' | 'products' | 'brands' | 'categories' | 'hero' | 'coupons' | 'inventory' | 'csv'>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Verify auth on mount
@@ -92,6 +96,7 @@ export default function AdminPage() {
     { id: 'products', icon: '👟', label: 'Products' },
     { id: 'brands', icon: '🏷️', label: 'Brands' },
     { id: 'categories', icon: '🗂️', label: 'Categories' },
+    { id: 'hero', icon: '🖼️', label: 'Hero Banners' },
     { id: 'coupons', icon: '🎟️', label: 'Coupons' },
     { id: 'inventory', icon: '📈', label: 'Inventory' },
     { id: 'csv', icon: '📥', label: 'Import CSV' },
@@ -143,6 +148,7 @@ export default function AdminPage() {
           {section === 'coupons' && <CouponsSection show={show} />}
           {section === 'inventory' && <InventorySection show={show} />}
           {section === 'csv' && <CSVSection show={show} />}
+          {section === 'hero' && <HeroSection show={show} />}
         </div>
       </div>
     </div>
@@ -1565,6 +1571,181 @@ function CSVSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// HERO SLIDES SECTION
+// ════════════════════════════════════════════════════════════════
+function HeroSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
+  const [slides, setSlides] = useState<HeroSlide[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<HeroSlide | Partial<HeroSlide> | null>(null);
+
+  const fetchSlides = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api('/api/admin/hero-slides');
+      if (res.ok) setSlides(await res.json());
+      else show('Failed to fetch hero slides', 'err');
+    } catch { show('Network error fetching slides', 'err'); }
+    setLoading(false);
+  }, [show]);
+
+  useEffect(() => { fetchSlides(); }, [fetchSlides]);
+
+  const saveSlide = async (s: Partial<HeroSlide>) => {
+    try {
+      const isNew = !s.id;
+      const res = await api(isNew ? '/api/admin/hero-slides' : `/api/admin/hero-slides/${s.id}`, {
+        method: isNew ? 'POST' : 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(s)
+      });
+      if (res.ok) {
+        show(isNew ? 'Slide added' : 'Slide updated');
+        setEditing(null);
+        fetchSlides();
+      } else show('Failed to save slide', 'err');
+    } catch { show('Network error', 'err'); }
+  };
+
+  const delSlide = async (id: number) => {
+    if (!confirm('Delete this slide?')) return;
+    try {
+      const res = await api(`/api/admin/hero-slides/${id}`, { method: 'DELETE' });
+      if (res.ok) { show('Slide deleted'); fetchSlides(); }
+      else show('Failed to delete', 'err');
+    } catch { show('Network error', 'err'); }
+  };
+
+  if (loading) return <div className={styles.loading}>Loading hero slides...</div>;
+
+  return (
+    <div>
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>Hero Banners</h2>
+        <button className={styles.btnPrimary} onClick={() => setEditing({ active: true, sortOrder: 0, image: '', label: '', tagline: '', spec: '', emoji: '', href: '' })}>+ ADD SLIDE</button>
+      </div>
+
+      <div className={styles.tableWrap}>
+        <table className={styles.table}>
+          <thead><tr><th>Image</th><th>Label</th><th>Tagline</th><th>Status</th><th>Order</th><th>Actions</th></tr></thead>
+          <tbody>
+            {slides.length === 0 ? <tr><td colSpan={6} style={{ textAlign: 'center', padding: 20 }}>No slides configured</td></tr> : slides.map(s => (
+              <tr key={s.id}>
+                <td>{s.image && <img src={s.image} alt={s.label} style={{ height: 40, borderRadius: 4, objectFit: 'cover' }} />}</td>
+                <td><strong>{s.emoji} {s.label}</strong></td>
+                <td>{s.tagline}</td>
+                <td><span className={styles.badge} style={{ background: s.active ? '#22c55e' : '#888' }}>{s.active ? 'ACTIVE' : 'HIDDEN'}</span></td>
+                <td>{s.sortOrder}</td>
+                <td>
+                  <div className={styles.actionRow}>
+                    <button className={styles.actionBtn} onClick={() => setEditing(s)}>Edit</button>
+                    <button className={styles.actionBtn} onClick={() => delSlide(s.id)} style={{ color: '#CC0000' }}>Delete</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {editing && <HeroSlideForm initial={editing} onClose={() => setEditing(null)} onSave={saveSlide} />}
+    </div>
+  );
+}
+
+function HeroSlideForm({ initial, onClose, onSave }: { initial: Partial<HeroSlide>; onClose: () => void; onSave: (s: Partial<HeroSlide>) => Promise<void> }) {
+  const [form, setForm] = useState(initial);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }));
+
+  const uploadToCloudinary = async (file: File) => {
+    const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const preset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+    if (!cloud || !preset) {
+      alert("Image upload isn't configured yet. Cloudinary environment variables are missing on this deployment. For now, paste an image URL below instead.");
+      return;
+    }
+    if (!file.type.startsWith('image/')) { alert('Please choose an image file.'); return; }
+    if (file.size > 10 * 1024 * 1024) { alert('Image is too large (max 10MB).'); return; }
+    setUploading(true);
+    const fd = new FormData(); fd.append('file', file); fd.append('upload_preset', preset);
+    try {
+      const r = await fetch(`https://api.cloudinary.com/v1_1/${cloud}/image/upload`, { method: 'POST', body: fd });
+      const d = await r.json();
+      if (d.secure_url) set('image', d.secure_url);
+      else alert(d?.error?.message || 'Unknown error');
+    } catch { alert('Network error during upload'); } finally { setUploading(false); }
+  };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault(); setSaving(true); await onSave(form); setSaving(false);
+  };
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modal} onClick={e => e.stopPropagation()} style={{ maxWidth: 800 }}>
+        <h3 className={styles.modalTitle}>{initial.id ? 'Edit Slide' : 'Add Slide'}</h3>
+        <form onSubmit={submit} className={styles.formStack}>
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>Label (e.g. SNEAKERS) *</label>
+              <input value={form.label || ''} onChange={e => set('label', e.target.value.toUpperCase())} required />
+            </div>
+            <div className={styles.formGroup} style={{ flex: '0 0 100px' }}>
+              <label>Emoji *</label>
+              <input value={form.emoji || ''} onChange={e => set('emoji', e.target.value)} required placeholder="👟" />
+            </div>
+          </div>
+          
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>Tagline (e.g. FRESH KICKS) *</label>
+              <input value={form.tagline || ''} onChange={e => set('tagline', e.target.value.toUpperCase())} required />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Specs/Details (e.g. VULCANIZED RUBBER) *</label>
+              <input value={form.spec || ''} onChange={e => set('spec', e.target.value.toUpperCase())} required />
+            </div>
+          </div>
+
+          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+            <label>Image (Upload or URL) - Recommended size: 900x900px</label>
+            <div className={styles.imageUploadArea} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files?.[0]) uploadToCloudinary(e.dataTransfer.files[0]); }}>
+              <p>{uploading ? 'Uploading...' : 'Drag & drop image here, or'}</p>
+              <input type="file" accept="image/*" onChange={e => { if (e.target.files?.[0]) uploadToCloudinary(e.target.files[0]); }} className={styles.fileInput} />
+            </div>
+            <input value={form.image || ''} onChange={e => set('image', e.target.value)} placeholder="Or paste image https://..." style={{ marginTop: 8 }} required />
+            {form.image && <img src={form.image} alt="preview" className={styles.logoPreview} style={{ marginTop: 8, maxHeight: 120, objectFit: 'contain' }} />}
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>Link / URL *</label>
+              <input value={form.href || ''} onChange={e => set('href', e.target.value)} required placeholder="/products?category=sneakers" />
+            </div>
+            <div className={styles.formGroup} style={{ flex: '0 0 100px' }}>
+              <label>Sort Order</label>
+              <input type="number" value={form.sortOrder || 0} onChange={e => set('sortOrder', Number(e.target.value))} />
+            </div>
+          </div>
+
+          <div className={styles.formRow}>
+            <label className={styles.checkboxLabel}>
+              <input type="checkbox" checked={form.active ?? true} onChange={e => set('active', e.target.checked)} />
+              ACTIVE
+            </label>
+          </div>
+
+          <div className={styles.modalActions}>
+            <button type="button" className={styles.btnSecondary} onClick={onClose} disabled={saving}>CANCEL</button>
+            <button type="submit" className={styles.btnPrimary} disabled={saving}>{saving ? 'SAVING...' : 'SAVE SLIDE'}</button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

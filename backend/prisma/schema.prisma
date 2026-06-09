@@ -136,3 +136,17 @@ model ImportHistory {
   log          Json?
   createdAt    DateTime @default(now()) @map("created_at")
 }
+
+model HeroSlide {
+  id        Int      @id @default(autoincrement())
+  image     String
+  label     String
+  tagline   String
+  spec      String
+  emoji     String
+  href      String
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}

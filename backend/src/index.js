@@ -1132,6 +1132,72 @@ app.post('/api/admin/scraper/brand-mappings', adminAuth, async (req, res) => {
   }
 });
 
+// ════════════════════════════════════════════════════════════════
+// HERO SLIDES
+// ════════════════════════════════════════════════════════════════
+
+// Public: Get active hero slides
+app.get('/api/hero-slides', async (req, res) => {
+  try {
+    const slides = await prisma.heroSlide.findMany({
+      where: { active: true },
+      orderBy: { sortOrder: 'asc' },
+    });
+    res.json(slides);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch hero slides' });
+  }
+});
+
+// Admin: Get all hero slides
+app.get('/api/admin/hero-slides', adminAuth, async (req, res) => {
+  try {
+    const slides = await prisma.heroSlide.findMany({
+      orderBy: { sortOrder: 'asc' },
+    });
+    res.json(slides);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch hero slides' });
+  }
+});
+
+// Admin: Create hero slide
+app.post('/api/admin/hero-slides', adminAuth, async (req, res) => {
+  try {
+    const slide = await prisma.heroSlide.create({
+      data: req.body,
+    });
+    res.status(201).json(slide);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create hero slide' });
+  }
+});
+
+// Admin: Update hero slide
+app.put('/api/admin/hero-slides/:id', adminAuth, async (req, res) => {
+  try {
+    const slide = await prisma.heroSlide.update({
+      where: { id: parseInt(req.params.id) },
+      data: req.body,
+    });
+    res.json(slide);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update hero slide' });
+  }
+});
+
+// Admin: Delete hero slide
+app.delete('/api/admin/hero-slides/:id', adminAuth, async (req, res) => {
+  try {
+    await prisma.heroSlide.delete({
+      where: { id: parseInt(req.params.id) },
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete hero slide' });
+  }
+});
+
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 app.listen(PORT, () => console.log(`🚀 UrbanEx API running on port ${PORT}`));

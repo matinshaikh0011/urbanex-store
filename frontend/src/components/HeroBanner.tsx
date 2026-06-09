@@ -7,7 +7,7 @@ import styles from './HeroBanner.module.css';
 // ──────────────────────────────────────────────────────────────
 // PRODUCT DROPS — cycles through the four core categories
 // ──────────────────────────────────────────────────────────────
-const PRODUCTS = [
+const DEFAULT_PRODUCTS = [
   {
     image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=900&q=80',
     label: 'SNEAKERS',
@@ -92,10 +92,22 @@ function shouldPlayShutter(): boolean {
 }
 
 export default function HeroBanner() {
+  const [slides, setSlides] = useState<any[]>(DEFAULT_PRODUCTS);
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const statRefs = useRef<(HTMLSpanElement | null)[]>([null, null, null]);
+
+  useEffect(() => {
+    fetch('/api/hero-slides')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setSlides(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // ── THE SHUTTER — storefront roller-door reveal ────────────────
   // 'closed' → 'opening' → 'open'. Initialised lazily so the gate
@@ -140,10 +152,10 @@ export default function HeroBanner() {
   useEffect(() => {
     if (paused) return;
     const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % PRODUCTS.length);
+      setCurrent((prev) => (prev + 1) % slides.length);
     }, 3800);
     return () => clearInterval(interval);
-  }, [paused]);
+  }, [paused, slides.length]);
 
   // Animated stat counters — pure rAF, no libraries
   useEffect(() => {
@@ -199,7 +211,7 @@ export default function HeroBanner() {
     };
   }, []);
 
-  const product = PRODUCTS[current];
+  const product = slides[current] || slides[0];
 
   return (
     <section ref={sectionRef} className={styles.hero}>
@@ -319,9 +331,9 @@ export default function HeroBanner() {
             <span className={styles.cornerSticker}>NEW<br />DROP</span>
 
             <Link href={product.href} className={styles.stage} data-cursor="view">
-              {PRODUCTS.map((p, i) => (
+              {slides.map((p, i) => (
                 <img
-                  key={p.image}
+                  key={p.image + i}
                   src={p.image}
                   alt={p.label}
                   className={`${styles.productImg} ${i === current ? styles.productActive : ''}`}
@@ -336,9 +348,9 @@ export default function HeroBanner() {
             <div className={styles.showcaseFoot}>
               <span className={styles.priceHint}>{product.tagline}</span>
               <div className={styles.dots}>
-                {PRODUCTS.map((p, i) => (
+                {slides.map((p, i) => (
                   <button
-                    key={p.label}
+                    key={p.label + i}
                     className={`${styles.dot} ${i === current ? styles.dotActive : ''}`}
                     onClick={() => setCurrent(i)}
                     onMouseEnter={() => setPaused(true)}
