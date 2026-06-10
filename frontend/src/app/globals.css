@@ -312,13 +312,6 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); }
   50%       { transform: rotate(45deg) translateY(6px); }
 }
 
-/* ================================================================
-   CUSTOM CURSOR
-   ================================================================ */
-body.custom-cursor-active,
-body.custom-cursor-active *:not(input):not(textarea):not(select) {
-  cursor: none !important;
-}
 
 /* ================================================================
    RESPONSIVE BASE
