@@ -87,6 +87,7 @@ model Order {
   advancePaid      Boolean   @default(false) @map("advance_paid")
   paymentMethod    String?   @map("payment_method")
   utrNumber        String?   @map("utr_number")
+  paymentScreenshot String?  @map("payment_screenshot")
   amountPaid       Decimal?  @map("amount_paid") @db.Decimal(10, 2)
   whatsappLeadSent Boolean   @default(false) @map("whatsapp_lead_sent")
   shippingName     String    @map("shipping_name")
@@ -94,6 +95,8 @@ model Order {
   shippingEmail    String    @map("shipping_email")
   shippingPhone    String    @map("shipping_phone")
   notes            String?
+  couponCode       String?   @map("coupon_code")
+  discountAmount   Decimal?  @map("discount_amount") @db.Decimal(10, 2)
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")
 }

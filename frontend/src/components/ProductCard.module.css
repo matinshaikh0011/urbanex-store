@@ -1,13 +1,21 @@
 /* ================================================================
-   PRODUCT CARD — Graffiti Sticker Style
-   White fill cards with thick marker outlines, like sticker art
+   PRODUCT CARD — UrbanEx "Concrete Sticker"
+   Monochrome ink/bone/cement. Matches homepage + logo. No red.
    ================================================================ */
 
 .card {
+  /* Local mono palette tokens */
+  --ux-cement:      #ebe9e6;
+  --ux-cement-deep: #d6d4cf;
+  --ux-asphalt:     #1c1c1e;
+  --ux-bone:        #f4f2ed;
+  --ux-ink:         #0a0a0a;
+  --ux-chalk:       #c8c5be;
+
   display: block;
-  background: var(--bg-secondary);
-  border: var(--border);
-  box-shadow: var(--shadow);
+  background: var(--ux-bone);
+  border: 3px solid var(--ux-ink);
+  box-shadow: 5px 5px 0 var(--ux-ink);
   overflow: hidden;
   position: relative;
   text-decoration: none;
@@ -17,7 +25,7 @@
     box-shadow 0.14s ease;
 }
 
-/* ---- Scroll reveal (Sleek, Professional Fade-Up) ---- */
+/* ---- Scroll reveal ---- */
 .reveal {
   opacity: 0;
   transform: translateY(30px);
@@ -31,17 +39,16 @@
   transform: translateY(0);
 }
 
-/* Stagger transition delay based on grid layout */
 .card:nth-child(4n+1) { transition-delay: 0s; }
 .card:nth-child(4n+2) { transition-delay: 0.1s; }
 .card:nth-child(4n+3) { transition-delay: 0.2s; }
 .card:nth-child(4n+4) { transition-delay: 0.3s; }
 
-/* Hover: sticker lifts up and shifts */
+/* Hover: sticker lifts up + slight wheatpaste rotate */
 .card:hover {
   transform: translate(-4px, -4px) rotate(-0.5deg);
-  box-shadow: var(--shadow-lift);
-  border-color: var(--accent-primary);
+  box-shadow: 8px 8px 0 var(--ux-ink);
+  border-color: var(--ux-ink);
 }
 
 /* Holographic shimmer sweep on hover */
@@ -60,9 +67,9 @@
   background: linear-gradient(
     105deg,
     transparent 0%,
-    rgba(255,255,255,0.03) 35%,
-    rgba(255,255,255,0.08) 50%,
-    rgba(255,255,255,0.03) 65%,
+    rgba(255,255,255,0.04) 35%,
+    rgba(255,255,255,0.10) 50%,
+    rgba(255,255,255,0.04) 65%,
     transparent 100%
   );
   transform: translateX(-150%) skewX(-20deg);
@@ -74,13 +81,13 @@
   animation: cardShimmer 0.8s ease;
 }
 
-/* Orange spray corner accent on hover */
+/* Ink spray corner accent on hover (was orange) */
 .card::before {
   content: '';
   position: absolute;
   top: 0; left: 0;
   width: 0; height: 0;
-  border-top: 40px solid var(--accent-primary);
+  border-top: 40px solid var(--ux-ink);
   border-right: 40px solid transparent;
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -96,14 +103,15 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1;
-  background: var(--bg-tertiary);
+  background: var(--ux-cement-deep);
   overflow: hidden;
-  border-bottom: var(--border);
+  border-bottom: 3px solid var(--ux-ink);
 }
 
 .image {
   object-fit: cover;
-  transition: transform 0.5s var(--ease-out);
+  filter: grayscale(0.12);
+  transition: transform 0.5s var(--ease-out), filter 0.5s ease;
 }
 
 .secondImage {
@@ -113,31 +121,33 @@
 
 .card:hover .image {
   transform: scale(1.07);
+  filter: grayscale(0);
 }
 
 .card:hover .secondImage {
   opacity: 1;
 }
 
-/* ---- SALE sticker tag ---- */
+/* ---- SALE ribbon — bone-on-ink stamp ---- */
 .saleTag {
   position: absolute;
   top: 12px;
   left: -4px;
-  background: var(--accent-primary);
-  color: #fff;
-  font-family: 'Permanent Marker', cursive;
-  font-size: 13px;
+  background: var(--ux-ink);
+  color: var(--ux-bone);
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
   padding: 5px 14px 5px 10px;
   z-index: 2;
-  border: 2px solid var(--border-color);
-  box-shadow: 3px 3px 0 var(--border-color);
+  border: 2px solid var(--ux-ink);
+  box-shadow: 3px 3px 0 var(--ux-chalk);
   transform: rotate(-3deg);
-  /* Ribbon tail */
   clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
 }
 
-/* ---- Wishlist heart button ---- */
+/* ---- Wishlist heart ---- */
 .wishlistBtn {
   position: absolute;
   top: 10px;
@@ -150,22 +160,22 @@
   justify-content: center;
   font-size: 20px;
   line-height: 1;
-  color: var(--accent-primary);
-  background: var(--bg-secondary);
-  border: 2px solid var(--border-color);
-  box-shadow: 2px 2px 0 var(--border-color);
+  color: var(--ux-ink);
+  background: var(--ux-bone);
+  border: 2px solid var(--ux-ink);
+  box-shadow: 2px 2px 0 var(--ux-ink);
   cursor: pointer;
-  transition: transform 0.15s var(--ease-spring), background 0.15s ease;
+  transition: transform 0.15s var(--ease-spring), background 0.15s ease, color 0.15s ease;
 }
 
 .wishlistBtn:hover {
   transform: scale(1.12);
-  background: #fff;
+  background: var(--ux-cement);
 }
 
 .wishlistBtn.wishlisted {
-  background: var(--accent-primary);
-  color: #fff;
+  background: var(--ux-ink);
+  color: var(--ux-bone);
   animation: heartPop 0.35s var(--ease-spring);
 }
 
@@ -175,11 +185,11 @@
   100% { transform: scale(1); }
 }
 
-/* ---- Overlay on hover (quick-add) ---- */
+/* ---- Overlay quick-add ---- */
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(26, 26, 26, 0.75);
+  background: rgba(10, 10, 10, 0.78);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -192,15 +202,17 @@
 }
 
 .quickAdd {
-  background: var(--accent-primary);
-  color: #fff;
-  border: var(--border);
+  background: var(--ux-bone);
+  color: var(--ux-ink);
+  border: 3px solid var(--ux-bone);
   padding: 14px 28px;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 17px;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
   letter-spacing: 3px;
+  text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 4px 4px 0 var(--border-color);
+  box-shadow: 4px 4px 0 var(--ux-ink);
   transform: translateY(16px) scale(0.95);
   transition: transform 0.2s var(--ease-spring), box-shadow 0.15s ease;
 }
@@ -211,11 +223,13 @@
 
 .quickAdd:hover {
   transform: translate(3px, 3px) scale(1);
-  box-shadow: 1px 1px 0 var(--border-color);
+  box-shadow: 1px 1px 0 var(--ux-ink);
 }
 
 .quickAdd.added {
-  background: var(--success);
+  background: var(--ux-ink);
+  color: var(--ux-bone);
+  border-color: var(--ux-bone);
 }
 
 /* ---- Card Info ---- */
@@ -227,7 +241,7 @@
   font-family: 'Bebas Neue', sans-serif;
   font-size: 11px;
   letter-spacing: 4px;
-  color: var(--text-muted);
+  color: rgba(10,10,10,0.45);
   text-transform: uppercase;
   margin-bottom: 4px;
 }
@@ -236,7 +250,7 @@
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--ux-ink);
   margin-bottom: 10px;
   line-height: 1.4;
   display: -webkit-box;
@@ -253,15 +267,16 @@
 
 .price {
   font-family: 'Oswald', sans-serif;
+  font-weight: 700;
   font-size: 20px;
   letter-spacing: 1px;
-  color: var(--text-primary);
+  color: var(--ux-ink);
 }
 
 .originalPrice {
   font-family: 'Inter', sans-serif;
   font-size: 13px;
-  color: var(--text-muted);
+  color: rgba(10,10,10,0.4);
   text-decoration: line-through;
 }
 
@@ -271,14 +286,13 @@
 @media (max-width: 600px) {
   .quickAdd {
     padding: 12px 20px;
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .price { font-size: 17px; }
   .name { font-size: 13px; }
   .info { padding: 12px; }
 
-  /* Reset stagger for 2-column mobile layout */
   .card:nth-child(n) { transition-delay: 0s; }
   .card:nth-child(2n+1) { transition-delay: 0s; }
   .card:nth-child(2n+2) { transition-delay: 0.1s; }

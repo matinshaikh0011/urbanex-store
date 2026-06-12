@@ -569,9 +569,20 @@ app.put('/api/products/:id/stock', adminAuth, async (req, res) => {
 
 app.post('/api/orders', async (req, res) => {
   try {
-    const { productId, size, color, quantity, totalAmount, paymentMethod, utrNumber, amountPaid, shippingName, shippingAddress, shippingEmail, shippingPhone, items } = req.body;
+    const { productId, size, color, quantity, totalAmount, paymentMethod, utrNumber, amountPaid, shippingName, shippingAddress, shippingEmail, shippingPhone, items, couponCode, discountAmount } = req.body;
     const cleanUtr = (utrNumber || '').toString().trim();
     if (!/^\d{12}$/.test(cleanUtr)) return res.status(400).json({ error: 'A valid 12-digit UTR / Transaction ID is required.' });
+
+    // Update coupon usage if provided
+    if (couponCode) {
+      const coupon = await prisma.coupon.findFirst({ where: { code: couponCode.toUpperCase(), isActive: true } });
+      if (coupon) {
+        await prisma.coupon.update({
+          where: { id: coupon.id },
+          data: { usedCount: { increment: 1 } },
+        });
+      }
+    }
 
     const orderId = generateOrderId();
     const firstItem = items && items.length > 0 ? items[0] : null;
@@ -585,6 +596,8 @@ app.post('/api/orders', async (req, res) => {
         size: firstItem ? firstItem.size : (size || null),
         color: firstItem ? firstItem.color : (color || null),
         quantity: firstItem ? (firstItem.quantity || 1) : (quantity || 1),
+        couponCode: couponCode ? couponCode.toUpperCase() : null,
+        discountAmount: discountAmount ? parseFloat(discountAmount) : null,
       },
     });
     res.status(201).json(order);

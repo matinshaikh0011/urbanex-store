@@ -13,7 +13,8 @@
       "Bash(taskkill *)",
       "Bash(powershell -Command \"Stop-Process -Id 3252 -Force -ErrorAction SilentlyContinue\")",
       "Bash(powershell *)",
-      "Bash(Start-Sleep *)"
+      "Bash(Start-Sleep *)",
+      "Bash(curl.exe *)"
     ]
   }
 }

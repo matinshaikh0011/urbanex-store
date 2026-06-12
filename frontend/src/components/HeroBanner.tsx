@@ -51,6 +51,11 @@ const TICKER = [
   'COP OR DROP',
 ];
 
+// Inline SVG crack — used as the seam between the light & dark slabs.
+// Hand-tuned to feel organic, not algorithmic; mirrors the cracks on the logo.
+const CRACK_SVG =
+  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 1000' preserveAspectRatio='none'><path d='M20 0 L18 60 L22 130 L17 210 L24 290 L19 360 L23 440 L16 520 L22 600 L18 690 L25 770 L17 850 L21 930 L20 1000' stroke='%230a0a0a' stroke-width='2.4' fill='none' opacity='0.85'/><path d='M20 0 L18 60 L22 130 L17 210 L24 290 L19 360 L23 440 L16 520 L22 600 L18 690 L25 770 L17 850 L21 930 L20 1000' stroke='%23f4f2ed' stroke-width='0.8' fill='none' opacity='0.5'/></svg>\")";
+
 // ── Shutter trigger gate ───────────────────────────────────────
 // Survives client-side navigation within one document load; resets on
 // a real page load. Prevents the reveal from replaying when the user
@@ -215,29 +220,47 @@ export default function HeroBanner() {
 
   return (
     <section ref={sectionRef} className={styles.hero}>
-      {/* ════════ ANIMATED BACKGROUND (GPU-cheap) ════════ */}
+      {/* ════════ DIPTYCH BACKGROUND — light cement | dark asphalt ════════ */}
       <div className={styles.bg} aria-hidden>
-        <div className={styles.bgMesh} />
-        <div className={styles.bgStripes} />
-        <div className={styles.bgGrid} />
-        <div className={styles.bgWordWrap}>
-          <div className={styles.bgWordTrack}>
-            <span>{product.label}</span>
-            <span className={styles.bgWordOutline}>{product.label}</span>
-            <span>{product.label}</span>
+        {/* Left half: light cement slab */}
+        <div className={styles.slabLight}>
+          <div className={styles.slabGrain} />
+          <div className={styles.slabStains} />
+        </div>
+        {/* Right half: dark asphalt slab */}
+        <div className={styles.slabDark}>
+          <div className={styles.slabGrain} />
+          <div className={styles.slabStains} />
+        </div>
+
+        {/* Cracked seam down the centre */}
+        <div
+          className={styles.crack}
+          style={{ backgroundImage: CRACK_SVG }}
+        />
+
+        {/* Ghost wordmark drifting across (paint stencil) */}
+        <div className={styles.ghostWordWrap}>
+          <div className={styles.ghostWordTrack}>
+            <span>URBANEX</span>
+            <span className={styles.ghostWordOutline}>URBANEX</span>
+            <span>URBANEX</span>
           </div>
         </div>
-        {/* Floating graffiti shapes (desktop/tablet) */}
-        <span className={`${styles.shape} ${styles.shapeRing}`} />
-        <span className={`${styles.shape} ${styles.shapeSquare}`} />
-        <span className={`${styles.shape} ${styles.shapeDot}`} />
-        <span className={`${styles.shape} ${styles.shapePlus}`}>+</span>
-        <span className={`${styles.shape} ${styles.shapeStar}`}>✦</span>
-        <span className={`${styles.shape} ${styles.shapeZig}`} />
 
-        {/* Mobile-only animated background: rising graffiti symbols + sheen */}
+        {/* Spray drips falling from the seam */}
+        <span className={`${styles.drip} ${styles.dripA}`} />
+        <span className={`${styles.drip} ${styles.dripB}`} />
+        <span className={`${styles.drip} ${styles.dripC}`} />
+
+        {/* Stencil glyphs */}
+        <span className={`${styles.glyph} ${styles.glyphPlus}`}>+</span>
+        <span className={`${styles.glyph} ${styles.glyphStar}`}>✦</span>
+        <span className={`${styles.glyph} ${styles.glyphX}`}>✕</span>
+        <span className={`${styles.glyph} ${styles.glyphCircle}`} />
+
+        {/* Mobile-only: rising glyphs over a single stacked background */}
         <div className={styles.mobileFX} aria-hidden>
-          <span className={styles.mSheen} />
           {['✦', '✕', '★', '◆', '+', '●', '✦', '✕', '★'].map((g, i) => (
             <span key={i} className={styles.mGlyph}>{g}</span>
           ))}
@@ -370,7 +393,7 @@ export default function HeroBanner() {
         <div className={styles.scrollArrow} />
       </div>
 
-      {/* ════════ THE STOREFRONT SHUTTER — reveal layer over the hero ════════ */}
+      {/* ════════ THE DIPTYCH SHUTTER — two slabs part from the seam ════════ */}
       {shutterState !== 'open' && (
         <div
           className={`${styles.shutter} ${shutterState === 'opening' ? styles.shutterOpening : ''}`}
@@ -380,45 +403,43 @@ export default function HeroBanner() {
           onTouchMove={onShutterTouchMove}
           onTouchEnd={onShutterTouchEnd}
         >
-          {/* Interior light / spotlight warm-up + product silhouette (behind the door) */}
-          <div className={styles.shutterGlow} aria-hidden>
-            <img
-              src={product.image}
-              alt=""
-              className={styles.shutterSilhouette}
-              aria-hidden
-              draggable={false}
-            />
-          </div>
+          {/* Interior glow behind the slabs */}
+          <div className={styles.shutterGlow} aria-hidden />
 
-          {/* Top housing / drum — the slats roll up into this */}
-          <div className={styles.shutterHousing} aria-hidden />
-
-          {/* The roller door (transform target) */}
-          <div className={styles.shutterDoor}>
-            <div className={styles.shutterSlats} aria-hidden />
-            <span className={styles.shutterSheen} aria-hidden />
-
-            {/* Storefront sign — the readable brand (Variant A: red plate) */}
-            <div className={styles.shutterSign}>
-              <span className={styles.shutterSignWord}>URBANEX</span>
-              <span className={styles.shutterSignSub}>EST. STREETWEAR</span>
-            </div>
-
-            {/* Weighted bottom rail with grip handle */}
-            <div className={styles.shutterRail} aria-hidden>
-              <span className={styles.shutterHandle} />
+          {/* Left slab — light cement */}
+          <div className={`${styles.shutterSlab} ${styles.shutterSlabLeft}`}>
+            <div className={styles.shutterSlabTex} aria-hidden />
+            <div className={styles.shutterSignLeft}>
+              <span className={styles.shutterSignWordLight}>URBAN</span>
             </div>
           </div>
+
+          {/* Right slab — dark asphalt */}
+          <div className={`${styles.shutterSlab} ${styles.shutterSlabRight}`}>
+            <div className={styles.shutterSlabTex} aria-hidden />
+            <div className={styles.shutterSignRight}>
+              <span className={styles.shutterSignWordDark}>EX</span>
+            </div>
+          </div>
+
+          {/* The crack/seam that splits */}
+          <div
+            className={styles.shutterCrack}
+            style={{ backgroundImage: CRACK_SVG }}
+            aria-hidden
+          />
+
+          {/* Sub-tag, centered */}
+          <div className={styles.shutterTag} aria-hidden>EST. STREETWEAR</div>
 
           {/* Controls */}
           <button
             className={styles.shutterLift}
             onClick={liftShutter}
-            aria-label="Lift the shutter and enter the store"
+            aria-label="Open the doors and enter the store"
           >
-            <span className={styles.shutterChevron} aria-hidden>⌃</span>
-            LIFT TO ENTER
+            <span className={styles.shutterChevron} aria-hidden>⇔</span>
+            PART TO ENTER
           </button>
           <button className={styles.shutterSkip} onClick={liftShutter} aria-label="Skip intro and enter the store">
             SKIP →

@@ -10,7 +10,9 @@ interface Order {
   shippingAddress?: string; shippingEmail?: string; totalAmount: number;
   amountPaid?: number | null; status: string; createdAt: string;
   utrNumber?: string | null; paymentMethod?: string | null; notes?: string | null;
+  paymentScreenshot?: string | null;
   size?: string | null; product?: { name: string; brand?: { name: string } } | null;
+  couponCode?: string | null; discountAmount?: number | null;
 }
 interface Product {
   id: number; name: string; slug: string; category: string; price: number;
@@ -77,7 +79,7 @@ async function api(path: string, opts?: RequestInit) {
 export default function AdminPage() {
   const router = useRouter();
   const { toasts, show } = useToast();
-  const [section, setSection] = useState<'overview' | 'orders' | 'products' | 'brands' | 'categories' | 'hero' | 'coupons' | 'inventory' | 'csv'>('overview');
+  const [section, setSection] = useState<'overview' | 'orders' | 'payments' | 'products' | 'brands' | 'categories' | 'hero' | 'coupons' | 'inventory' | 'csv'>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Verify auth on mount
@@ -93,6 +95,7 @@ export default function AdminPage() {
   const NAV = [
     { id: 'overview', icon: '📊', label: 'Overview' },
     { id: 'orders', icon: '📦', label: 'Orders' },
+    { id: 'payments', icon: '💳', label: 'Manage Payments' },
     { id: 'products', icon: '👟', label: 'Products' },
     { id: 'brands', icon: '🏷️', label: 'Brands' },
     { id: 'categories', icon: '🗂️', label: 'Categories' },
@@ -142,6 +145,7 @@ export default function AdminPage() {
         <div className={styles.content}>
           {section === 'overview' && <OverviewSection show={show} />}
           {section === 'orders' && <OrdersSection show={show} />}
+          {section === 'payments' && <PaymentsSection show={show} />}
           {section === 'products' && <ProductsSection show={show} />}
           {section === 'brands' && <BrandsSection show={show} />}
           {section === 'categories' && <CategoriesSection show={show} />}
@@ -370,7 +374,7 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
             <h3 className={styles.modalTitle}>Order {detailOrder.orderId}</h3>
             <div className={styles.detailGrid}>
-              {[['Customer', detailOrder.shippingName], ['Phone', detailOrder.shippingPhone], ['Email', detailOrder.shippingEmail], ['Address', detailOrder.shippingAddress], ['Product', detailOrder.product?.name], ['Size', detailOrder.size], ['Amount', fmt(Number(detailOrder.totalAmount))], ['Paid', detailOrder.amountPaid ? fmt(Number(detailOrder.amountPaid)) : '"”'], ['UTR', detailOrder.utrNumber || '"”'], ['Payment', detailOrder.paymentMethod || '"”'], ['Status', detailOrder.status], ['Date', fmtDate(detailOrder.createdAt)]].map(([k, v]) => (
+              {[['Customer', detailOrder.shippingName], ['Phone', detailOrder.shippingPhone], ['Email', detailOrder.shippingEmail], ['Address', detailOrder.shippingAddress], ['Product', detailOrder.product?.name], ['Size', detailOrder.size], ['Amount', fmt(Number(detailOrder.totalAmount))], ['Paid', detailOrder.amountPaid ? fmt(Number(detailOrder.amountPaid)) : '"”'], ['UTR', detailOrder.utrNumber || '"”'], ['Payment', detailOrder.paymentMethod || '"”'], ['Coupon', detailOrder.couponCode ? `${detailOrder.couponCode} (-${fmt(Number(detailOrder.discountAmount))})` : '"”'], ['Status', detailOrder.status], ['Date', fmtDate(detailOrder.createdAt)]].map(([k, v]) => (
                 <div key={k as string} className={styles.detailRow}><span className={styles.detailKey}>{k}</span><span>{v || '"”'}</span></div>
               ))}
             </div>
@@ -385,6 +389,90 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // PRODUCTS SECTION
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ════════════════════════════════════════════════════════════════
+// MANAGE PAYMENTS SECTION — screenshots by customer
+// ════════════════════════════════════════════════════════════════
+function PaymentsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [onlyWithProof, setOnlyWithProof] = useState(false);
+  const [zoom, setZoom] = useState<{ src: string; name: string } | null>(null);
+
+  const load = useCallback(() => {
+    setLoading(true);
+    api('/api/admin/orders').then(r => r.json()).then(d => { setOrders(Array.isArray(d) ? d : []); setLoading(false); }).catch(() => { show('Failed to load payments', 'err'); setLoading(false); });
+  }, [show]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const updateStatus = async (orderId: string, status: string) => {
+    setOrders(prev => prev.map(o => o.orderId === orderId ? { ...o, status } : o));
+    const res = await api(`/api/admin/orders/${orderId}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
+    if (!res.ok) { show('Failed to update', 'err'); load(); } else show(`Status -> ${status}`);
+  };
+
+  const filtered = orders.filter(o => {
+    if (onlyWithProof && !o.paymentScreenshot) return false;
+    const q = search.toLowerCase();
+    return !q || (o.shippingName || '').toLowerCase().includes(q) || o.orderId.toLowerCase().includes(q) || (o.utrNumber || '').includes(q);
+  });
+
+  return (
+    <div>
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>Manage Payments</h2>
+        <input className={styles.searchInput} placeholder="Search name, order ID, UTR..." value={search} onChange={e => setSearch(e.target.value)} />
+      </div>
+      <div className={styles.filterRow}>
+        <button className={`${styles.filterBtn} ${!onlyWithProof ? styles.filterActive : ''}`} onClick={() => setOnlyWithProof(false)}>All</button>
+        <button className={`${styles.filterBtn} ${onlyWithProof ? styles.filterActive : ''}`} onClick={() => setOnlyWithProof(true)}>With Screenshot</button>
+      </div>
+
+      {loading ? <div className={styles.loading}>Loading...</div> : filtered.length === 0 ? (
+        <div className={styles.loading} style={{ color: '#888' }}>No payments found.</div>
+      ) : (
+        <div className={styles.payGrid}>
+          {filtered.map(o => (
+            <div key={o.id} className={styles.payCard}>
+              <div className={styles.payShot}>
+                {o.paymentScreenshot ? (
+                  <img src={o.paymentScreenshot} alt={`Payment by ${o.shippingName}`} onClick={() => setZoom({ src: o.paymentScreenshot!, name: o.shippingName })} />
+                ) : (
+                  <div className={styles.payNoShot}>No screenshot uploaded</div>
+                )}
+              </div>
+              <div className={styles.payInfo}>
+                <span className={styles.payName}>{o.shippingName}</span>
+                <span className={styles.payMeta}>{o.orderId} · {fmt(Number(o.amountPaid || o.totalAmount))}</span>
+                <span className={styles.payUtr}>UTR: {o.utrNumber || '-'}</span>
+                <a className={styles.payPhone} href={`https://wa.me/91${(o.shippingPhone || '').replace(/\D/g, '').slice(-10)}`} target="_blank" rel="noopener">{o.shippingPhone}</a>
+                <span className={styles.badge} style={{ background: statusColor(o.status), alignSelf: 'flex-start' }}>{o.status}</span>
+                <select className={styles.statusSelect} value={o.status} onChange={e => updateStatus(o.orderId, e.target.value)}>
+                  {['Pending Verification', 'Verified', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'].map(s => <option key={s}>{s}</option>)}
+                </select>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {zoom && (
+        <div className={styles.modalOverlay} onClick={() => setZoom(null)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>
+            <h3 className={styles.modalTitle}>{zoom.name} — Payment Proof</h3>
+            <img src={zoom.src} alt="Payment screenshot" style={{ width: '100%', border: '2px solid #111' }} />
+            <div className={styles.modalActions}>
+              <a className={styles.btnPrimary} href={zoom.src} download target="_blank" rel="noopener" style={{ textDecoration: 'none', textAlign: 'center' }}>OPEN / DOWNLOAD</a>
+              <button className={styles.btnSecondary} onClick={() => setZoom(null)}>CLOSE</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const CATEGORIES = ['sneakers', 'watches', 'luxury-watches', 'glasses', 'handbags', 'clothing', 'ua-batch'];
 const SNEAKER_SIZES = ['6', '7', '8', '9', '10', '11', '12'];
 const APPAREL_SIZES = ['S', 'M', 'L', 'XL', 'XXL'];

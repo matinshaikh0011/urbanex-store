@@ -18,16 +18,7 @@ interface Category {
   sortOrder: number;
 }
 
-// ── Category icons map ───────────────────────────────────────────
-const CAT_ICONS: Record<string, string> = {
-  sneakers: '👟',
-  watches: '⌚',
-  'luxury-watches': '⌚',
-  glasses: '🕶️',
-  handbags: '👜',
-  clothing: '👕',
-  'ua-batch': '🔥',
-};
+
 
 // ── Static fallback categories (used when API is down) ───────────
 const FALLBACK_CATEGORIES: Category[] = [
@@ -90,6 +81,16 @@ function ScrambleText() {
     </span>
   );
 }
+
+// ── Utility tape strip — top dark marquee ────────────────────────
+const UTILITY_NOTES = [
+  'FREE SHIPPING OVER ₹999',
+  '7-DAY EASY RETURNS',
+  'COD AVAILABLE',
+  '100% AUTHENTIC',
+  'INSTANT WHATSAPP SUPPORT',
+  'NEW DROP 2026',
+];
 
 // ── Search overlay ───────────────────────────────────────────────
 interface SearchProduct {
@@ -206,7 +207,7 @@ function MegaMenu({ categories, onClose }: MegaMenuProps) {
                 className={styles.megaParent}
                 onClick={onClose}
               >
-                <span className={styles.megaParentIcon}>{CAT_ICONS[parent.slug] || '▸'}</span>
+                <span className={styles.megaParentIcon}>▸</span>
                 {parent.name}
               </Link>
               {/* Children */}
@@ -265,7 +266,7 @@ function MobileAccordion({ categories, onClose }: MobileAccordionProps) {
                 className={styles.accordionParentLink}
                 onClick={onClose}
               >
-                <span>{CAT_ICONS[parent.slug] || '▸'}</span>
+                <span>▸</span>
                 {parent.name}
               </Link>
               {children.length > 0 && (
@@ -340,6 +341,16 @@ export default function Header() {
       .catch(() => setCategories(FALLBACK_CATEGORIES));
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
   const closeAll = useCallback(() => {
     setMenuOpen(false);
     setMegaOpen(false);
@@ -388,7 +399,18 @@ export default function Header() {
   }, [megaOpen]);
 
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header} ${menuOpen ? styles.mobileOpen : ''}`}>
+      {/* Utility tape — dark marquee strip above the main bar */}
+      <div className={styles.utilityTape} aria-hidden>
+        <div className={styles.utilityTrack}>
+          {[...UTILITY_NOTES, ...UTILITY_NOTES, ...UTILITY_NOTES].map((note, i) => (
+            <span key={i} className={styles.utilityItem}>
+              {note}<i>✦</i>
+            </span>
+          ))}
+        </div>
+      </div>
+
       <div className={styles.container}>
         {/* Logo */}
         <Link href="/" className={styles.logo} onClick={closeAll}>
@@ -476,7 +498,7 @@ export default function Header() {
             </svg>
             {mounted && itemCount > 0 && <span className={styles.cartCount}>{itemCount}</span>}
           </Link>
-          <button className={styles.menuToggle} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+          <button className={`${styles.menuToggle} ${menuOpen ? styles.open : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
             <span></span><span></span><span></span>
           </button>
         </div>

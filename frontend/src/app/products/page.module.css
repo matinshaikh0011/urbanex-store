@@ -1,102 +1,98 @@
 /* ================================================================
-   PRODUCTS PAGE — Premium Animated Storefront
-   Animated hero, staggered grid, interactive filters
+   PRODUCTS PAGE — UrbanEx "Concrete Diptych"
+   Monochrome cement/asphalt/bone/ink. Matches homepage + logo.
    ================================================================ */
 
-/* ---- Keyframe Animations ---- */
+.main {
+  /* Local mono palette tokens */
+  --ux-cement:      #ebe9e6;
+  --ux-cement-deep: #d6d4cf;
+  --ux-asphalt:     #1c1c1e;
+  --ux-asphalt-mid: #2a2a2e;
+  --ux-bone:        #f4f2ed;
+  --ux-ink:         #0a0a0a;
+  --ux-chalk:       #c8c5be;
+
+  min-height: calc(100vh - 74px);
+  padding: 0;
+  background: var(--ux-cement);
+}
+
+/* ---- Keyframes ---- */
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
 @keyframes scaleIn {
   from { opacity: 0; transform: scale(0.85) translateY(20px); }
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
-
 @keyframes shimmer {
   0%   { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
-
-@keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(204, 0, 0, 0.3); }
-  50%      { box-shadow: 0 0 20px 4px rgba(204, 0, 0, 0.15); }
+@keyframes stencilFade {
+  from { opacity: 0; letter-spacing: 12px; }
+  to   { opacity: 1; letter-spacing: 6px; }
 }
-
-@keyframes borderDraw {
-  from { clip-path: inset(0 100% 0 0); }
-  to   { clip-path: inset(0 0 0 0); }
+@keyframes underlineDraw {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
 }
-
 @keyframes floatUp {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-6px); }
 }
-
-@keyframes countPop {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.15); }
-  100% { transform: scale(1); }
+@keyframes skeletonShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 /* ================================================================
-   PAGE HERO BANNER — Category-aware animated header
+   PAGE HERO — dark asphalt slab with concrete grain
    ================================================================ */
 .pageHero {
   position: relative;
-  padding: 48px 24px 40px;
-  background: var(--bg-dark);
-  border-bottom: var(--border);
+  padding: 60px 24px 52px;
+  background: var(--ux-asphalt);
+  border-bottom: 3px solid var(--ux-ink);
   overflow: hidden;
-  margin-bottom: 24px;
+  margin-bottom: 0;
+  isolation: isolate;
 }
 
-/* Animated gradient stripe at top */
+/* Concrete grain */
 .pageHero::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(
-    90deg,
-    var(--accent-primary),
-    #F5C400,
-    #00C8C8,
-    #B400DC,
-    var(--accent-primary)
-  );
-  background-size: 300% 100%;
-  animation: shimmer 4s linear infinite;
+  inset: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='500' height='500' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 360px 360px;
+  mix-blend-mode: screen;
+  opacity: 0.16;
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* Floating particles in hero */
+/* Ghost wordmark + stain depth */
 .pageHero::after {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: -10%;
   background:
-    radial-gradient(circle at 15% 50%, rgba(204,0,0,0.06) 0%, transparent 50%),
-    radial-gradient(circle at 85% 30%, rgba(245,196,0,0.04) 0%, transparent 50%),
-    radial-gradient(circle at 50% 80%, rgba(0,200,200,0.03) 0%, transparent 50%);
-  animation: floatUp 8s ease-in-out infinite;
+    radial-gradient(ellipse 38% 40% at 18% 30%, rgba(255,255,255,0.04), transparent 60%),
+    radial-gradient(ellipse 40% 32% at 82% 72%, rgba(0,0,0,0.35), transparent 60%);
   pointer-events: none;
+  z-index: 0;
 }
 
 .pageHeroContent {
@@ -107,62 +103,76 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
 }
 
 .pageHeroTitle {
   font-family: 'Oswald', sans-serif;
-  font-size: clamp(32px, 5vw, 52px);
+  font-size: clamp(34px, 5.5vw, 58px);
   font-weight: 700;
   letter-spacing: 6px;
-  color: var(--text-light);
-  text-shadow: 4px 4px 0 rgba(0,0,0,0.3);
-  animation: slideUp 0.5s var(--ease-out) both;
+  color: var(--ux-bone);
+  text-transform: uppercase;
+  text-shadow: 4px 5px 0 var(--ux-ink);
+  animation: stencilFade 0.8s cubic-bezier(0.16,1,0.3,1) both;
 }
 
-.pageHeroTitle .heroAccent {
-  color: var(--accent-primary);
+/* Global heroAccent class used in JSX */
+.pageHeroTitle :global(.heroAccent) {
+  color: var(--ux-chalk);
   position: relative;
 }
-
-.pageHeroTitle .heroAccent::after {
+.pageHeroTitle :global(.heroAccent)::after {
   content: '';
   position: absolute;
-  bottom: -4px;
+  bottom: -6px;
   left: 0;
   right: 0;
-  height: 3px;
-  background: var(--accent-primary);
-  animation: borderDraw 0.6s var(--ease-out) 0.3s both;
+  height: 4px;
+  background: var(--ux-bone);
+  transform-origin: left;
+  animation: underlineDraw 0.6s cubic-bezier(0.16,1,0.3,1) 0.4s both;
 }
 
 .pageHeroCount {
   font-family: 'Oswald', sans-serif;
-  font-size: 18px;
+  font-size: 16px;
+  font-weight: 600;
   letter-spacing: 3px;
-  color: rgba(255,255,255,0.5);
-  animation: fadeIn 0.6s ease 0.2s both;
+  color: rgba(244,242,237,0.55);
+  background: var(--ux-ink);
+  border: 2px solid var(--ux-bone);
+  box-shadow: 4px 4px 0 var(--ux-bone);
+  padding: 8px 16px;
+  white-space: nowrap;
+  animation: fadeIn 0.6s ease 0.3s both;
+}
+.pageHeroCount strong {
+  color: var(--ux-bone);
+  font-size: 22px;
+  margin-right: 4px;
 }
 
-.pageHeroCount strong {
-  color: var(--accent-primary);
-  font-size: 28px;
-  animation: countPop 0.5s ease 0.4s both;
-  display: inline-block;
+/* Crack divider beneath hero */
+.pageHero + .container::before {
+  content: '';
+  display: block;
+  height: 18px;
+  margin: 0 -20px 24px;
+  background-color: transparent;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 18' preserveAspectRatio='none'><path d='M0 9 L80 7 L160 11 L260 6 L360 12 L450 8 L560 11 L660 7 L780 12 L880 8 L990 11 L1100 7 L1220 12 L1330 8 L1440 11 L1600 9' stroke='%230a0a0a' stroke-width='2' fill='none' opacity='0.85'/></svg>");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 /* ================================================================
    MAIN LAYOUT
    ================================================================ */
-.main {
-  min-height: calc(100vh - 74px);
-  padding: 0;
-  background: var(--bg-primary);
-}
-
 .container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 20px 40px;
+  padding: 0 20px 48px;
 }
 
 /* ================================================================
@@ -172,201 +182,131 @@
   display: none;
   width: 100%;
   padding: 16px 20px;
-  background: var(--bg-secondary);
-  border: var(--border);
-  box-shadow: var(--shadow);
-  color: var(--text-primary);
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 17px;
-  letter-spacing: 2px;
+  background: var(--ux-ink);
+  border: 3px solid var(--ux-ink);
+  box-shadow: 5px 5px 0 var(--ux-chalk);
+  color: var(--ux-bone);
+  font-family: 'Oswald', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
   cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition: transform 0.12s var(--ease-spring), box-shadow 0.12s ease;
 }
-
 .mobileFilterBtn:hover {
-  transform: translate(2px, 2px);
-  box-shadow: var(--shadow-hover);
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 var(--ux-chalk);
 }
-
 .filterCount {
-  background: var(--accent-primary);
-  color: #fff;
-  font-family: 'Bebas Neue', sans-serif;
+  background: var(--ux-bone);
+  color: var(--ux-ink);
+  font-family: 'Oswald', sans-serif;
   font-size: 14px;
-  padding: 3px 10px;
-  border: 2px solid var(--border-color);
+  font-weight: 700;
+  padding: 2px 12px;
+  border: 2px solid var(--ux-bone);
   letter-spacing: 1px;
-  animation: pulseGlow 2s ease-in-out infinite;
 }
 
 /* ================================================================
-   FILTERS PANEL — Animated sticker wall
+   FILTERS PANEL — concrete slab
    ================================================================ */
 .filtersPanel {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
-  padding: 24px;
-  background: var(--bg-secondary);
-  border: var(--border);
-  box-shadow: var(--shadow);
-  margin-bottom: 20px;
+  gap: 22px;
+  padding: 26px;
+  background: var(--ux-bone);
+  border: 3px solid var(--ux-ink);
+  box-shadow: 6px 6px 0 var(--ux-ink);
+  margin-bottom: 26px;
   animation: slideDown 0.4s var(--ease-out);
   position: relative;
   overflow: hidden;
+  isolation: isolate;
 }
 
-/* Decorative top accent line */
+/* Concrete grain on the slab */
 .filtersPanel::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent-primary), #F5C400, transparent);
-  animation: borderDraw 0.8s var(--ease-out) 0.2s both;
+  inset: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='500' height='500' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+  background-size: 320px 320px;
+  mix-blend-mode: multiply;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .filterGroup {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   animation: fadeIn 0.3s ease both;
 }
-
 .filterGroup:nth-child(1) { animation-delay: 0.05s; }
 .filterGroup:nth-child(2) { animation-delay: 0.1s; }
 .filterGroup:nth-child(3) { animation-delay: 0.15s; }
+.filterGroup:nth-child(4) { animation-delay: 0.2s; }
 
 .filterLabel {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 12px;
-  letter-spacing: 4px;
-  color: var(--text-muted);
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--border-color);
-}
-
-/* ---- Category tag stickers ---- */
-.categoryTags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.categoryTag {
-  padding: 8px 16px;
-  background: var(--bg-primary);
-  border: var(--border);
-  box-shadow: var(--shadow-btn);
-  font-family: 'Bebas Neue', sans-serif;
   font-size: 13px;
-  letter-spacing: 2px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: transform 0.15s var(--ease-spring), box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
-  position: relative;
-  overflow: hidden;
+  letter-spacing: 5px;
+  color: rgba(10,10,10,0.5);
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--ux-ink);
 }
 
-/* Shimmer on hover */
-.categoryTag::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%);
-  background-size: 200% 100%;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.categoryTag:hover::after {
-  opacity: 1;
-  animation: shimmer 0.8s ease;
-}
-
-.categoryTag:hover {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  transform: translate(-2px, -2px) rotate(-0.5deg);
-  box-shadow: var(--shadow);
-}
-
-.categoryTag.active {
-  background: var(--accent-primary);
-  color: #fff;
-  border-color: var(--border-color);
-  box-shadow: var(--shadow-btn);
-  transform: translate(-2px, -2px);
-  font-style: normal;
-}
-
-/* ---- Brand button stickers ---- */
+/* ---- Category + brand sticker buttons ---- */
+.categoryTags,
 .brandButtons {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
+.categoryTag,
 .brandBtn {
-  padding: 8px 16px;
-  background: var(--bg-primary);
-  border: var(--border);
-  box-shadow: var(--shadow-btn);
-  font-family: 'Bebas Neue', sans-serif;
+  padding: 9px 18px;
+  background: var(--ux-bone);
+  border: 2px solid var(--ux-ink);
+  box-shadow: 3px 3px 0 var(--ux-ink);
+  font-family: 'Oswald', sans-serif;
   font-size: 13px;
+  font-weight: 600;
   letter-spacing: 2px;
-  color: var(--text-secondary);
+  text-transform: uppercase;
+  color: var(--ux-ink);
   cursor: pointer;
   transition: transform 0.15s var(--ease-spring), box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
+.categoryTag:hover,
 .brandBtn:hover {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
+  background: var(--ux-cement);
   transform: translate(-2px, -2px);
-  box-shadow: var(--shadow);
+  box-shadow: 5px 5px 0 var(--ux-ink);
 }
 
+.categoryTag.active,
 .brandBtn.active {
-  background: var(--bg-dark);
-  color: var(--text-light);
-  border-color: var(--border-color);
-  box-shadow: var(--shadow-btn);
-  transform: translate(-2px, -2px);
+  background: var(--ux-ink);
+  color: var(--ux-bone);
+  border-color: var(--ux-ink);
+  box-shadow: 3px 3px 0 var(--ux-chalk);
+  transform: translate(-1px, -1px);
 }
 
-/* ---- Price select ---- */
-.filterSelect {
-  padding: 12px 16px;
-  background: var(--bg-primary);
-  border: var(--border);
-  box-shadow: 3px 3px 0 var(--border-color);
-  color: var(--text-primary);
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 15px;
-  letter-spacing: 2px;
-  cursor: pointer;
-  outline: none;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-  appearance: none;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%231A1A1A'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  padding-right: 40px;
-}
-
-.filterSelect:focus {
-  transform: translate(-2px, -2px);
-  box-shadow: 5px 5px 0 var(--accent-primary);
-}
-
-/* ---- Price range slider (dual handle) ---- */
+/* ---- Price range slider (dual handle) — monochrome ---- */
 .priceValues {
   display: flex;
   justify-content: space-between;
@@ -374,14 +314,14 @@
   font-size: 15px;
   font-weight: 600;
   letter-spacing: 1px;
-  color: var(--text-primary);
+  color: var(--ux-ink);
   margin-bottom: 14px;
 }
 .priceValues span {
-  background: var(--bg-primary);
-  border: 2px solid var(--border-color);
-  box-shadow: 2px 2px 0 var(--border-color);
-  padding: 3px 12px;
+  background: var(--ux-cement);
+  border: 2px solid var(--ux-ink);
+  box-shadow: 2px 2px 0 var(--ux-ink);
+  padding: 4px 14px;
 }
 
 .slider {
@@ -394,20 +334,18 @@
   position: absolute;
   left: 0; right: 0;
   height: 6px;
-  background: var(--bg-tertiary);
-  border: 2px solid var(--border-color);
+  background: var(--ux-cement-deep);
+  border: 2px solid var(--ux-ink);
 }
 .sliderFill {
   position: absolute;
   height: 6px;
   left: var(--lo, 0%);
   right: calc(100% - var(--hi, 100%));
-  background: var(--accent-primary);
-  border-top: 2px solid var(--border-color);
-  border-bottom: 2px solid var(--border-color);
+  background: var(--ux-ink);
+  border-top: 2px solid var(--ux-ink);
+  border-bottom: 2px solid var(--ux-ink);
 }
-
-/* Both range inputs stacked; only thumbs are interactive */
 .sliderInput {
   position: absolute;
   left: 0;
@@ -425,117 +363,77 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #fff;
-  border: 3px solid var(--accent-primary);
-  box-shadow: 2px 2px 0 var(--border-color);
+  background: var(--ux-bone);
+  border: 3px solid var(--ux-ink);
+  box-shadow: 2px 2px 0 var(--ux-ink);
   cursor: pointer;
   transition: transform 0.12s var(--ease-spring);
 }
 .sliderInput::-webkit-slider-thumb:hover { transform: scale(1.15); }
-.sliderInput::-webkit-slider-thumb:active { transform: scale(1.05); background: var(--accent-primary); }
+.sliderInput::-webkit-slider-thumb:active { transform: scale(1.05); background: var(--ux-ink); }
 .sliderInput::-moz-range-thumb {
   pointer-events: auto;
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #fff;
-  border: 3px solid var(--accent-primary);
-  box-shadow: 2px 2px 0 var(--border-color);
+  background: var(--ux-bone);
+  border: 3px solid var(--ux-ink);
+  box-shadow: 2px 2px 0 var(--ux-ink);
   cursor: pointer;
 }
 
 /* ---- Clear filters ---- */
 .clearFilters {
-  padding: 12px 20px;
+  position: relative;
+  z-index: 1;
+  padding: 13px 20px;
   background: transparent;
-  border: var(--border);
-  box-shadow: 3px 3px 0 var(--border-color);
-  color: var(--error);
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 15px;
+  border: 2px solid var(--ux-ink);
+  box-shadow: 3px 3px 0 var(--ux-ink);
+  color: var(--ux-ink);
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
   letter-spacing: 2px;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease, color 0.15s ease;
 }
-
 .clearFilters:hover {
-  background: var(--error);
-  color: #fff;
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 var(--border-color);
+  background: var(--ux-ink);
+  color: var(--ux-bone);
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--ux-ink);
 }
 
 /* ================================================================
-   PRODUCTS CONTENT
+   CONTENT
    ================================================================ */
 .content {
   animation: fadeIn 0.4s ease;
 }
 
+/* legacy header block (kept for safety) */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
   padding: 16px 20px;
-  background: var(--bg-dark);
-  border: var(--border);
-  box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
+  background: var(--ux-asphalt);
+  border: 3px solid var(--ux-ink);
+  box-shadow: 5px 5px 0 var(--ux-ink);
 }
-
-/* Animated underline accent */
-.header::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent-primary) 0%, #F5C400 50%, transparent 100%);
-  animation: borderDraw 1s var(--ease-out) both;
-}
-
 .title {
   font-family: 'Oswald', sans-serif;
   font-size: 28px;
   letter-spacing: 4px;
-  color: var(--text-light);
-  -webkit-text-stroke: 0.5px rgba(255,255,255,0.3);
+  color: var(--ux-bone);
 }
-
 .count {
   font-family: 'Permanent Marker', cursive;
   font-size: 14px;
-  color: rgba(255,255,255,0.4);
-}
-
-/* ================================================================
-   LOADING SPINNER — Enhanced
-   ================================================================ */
-.loading {
-  text-align: center;
-  padding: 80px 20px;
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid var(--bg-tertiary);
-  border-top-color: var(--accent-primary);
-  border-radius: 50%;
-  margin: 0 auto 16px;
-  animation: spin 0.8s linear infinite;
-}
-
-/* ================================================================
-   PRODUCTS GRID — Staggered entrance animation
-   ================================================================ */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 22px;
+  color: var(--ux-chalk);
 }
 
 /* ---- Sort bar ---- */
@@ -545,80 +443,87 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 20px;
-  padding: 12px 16px;
-  background: var(--bg-secondary);
-  border: var(--border-thin);
-  box-shadow: var(--shadow-sm);
+  margin-bottom: 22px;
+  padding: 14px 18px;
+  background: var(--ux-bone);
+  border: 2px solid var(--ux-ink);
+  box-shadow: 4px 4px 0 var(--ux-ink);
 }
 .resultCount {
   font-family: 'Oswald', sans-serif;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 2px;
-  color: var(--text-primary);
+  text-transform: uppercase;
+  color: var(--ux-ink);
 }
-.sortWrap { display: flex; align-items: center; gap: 8px; }
+.sortWrap { display: flex; align-items: center; gap: 10px; }
 .sortLabel {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 13px;
-  letter-spacing: 2px;
-  color: var(--text-muted);
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: rgba(10,10,10,0.5);
 }
 .sortSelect {
-  padding: 8px 32px 8px 12px;
-  background: var(--bg-primary);
-  border: var(--border-thin);
-  box-shadow: 2px 2px 0 var(--border-color);
+  padding: 9px 34px 9px 14px;
+  background: var(--ux-cement);
+  border: 2px solid var(--ux-ink);
+  box-shadow: 2px 2px 0 var(--ux-ink);
   font-family: 'Oswald', sans-serif;
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 1px;
-  color: var(--text-primary);
+  color: var(--ux-ink);
   cursor: pointer;
   outline: none;
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%23CC0000'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%230a0a0a'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.sortSelect:focus {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--ux-ink);
 }
 
-/* ---- Skeleton loading cards ---- */
-@keyframes skeletonShimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+/* ================================================================
+   GRID
+   ================================================================ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
 }
+
+/* ---- Skeleton cards ---- */
 .skeletonCard {
-  background: var(--bg-secondary);
-  border: var(--border);
-  box-shadow: var(--shadow);
+  background: var(--ux-bone);
+  border: 3px solid var(--ux-ink);
+  box-shadow: 5px 5px 0 var(--ux-ink);
   overflow: hidden;
 }
 .skeletonImg {
   width: 100%;
   aspect-ratio: 1;
-  border-bottom: var(--border-thin);
-  background: linear-gradient(100deg, var(--bg-tertiary) 30%, rgba(255,255,255,0.6) 50%, var(--bg-tertiary) 70%);
+  border-bottom: 2px solid var(--ux-ink);
+  background: linear-gradient(100deg, var(--ux-cement-deep) 30%, rgba(255,255,255,0.7) 50%, var(--ux-cement-deep) 70%);
   background-size: 200% 100%;
   animation: skeletonShimmer 1.4s ease-in-out infinite;
 }
 .skeletonBody { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
 .skeletonLine {
   height: 12px;
-  border-radius: 2px;
-  background: linear-gradient(100deg, var(--bg-tertiary) 30%, rgba(255,255,255,0.6) 50%, var(--bg-tertiary) 70%);
+  background: linear-gradient(100deg, var(--ux-cement-deep) 30%, rgba(255,255,255,0.7) 50%, var(--ux-cement-deep) 70%);
   background-size: 200% 100%;
   animation: skeletonShimmer 1.4s ease-in-out infinite;
 }
 
-/* Staggered scale-in entrance */
 .productWrapper {
   animation: scaleIn 0.5s var(--ease-out) backwards;
   transition: transform 0.3s ease;
 }
-
-/* Stagger product card appearances */
 .productWrapper:nth-child(1)  { animation-delay: 0.03s; }
 .productWrapper:nth-child(2)  { animation-delay: 0.06s; }
 .productWrapper:nth-child(3)  { animation-delay: 0.09s; }
@@ -627,76 +532,73 @@
 .productWrapper:nth-child(6)  { animation-delay: 0.18s; }
 .productWrapper:nth-child(7)  { animation-delay: 0.21s; }
 .productWrapper:nth-child(8)  { animation-delay: 0.24s; }
-.productWrapper:nth-child(9)  { animation-delay: 0.27s; }
-.productWrapper:nth-child(10) { animation-delay: 0.30s; }
-.productWrapper:nth-child(11) { animation-delay: 0.33s; }
-.productWrapper:nth-child(12) { animation-delay: 0.36s; }
 
 /* ================================================================
-   EMPTY STATE — Enhanced with animations
+   EMPTY STATE
    ================================================================ */
 .empty {
   text-align: center;
-  padding: 80px 20px;
-  background: var(--bg-secondary);
-  border: var(--border);
-  box-shadow: var(--shadow);
+  padding: 80px 24px;
+  background: var(--ux-bone);
+  border: 3px solid var(--ux-ink);
+  box-shadow: 6px 6px 0 var(--ux-ink);
   animation: scaleIn 0.5s var(--ease-out) both;
 }
-
 .emptyIcon {
   font-size: 72px;
   margin-bottom: 20px;
   display: block;
-  opacity: 0.4;
+  opacity: 0.5;
   filter: grayscale(1);
   animation: floatUp 3s ease-in-out infinite;
 }
-
 .empty h3 {
   font-family: 'Oswald', sans-serif;
-  font-size: 24px;
+  font-size: 26px;
+  font-weight: 700;
   letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ux-ink);
   margin-bottom: 10px;
 }
-
 .empty p {
-  color: var(--text-secondary);
+  color: rgba(10,10,10,0.6);
   margin-bottom: 28px;
   font-family: 'Permanent Marker', cursive;
 }
-
 .resetBtn {
-  padding: 14px 36px;
-  background: var(--accent-primary);
-  color: #fff;
-  border: var(--border);
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 17px;
+  padding: 15px 40px;
+  background: var(--ux-ink);
+  color: var(--ux-bone);
+  border: 3px solid var(--ux-ink);
+  font-family: 'Oswald', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
   letter-spacing: 3px;
+  text-transform: uppercase;
   cursor: pointer;
-  box-shadow: var(--shadow);
+  box-shadow: 5px 5px 0 var(--ux-chalk);
   transition: transform 0.12s var(--ease-spring), box-shadow 0.12s ease;
 }
-
 .resetBtn:hover {
   transform: translate(4px, 4px);
-  box-shadow: var(--shadow-hover);
+  box-shadow: 1px 1px 0 var(--ux-chalk);
+  color: var(--ux-bone);
 }
 
 /* ================================================================
-   SCROLL TO TOP BUTTON
+   SCROLL TO TOP
    ================================================================ */
 .scrollTopBtn {
   position: fixed;
   bottom: 32px;
   right: 32px;
-  width: 48px;
-  height: 48px;
-  background: var(--accent-primary);
-  color: #fff;
-  border: var(--border);
-  box-shadow: var(--shadow-lg);
+  width: 50px;
+  height: 50px;
+  background: var(--ux-ink);
+  color: var(--ux-bone);
+  border: 3px solid var(--ux-ink);
+  box-shadow: 5px 5px 0 var(--ux-chalk);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -705,16 +607,11 @@
   transition: transform 0.2s var(--ease-spring), box-shadow 0.2s ease, opacity 0.3s ease;
   animation: slideUp 0.3s var(--ease-out) both;
 }
-
 .scrollTopBtn:hover {
   transform: translate(-2px, -4px);
-  box-shadow: var(--shadow-lift);
+  box-shadow: 7px 8px 0 var(--ux-chalk);
 }
-
-.scrollTopBtn svg {
-  width: 20px;
-  height: 20px;
-}
+.scrollTopBtn svg { width: 20px; height: 20px; }
 
 /* ================================================================
    RESPONSIVE
@@ -725,7 +622,7 @@
 
 @media (max-width: 768px) {
   .mobileFilterBtn { display: flex; }
-  .filtersPanel { display: none; padding: 16px; }
+  .filtersPanel { display: none; padding: 18px; }
   .filtersPanel.open {
     display: grid;
     animation: slideDown 0.3s var(--ease-out);
@@ -733,17 +630,16 @@
   .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .title { font-size: 22px; }
   .header { flex-direction: column; align-items: flex-start; gap: 6px; }
-  .pageHero { padding: 36px 16px 32px; }
-  .pageHeroTitle { font-size: 28px; letter-spacing: 4px; }
-  .pageHeroContent { flex-direction: column; gap: 8px; align-items: flex-start; }
-  .scrollTopBtn { bottom: 20px; right: 20px; width: 42px; height: 42px; }
+  .pageHero { padding: 42px 16px 36px; }
+  .pageHeroTitle { font-size: 30px; letter-spacing: 4px; }
+  .pageHeroContent { flex-direction: column; gap: 14px; align-items: flex-start; }
+  .scrollTopBtn { bottom: 20px; right: 20px; width: 44px; height: 44px; }
 }
 
 @media (max-width: 480px) {
-  .main { padding: 0; }
   .container { padding: 0 12px 32px; }
   .grid { gap: 10px; }
   .title { font-size: 18px; }
-  .pageHero { padding: 28px 12px 24px; }
-  .pageHeroTitle { font-size: 22px; letter-spacing: 3px; }
+  .pageHero { padding: 32px 12px 28px; }
+  .pageHeroTitle { font-size: 24px; letter-spacing: 3px; }
 }

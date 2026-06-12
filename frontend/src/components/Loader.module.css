@@ -1,7 +1,16 @@
 /* ================================================================
-   LOADER — Streetwear Shipping Tag / Barcode Scanner 
+   LOADER — UrbanEx "Authentication Tag"
+   Concrete Diptych system. Monochrome ink/bone/cement. No red, no RGB.
    ================================================================ */
 .wrap {
+  /* Local mono palette tokens — matches homepage hero */
+  --ux-cement:      #ebe9e6;
+  --ux-cement-deep: #d6d4cf;
+  --ux-asphalt:     #1c1c1e;
+  --ux-bone:        #f4f2ed;
+  --ux-ink:         #0a0a0a;
+  --ux-chalk:       #c8c5be;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,18 +22,34 @@
 
 .shippingTag {
   width: 100%;
-  max-width: 320px;
-  background: var(--bg-secondary, #F4F0EA);
-  border: 3px solid var(--border-color, #111);
-  box-shadow: 8px 8px 0 var(--border-color, #111);
+  max-width: 330px;
+  background: var(--ux-bone);
+  border: 3px solid var(--ux-ink);
+  box-shadow: 8px 8px 0 var(--ux-ink);
   padding: 24px;
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 20px;
   overflow: hidden;
+  animation: tagDrop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Concrete grain on the tag */
+.shippingTag::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='500' height='500' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+  background-size: 320px 320px;
+  mix-blend-mode: multiply;
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Corner fold — bone-on-ink instead of red */
 .shippingTag::before {
   content: '';
   position: absolute;
@@ -32,29 +57,32 @@
   right: -20px;
   width: 60px;
   height: 60px;
-  background: var(--accent-primary, #CC0000);
+  background: var(--ux-ink);
   transform: rotate(45deg);
-  border-bottom: 3px solid var(--border-color, #111);
+  border-bottom: 3px solid var(--ux-ink);
   z-index: 10;
 }
 
 .tagHeader {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: space-between;
   font-family: monospace;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  color: #666;
-  border-bottom: 2px dashed #ccc;
+  color: rgba(10,10,10,0.55);
+  border-bottom: 2px dashed var(--ux-cement-deep);
   padding-bottom: 8px;
 }
 
 .barcodeWrap {
   position: relative;
+  z-index: 1;
   height: 60px;
-  background: #fff;
-  border: 2px solid #111;
+  background: var(--ux-bone);
+  border: 2px solid var(--ux-ink);
   padding: 4px;
   display: flex;
   align-items: stretch;
@@ -66,54 +94,59 @@
   height: 100%;
   background: repeating-linear-gradient(
     to right,
-    #111 0,
-    #111 4px,
-    #fff 4px,
-    #fff 6px,
-    #111 6px,
-    #111 12px,
-    #fff 12px,
-    #fff 16px,
-    #111 16px,
-    #111 18px,
-    #fff 18px,
-    #fff 24px,
-    #111 24px,
-    #111 32px,
-    #fff 32px,
-    #fff 34px
+    #0a0a0a 0,
+    #0a0a0a 4px,
+    transparent 4px,
+    transparent 6px,
+    #0a0a0a 6px,
+    #0a0a0a 12px,
+    transparent 12px,
+    transparent 16px,
+    #0a0a0a 16px,
+    #0a0a0a 18px,
+    transparent 18px,
+    transparent 24px,
+    #0a0a0a 24px,
+    #0a0a0a 32px,
+    transparent 32px,
+    transparent 34px
   );
 }
 
+/* Scanner — ink, not red */
 .scannerLine {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 2px;
-  background: #FF0000;
-  box-shadow: 0 0 8px #FF0000, 0 0 15px #FF0000;
+  background: var(--ux-ink);
+  box-shadow: 0 0 6px rgba(10,10,10,0.6), 0 0 12px rgba(10,10,10,0.35);
   animation: scan 1.8s linear infinite alternate;
   z-index: 2;
 }
 
 .tagBody {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-top: 10px;
 }
 
+/* Wordmark — clean ink offset-shadow glitch (no RGB) */
 .glitchText {
   font-family: 'Oswald', sans-serif;
-  font-size: 36px;
-  font-weight: 900;
-  letter-spacing: -1px;
-  color: #111;
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--ux-ink);
   position: relative;
   text-transform: uppercase;
-  animation: textGlitch 4s infinite;
   text-align: center;
+  text-shadow: 3px 3px 0 var(--ux-cement-deep);
+  animation: textGlitch 4s infinite;
 }
 
 .glitchText::before, .glitchText::after {
@@ -123,22 +156,23 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: var(--bg-secondary, #F4F0EA);
+  background: var(--ux-bone);
   display: flex;
   align-items: center;
   justify-content: center;
+  text-shadow: none;
 }
 
 .glitchText::before {
-  left: 2px;
-  text-shadow: -2px 0 red;
+  left: 3px;
+  color: rgba(10,10,10,0.7);
   clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
   animation: glitchAnim1 2.5s infinite linear alternate-reverse;
 }
 
 .glitchText::after {
-  left: -2px;
-  text-shadow: -2px 0 blue;
+  left: -3px;
+  color: var(--ux-ink);
   clip-path: polygon(0 80%, 100% 20%, 100% 100%, 0 100%);
   animation: glitchAnim2 3s infinite linear alternate-reverse;
 }
@@ -153,55 +187,62 @@
   font-family: monospace;
   font-size: 13px;
   font-weight: 700;
-  color: #111;
+  color: var(--ux-ink);
   letter-spacing: 1px;
   text-transform: uppercase;
 }
 
 .percentage {
   font-family: 'Oswald', sans-serif;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
-  color: var(--accent-primary, #CC0000);
+  color: var(--ux-ink);
   line-height: 1;
 }
 
 .progressBar {
   width: 100%;
   height: 12px;
-  background: var(--bg-tertiary, #C8C3BB);
-  border: 2px solid var(--border-color, #111);
+  background: var(--ux-cement-deep);
+  border: 2px solid var(--ux-ink);
   padding: 1px;
 }
 
 .progressFill {
   height: 100%;
-  background: var(--accent-primary, #CC0000);
+  background: var(--ux-ink);
   transition: width 0.15s ease-out;
   background-image: repeating-linear-gradient(
     -45deg,
     transparent,
     transparent 5px,
-    rgba(0,0,0,0.2) 5px,
-    rgba(0,0,0,0.2) 10px
+    rgba(244,242,237,0.25) 5px,
+    rgba(244,242,237,0.25) 10px
   );
 }
 
 .tagFooter {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: space-between;
   font-family: monospace;
   font-size: 11px;
   font-weight: 700;
-  color: #666;
-  border-top: 2px dashed #ccc;
+  color: rgba(10,10,10,0.55);
+  border-top: 2px dashed var(--ux-cement-deep);
   padding-top: 12px;
   margin-top: 10px;
 }
 
 .blink {
-  color: #CC0000;
+  color: var(--ux-ink);
   animation: blinking 1s infinite;
+}
+
+@keyframes tagDrop {
+  from { opacity: 0; transform: translateY(-24px) rotate(-2deg); }
+  to   { opacity: 1; transform: translateY(0) rotate(0deg); }
 }
 
 @keyframes scan {
@@ -212,9 +253,9 @@
 @keyframes textGlitch {
   0%, 100% { transform: none; opacity: 1; }
   92% { transform: skew(0deg); opacity: 1; }
-  94% { transform: skew(-15deg); opacity: 0.8; }
-  96% { transform: skew(10deg); opacity: 1; }
-  98% { transform: skew(-5deg); opacity: 0.9; }
+  94% { transform: skew(-12deg); opacity: 0.85; }
+  96% { transform: skew(8deg); opacity: 1; }
+  98% { transform: skew(-4deg); opacity: 0.92; }
 }
 
 @keyframes glitchAnim1 {
@@ -241,5 +282,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scannerLine, .glitchText, .glitchText::before, .glitchText::after, .blink { animation: none; }
+  .scannerLine, .glitchText, .glitchText::before, .glitchText::after, .blink, .shippingTag { animation: none; }
 }

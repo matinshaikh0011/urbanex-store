@@ -241,12 +241,13 @@ export default function Home() {
       <GlobalPopup />
       <Header />
       <main className={styles.main}>
-        {/* ═══════════════════════════════════════════════
-            HERO BANNER — Neobrutalist WebGL Editorial Drop
-            ═══════════════════════════════════════════════ */}
+        {/* HERO */}
         <HeroBanner />
 
-        {/* Marquee Tape Strip */}
+        {/* Crack divider into marquee */}
+        <div className={styles.crackDivider} aria-hidden />
+
+        {/* Marquee — dark asphalt */}
         <div className={styles.marqueeSection}>
           <div className={styles.marqueeTrack}>
             {['SNEAKERS', 'WATCHES', 'GLASSES', 'HANDBAGS', 'CLOTHING', 'UA BATCH', 'PREMIUM DROPS', 'FRESH KICKS', 'SNEAKERS', 'WATCHES', 'GLASSES', 'HANDBAGS', 'CLOTHING', 'UA BATCH', 'PREMIUM DROPS', 'FRESH KICKS'].map((item, i) => (
@@ -257,16 +258,24 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ===== INFO SLIDER ===== */}
-        <InfoSlider />
+        {/* SLAB: light cement — info slider */}
+        <section className={`${styles.slab} ${styles.slabLight}`}>
+          <div className={styles.slabGrain} aria-hidden />
+          <InfoSlider />
+        </section>
+        <div className={styles.crackDivider} aria-hidden />
 
-        {/* Professional Category Showcase */}
-        <ScrollReveal animation="slideUp" duration={800}>
-          <section className={styles.categoryShowcase}>
-            <div className={styles.catHeader}>
-              <h2 className={styles.catTitle}>SHOP BY <span className={styles.accent}>CATEGORY</span></h2>
-            </div>
-            <div className={styles.catGrid}>
+        {/* SLAB: dark asphalt — categories as wheatpaste posters */}
+        <section className={`${styles.slab} ${styles.slabDark}`}>
+          <div className={styles.slabGrain} aria-hidden />
+          <ScrollReveal animation="slideUp" duration={800}>
+            <div className={styles.categoryShowcase}>
+              <div className={styles.catHeader}>
+                <span className={styles.catEyebrow}>SECTION / 01</span>
+                <h2 className={styles.catTitle}>SHOP BY <span className={styles.accent}>CATEGORY</span></h2>
+                <span className={styles.catSubtag}>— pick your lane —</span>
+              </div>
+              <div className={styles.catGrid}>
               {categories.filter((c: any) => c.active && c.featured).length > 0 ? (
                 categories.filter((c: any) => c.active && c.featured).slice(0, 8).map((cat: any) => (
                   <Link key={cat.id} href={`/products?category=${cat.slug}`} className={styles.catCard} data-cursor="view">
@@ -342,41 +351,78 @@ export default function Home() {
                   </Link>
                 </>
               )}
+              </div>
             </div>
-          </section>
-        </ScrollReveal>
+          </ScrollReveal>
+        </section>
+        <div className={styles.crackDivider} aria-hidden />
 
-        <BrandCarousel brands={brands} />
+        {/* SLAB: light cement — brand carousel */}
+        <section className={`${styles.slab} ${styles.slabLight}`}>
+          <div className={styles.slabGrain} aria-hidden />
+          <BrandCarousel brands={brands} />
+        </section>
+        <div className={styles.crackDivider} aria-hidden />
 
-        {/* Featured Drops - Subdivided by Category */}
-        <section className={styles.featured}>
+        {/* SLAB: dark asphalt — Featured Drops header */}
+        <section className={`${styles.slab} ${styles.slabDark}`}>
+          <div className={styles.slabGrain} aria-hidden />
           <ScrollReveal animation="slideUp">
             <div className={styles.featuredHeader}>
+              <span className={styles.featuredEyebrow}>SECTION / 02</span>
               <h2 className={styles.sectionTitle}>
                 <span className={styles.titleAccent}>FEATURED</span> DROPS
               </h2>
               <p className={styles.sectionSubtitle}>The hottest releases in every category</p>
             </div>
           </ScrollReveal>
+        </section>
 
-          {hasAnyFeatured ? (
-            <>
+        {hasAnyFeatured ? (
+          <>
+            {/* Sneakers — light */}
+            <div className={styles.crackDivider} aria-hidden />
+            <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
+              <div className={styles.slabGrain} aria-hidden />
               <ScrollReveal animation="fadeIn">
                 <FeaturedRow icon="👟" title="SNEAKERS" href="/products?category=sneakers" products={featuredSneakers} />
               </ScrollReveal>
+            </section>
+
+            {/* Watches — dark */}
+            <div className={styles.crackDivider} aria-hidden />
+            <section className={`${styles.slab} ${styles.slabDark} ${styles.featuredSlab}`}>
+              <div className={styles.slabGrain} aria-hidden />
               <ScrollReveal animation="fadeIn">
                 <FeaturedRow icon="⌚" title="LUXURY WATCHES" href="/products?category=watches" products={featuredWatches} />
               </ScrollReveal>
+            </section>
+
+            {/* Glasses — light */}
+            <div className={styles.crackDivider} aria-hidden />
+            <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
+              <div className={styles.slabGrain} aria-hidden />
               <ScrollReveal animation="fadeIn">
                 <FeaturedRow icon="🕶️" title="GLASSES" href="/products?category=glasses" products={featuredGlasses} />
               </ScrollReveal>
+            </section>
+
+            {/* Handbags — dark */}
+            <div className={styles.crackDivider} aria-hidden />
+            <section className={`${styles.slab} ${styles.slabDark} ${styles.featuredSlab}`}>
+              <div className={styles.slabGrain} aria-hidden />
               <ScrollReveal animation="fadeIn">
                 <FeaturedRow icon="👜" title="HANDBAGS" href="/products?category=handbags" products={featuredHandbags} />
               </ScrollReveal>
+            </section>
+
+            {/* Clothing — light */}
+            <div className={styles.crackDivider} aria-hidden />
+            <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
+              <div className={styles.slabGrain} aria-hidden />
               <ScrollReveal animation="fadeIn">
                 <FeaturedRow icon="👕" title="CLOTHING" href="/products?category=clothing" products={featuredClothing} />
               </ScrollReveal>
-
               <ScrollReveal animation="fadeIn">
                 <div className={styles.featuredViewAll}>
                   <Link href="/products" className={styles.featuredViewAllBtn} data-cursor="cop">
@@ -384,8 +430,11 @@ export default function Home() {
                   </Link>
                 </div>
               </ScrollReveal>
-            </>
-          ) : (
+            </section>
+          </>
+        ) : (
+          <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
+            <div className={styles.slabGrain} aria-hidden />
             <ScrollReveal animation="scaleIn">
               <div className={styles.comingSoon}>
                 <span className={styles.comingSoonIcon}>🛍️</span>
@@ -396,65 +445,88 @@ export default function Home() {
                 </Link>
               </div>
             </ScrollReveal>
-          )}
+          </section>
+        )}
+
+        {/* Benefits — dark asphalt stamp strip */}
+        <div className={styles.crackDivider} aria-hidden />
+        <section className={`${styles.slab} ${styles.slabDark} ${styles.benefitsWrap}`}>
+          <div className={styles.slabGrain} aria-hidden />
+          <div className={styles.benefits}>
+            <ScrollReveal animation="slideUp" delay={100} duration={600}>
+              <div className={styles.benefit}>
+                <span className={styles.benefitIcon}>✓</span>
+                <div><strong>100% Premium</strong><p>Every product is verified original</p></div>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal animation="slideUp" delay={200} duration={600}>
+              <div className={styles.benefit}>
+                <span className={styles.benefitIcon}>✓</span>
+                <div><strong>Fast Shipping</strong><p>Delivery within 3-5 days</p></div>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal animation="slideUp" delay={300} duration={600}>
+              <div className={styles.benefit}>
+                <span className={styles.benefitIcon}>✓</span>
+                <div><strong>Easy Returns</strong><p>7-day return policy</p></div>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal animation="slideUp" delay={400} duration={600}>
+              <div className={styles.benefit}>
+                <span className={styles.benefitIcon}>✓</span>
+                <div><strong>WhatsApp Support</strong><p>Instant assistance</p></div>
+              </div>
+            </ScrollReveal>
+          </div>
         </section>
 
-        <section className={styles.benefits}>
-          <ScrollReveal animation="slideUp" delay={100} duration={600}>
-            <div className={styles.benefit}>
-              <span className={styles.benefitIcon}>✓</span>
-              <div><strong>100% Premium</strong><p>Every product is verified original</p></div>
-            </div>
-          </ScrollReveal>
-          <ScrollReveal animation="slideUp" delay={200} duration={600}>
-            <div className={styles.benefit}>
-              <span className={styles.benefitIcon}>✓</span>
-              <div><strong>Fast Shipping</strong><p>Delivery within 3-5 days</p></div>
-            </div>
-          </ScrollReveal>
-          <ScrollReveal animation="slideUp" delay={300} duration={600}>
-            <div className={styles.benefit}>
-              <span className={styles.benefitIcon}>✓</span>
-              <div><strong>Easy Returns</strong><p>7-day return policy</p></div>
-            </div>
-          </ScrollReveal>
-          <ScrollReveal animation="slideUp" delay={400} duration={600}>
-            <div className={styles.benefit}>
-              <span className={styles.benefitIcon}>✓</span>
-              <div><strong>WhatsApp Support</strong><p>Instant assistance</p></div>
-            </div>
-          </ScrollReveal>
-        </section>
-
+        {/* COP CTA — full diptych echo of hero */}
+        <div className={styles.crackDivider} aria-hidden />
         <section className={styles.cta}>
-          <ScrollReveal animation="scaleIn">
-            <div className={styles.ctaContent}>
-              <h2 className={styles.ctaTitle}>READY TO <span className={styles.highlight}>COP?</span></h2>
-              <p className={styles.ctaText}>Browse our curated collection of the hottest streetwear drops.</p>
+          <div className={styles.ctaLight}>
+            <div className={styles.slabGrain} aria-hidden />
+            <ScrollReveal animation="slideUp">
+              <div className={styles.ctaTextWrap}>
+                <span className={styles.ctaEyebrow}>SECTION / 03</span>
+                <h2 className={styles.ctaTitle}>READY TO <span className={styles.highlight}>COP?</span></h2>
+                <p className={styles.ctaText}>Browse our curated collection of the hottest streetwear drops.</p>
+              </div>
+            </ScrollReveal>
+          </div>
+          <div className={styles.ctaDark}>
+            <div className={styles.slabGrain} aria-hidden />
+            <ScrollReveal animation="slideUp">
               <div className={styles.ctaButtons}>
                 <Link href="/products" className={styles.ctaBtn} data-cursor="cop">EXPLORE COLLECTION</Link>
                 <Link href="/about" className={styles.ctaBtnOutline} data-cursor="explore">ABOUT US</Link>
               </div>
-            </div>
-          </ScrollReveal>
+            </ScrollReveal>
+          </div>
+          {/* vertical crack between */}
+          <div className={styles.ctaCrack} aria-hidden />
         </section>
 
-        {/* Instagram Feed */}
-        <section className={styles.instagram}>
-          <ScrollReveal animation="slideUp">
-            <div className={styles.instaHeader}>
-              <h2 className={styles.sectionTitle}>FOLLOW US ON <span className={styles.titleAccent}>INSTAGRAM</span></h2>
-              <a href="https://www.instagram.com/urbanex.store/" target="_blank" rel="noopener noreferrer" className={styles.instaHandle}>@urbanex.store</a>
+        {/* Instagram — light cement */}
+        <div className={styles.crackDivider} aria-hidden />
+        <section className={`${styles.slab} ${styles.slabLight} ${styles.instagramWrap}`}>
+          <div className={styles.slabGrain} aria-hidden />
+          <div className={styles.instagram}>
+            <ScrollReveal animation="slideUp">
+              <div className={styles.instaHeader}>
+                <span className={styles.featuredEyebrow}>SECTION / 04</span>
+                <h2 className={styles.sectionTitle}>FOLLOW US ON <span className={styles.titleAccent}>INSTAGRAM</span></h2>
+                <a href="https://www.instagram.com/urbanex.store/" target="_blank" rel="noopener noreferrer" className={styles.instaHandle}>@urbanex.store</a>
+              </div>
+            </ScrollReveal>
+            <div style={{ width: '100%', maxWidth: '1200px', margin: '2rem auto', minHeight: '300px' }}>
+              <Script src="https://elfsightcdn.com/platform.js" strategy="lazyOnload" />
+              <div className="elfsight-app-b08ff70a-db49-4175-90c8-14e852eefad1" data-elfsight-app-lazy></div>
             </div>
-          </ScrollReveal>
-          <div style={{ width: '100%', maxWidth: '1200px', margin: '2rem auto', minHeight: '300px' }}>
-            <Script src="https://elfsightcdn.com/platform.js" strategy="lazyOnload" />
-            <div className="elfsight-app-b08ff70a-db49-4175-90c8-14e852eefad1" data-elfsight-app-lazy></div>
-          </div>
-          <div className={styles.instaFollowWrap}>
-            <a href="https://www.instagram.com/urbanex.store/" target="_blank" rel="noopener noreferrer" className={styles.instaFollowBtn}>
-              FOLLOW US
-            </a>
+            <div className={styles.instaFollowWrap}>
+              <a href="https://www.instagram.com/urbanex.store/" target="_blank" rel="noopener noreferrer" className={styles.instaFollowBtn}>
+                FOLLOW US
+              </a>
+            </div>
           </div>
         </section>
       </main>

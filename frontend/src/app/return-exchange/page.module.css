@@ -1,192 +1,201 @@
+/* ================================================================
+   RETURN & EXCHANGE — UrbanEx "Concrete Diptych"
+   Monochrome cement/asphalt/bone/ink. Matches homepage + logo.
+   ================================================================ */
 .main {
+  --ux-cement:      #ebe9e6;
+  --ux-cement-deep: #d6d4cf;
+  --ux-asphalt:     #1c1c1e;
+  --ux-bone:        #f4f2ed;
+  --ux-ink:         #0a0a0a;
+  --ux-chalk:       #c8c5be;
+
   min-height: calc(100vh - 80px);
+  background: var(--ux-cement);
 }
 
+/* ---- Hero ---- */
 .hero {
-  background: var(--bg-secondary);
-  padding: 60px 24px;
+  background: var(--ux-bone);
+  border-bottom: 3px solid var(--ux-ink);
+  padding: 64px 24px;
   text-align: center;
 }
-
 .title {
-  font-size: 48px;
-  letter-spacing: 4px;
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(36px, 6vw, 56px);
+  font-weight: 700;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--ux-ink);
+  text-shadow: 4px 5px 0 var(--ux-cement-deep);
   margin-bottom: 12px;
 }
+.accent { color: rgba(10,10,10,0.45); }
+.subtitle { font-family: 'Permanent Marker', cursive; color: rgba(10,10,10,0.6); font-size: 15px; }
 
-.accent {
-  color: var(--accent-primary);
-}
+.container { max-width: 800px; margin: 0 auto; padding: 44px 24px; }
 
-.subtitle {
-  color: var(--text-secondary);
-  font-size: 16px;
-}
-
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 40px 24px;
-}
-
+/* ---- Success state ---- */
 .successMessage {
   text-align: center;
   padding: 60px 24px;
-  background: var(--bg-secondary);
-  border-radius: 16px;
+  background: var(--ux-bone);
+  border: 3px solid var(--ux-ink);
+  box-shadow: 6px 6px 0 var(--ux-ink);
 }
-
 .successIcon {
   width: 80px;
   height: 80px;
-  background: var(--success);
-  color: white;
+  background: var(--ux-ink);
+  color: var(--ux-bone);
   font-size: 40px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 24px;
+  border: 3px solid var(--ux-ink);
+  box-shadow: 4px 4px 0 var(--ux-chalk);
+  transform: rotate(-3deg);
 }
-
 .successMessage h2 {
+  font-family: 'Oswald', sans-serif;
   font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ux-ink);
   margin-bottom: 16px;
 }
-
-.successMessage p {
-  color: var(--text-secondary);
-  margin-bottom: 32px;
-}
-
+.successMessage p { color: rgba(10,10,10,0.65); margin-bottom: 32px; }
 .whatsappBtn {
   display: inline-block;
   background: #25D366;
-  color: white;
-  padding: 16px 32px;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
+  color: #fff;
+  padding: 16px 36px;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
   letter-spacing: 2px;
-  border-radius: 8px;
+  text-transform: uppercase;
+  border: 3px solid var(--ux-ink);
+  box-shadow: 5px 5px 0 var(--ux-ink);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
+.whatsappBtn:hover { transform: translate(4px,4px); box-shadow: 1px 1px 0 var(--ux-ink); color: #fff; }
 
-.formSection {
-  display: grid;
-  gap: 32px;
-}
+.formSection { display: grid; gap: 32px; }
 
+/* ---- Policy ---- */
 .policy {
-  background: var(--bg-secondary);
+  background: var(--ux-bone);
   padding: 28px;
-  border-radius: 12px;
+  border: 3px solid var(--ux-ink);
+  box-shadow: 5px 5px 0 var(--ux-ink);
 }
-
 .policy h3 {
+  font-family: 'Oswald', sans-serif;
   font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ux-ink);
   margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid var(--ux-ink);
 }
+.policy ul { list-style: none; }
+.policy li { padding: 12px 0; color: rgba(10,10,10,0.7); border-bottom: 1px solid var(--ux-cement-deep); }
+.policy li:last-child { border-bottom: none; }
 
-.policy ul {
-  list-style: none;
-}
-
-.policy li {
-  padding: 10px 0;
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.policy li:last-child {
-  border-bottom: none;
-}
-
+/* ---- Form ---- */
 .form {
-  background: var(--bg-secondary);
+  background: var(--ux-bone);
   padding: 32px;
-  border-radius: 16px;
+  border: 3px solid var(--ux-ink);
+  box-shadow: 6px 6px 0 var(--ux-ink);
 }
-
-.formGroup {
-  margin-bottom: 20px;
-}
-
+.formGroup { margin-bottom: 20px; }
 .formGroup label {
   display: block;
-  font-size: 14px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
   font-weight: 600;
-  color: var(--text-secondary);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ux-ink);
   margin-bottom: 8px;
 }
-
 .formGroup input,
 .formGroup select,
 .formGroup textarea {
   width: 100%;
   padding: 14px 16px;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
+  background: var(--ux-cement);
+  border: 2px solid var(--ux-ink);
+  box-shadow: 3px 3px 0 var(--ux-ink);
+  color: var(--ux-ink);
   font-size: 16px;
-  background: var(--bg-primary);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-
 .formGroup input:focus,
 .formGroup select:focus,
 .formGroup textarea:focus {
-  border-color: var(--accent-primary);
   outline: none;
+  transform: translate(-2px,-2px);
+  box-shadow: 5px 5px 0 var(--ux-ink);
 }
-
-.formRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-@media (max-width: 600px) {
-  .formRow { grid-template-columns: 1fr; }
-}
+.formRow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 600px) { .formRow { grid-template-columns: 1fr; } }
 
 .submitBtn {
   width: 100%;
-  background: var(--gradient);
-  color: white;
-  border: none;
+  background: var(--ux-ink);
+  color: var(--ux-bone);
+  border: 3px solid var(--ux-ink);
+  box-shadow: 5px 5px 0 var(--ux-chalk);
   padding: 18px;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
   font-size: 20px;
-  letter-spacing: 2px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.12s var(--ease-spring), box-shadow 0.12s ease;
 }
+.submitBtn:hover { transform: translate(4px, 4px); box-shadow: 1px 1px 0 var(--ux-chalk); }
 
-.submitBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
-}
-
+/* ---- Contact section ---- */
 .contactSection {
   text-align: center;
   margin-top: 40px;
   padding: 32px;
-  background: var(--bg-secondary);
-  border-radius: 16px;
+  background: var(--ux-bone);
+  border: 3px solid var(--ux-ink);
+  box-shadow: 6px 6px 0 var(--ux-ink);
 }
-
 .contactSection h3 {
+  font-family: 'Oswald', sans-serif;
   font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ux-ink);
   margin-bottom: 8px;
 }
-
-.contactSection p {
-  color: var(--text-secondary);
-  margin-bottom: 20px;
-}
-
+.contactSection p { color: rgba(10,10,10,0.65); margin-bottom: 20px; }
 .whatsappLink {
   display: inline-block;
   background: #25D366;
-  color: white;
-  padding: 14px 28px;
-  font-size: 18px;
-  font-weight: 600;
-  border-radius: 8px;
+  color: #fff;
+  padding: 14px 30px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 3px solid var(--ux-ink);
+  box-shadow: 4px 4px 0 var(--ux-ink);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
+.whatsappLink:hover { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--ux-ink); color: #fff; }

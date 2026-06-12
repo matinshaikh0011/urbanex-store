@@ -43,6 +43,8 @@ export default function OrderConfirmationPage() {
       }
 
       const amount = storedTotal ? parseInt(storedTotal) : 0;
+      const utr = (customer as any).utrNumber || 'N/A';
+      const paid = (customer as any).amountPaid || '';
       const message =
         `🛍️ NEW ORDER - UrbanEx\n` +
         `Order ID: ${storedOrderId}\n` +
@@ -50,9 +52,11 @@ export default function OrderConfirmationPage() {
         `Phone: ${customer.phone || 'N/A'}\n` +
         `Product: ${customer.product || 'N/A'}\n` +
         `Size: ${customer.size || '-'}\n` +
-        `Amount: ₹${amount}\n` +
+        `Order Total: ₹${amount}\n` +
+        `Amount Paid: ₹${paid || amount}\n` +
+        `UTR / Txn ID: ${utr}\n` +
         `Address: ${customer.address || 'N/A'}\n\n` +
-        `Please confirm this order.`;
+        `✅ Payment done. Please find my payment screenshot attached for verification.`;
 
       const waUrl = `https://wa.me/919898285850?text=${encodeURIComponent(message)}`;
       setWhatsappUrl(waUrl);
@@ -83,7 +87,7 @@ export default function OrderConfirmationPage() {
         </h1>
 
         <p className={styles.message}>
-          Our team will get in touch shortly.
+          Payment received. Our team will verify your payment and place your order shortly.
         </p>
 
         <div className={styles.orderCard}>
@@ -115,7 +119,7 @@ export default function OrderConfirmationPage() {
             <div className={styles.detailRow}>
               <span className={styles.detailLabel}>Status</span>
               <span className={`${styles.detailValue} ${styles.status}`}>
-                PENDING ADVANCE
+                PENDING VERIFICATION
               </span>
             </div>
           </div>
@@ -127,9 +131,9 @@ export default function OrderConfirmationPage() {
           <div className={styles.step}>
             <span className={styles.stepNumber}>1</span>
             <div className={styles.stepContent}>
-              <span className={styles.stepHeading}>WhatsApp Confirmation</span>
+              <span className={styles.stepHeading}>Send Your Payment Screenshot</span>
               <span className={styles.stepText}>
-                We just opened WhatsApp with your order details. Send the ₹300 advance to confirm your order.
+                We just opened WhatsApp with your order details. Please attach the payment screenshot you uploaded so our team can verify it.
               </span>
             </div>
           </div>
@@ -137,9 +141,9 @@ export default function OrderConfirmationPage() {
           <div className={styles.step}>
             <span className={styles.stepNumber}>2</span>
             <div className={styles.stepContent}>
-              <span className={styles.stepHeading}>Order Processing</span>
+              <span className={styles.stepHeading}>Payment Verification</span>
               <span className={styles.stepText}>
-                Once advance is received, we&apos;ll ship your order within 24-48 hours.
+                Our team verifies your UPI payment against the UTR / reference number you provided.
               </span>
             </div>
           </div>
@@ -147,9 +151,9 @@ export default function OrderConfirmationPage() {
           <div className={styles.step}>
             <span className={styles.stepNumber}>3</span>
             <div className={styles.stepContent}>
-              <span className={styles.stepHeading}>Delivery</span>
+              <span className={styles.stepHeading}>Order Placed & Shipped</span>
               <span className={styles.stepText}>
-                Pay remaining amount on delivery. Get 100% authentic products delivered to your door.
+                Once verified, your order is confirmed and shipped within 24-48 hours. 100% authentic products delivered to your door.
               </span>
             </div>
           </div>
@@ -162,7 +166,7 @@ export default function OrderConfirmationPage() {
             rel="noopener noreferrer"
             className={styles.whatsappLink}
           >
-            OPEN WHATSAPP TO CONFIRM
+            SEND SCREENSHOT ON WHATSAPP
           </a>
         </div>
 
