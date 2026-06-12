@@ -114,7 +114,7 @@
   align-items: start;
 }
 @media (max-width: 900px) {
-  .content { display: flex; flex-direction: column-reverse; gap: 36px; }
+  .content { display: flex; flex-direction: column; gap: 36px; }
 }
 
 .leftCol { display: flex; flex-direction: column; }
