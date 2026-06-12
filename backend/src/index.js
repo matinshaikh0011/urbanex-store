@@ -570,6 +570,7 @@ app.put('/api/products/:id/stock', adminAuth, async (req, res) => {
 app.post('/api/orders', async (req, res) => {
   try {
     const { productId, size, color, quantity, totalAmount, paymentMethod, utrNumber, amountPaid, shippingName, shippingAddress, shippingEmail, shippingPhone, items, couponCode, discountAmount } = req.body;
+    const paymentScreenshot = req.body.paymentScreenshot || null;
     const cleanUtr = (utrNumber || '').toString().trim();
     if (!/^\d{12}$/.test(cleanUtr)) return res.status(400).json({ error: 'A valid 12-digit UTR / Transaction ID is required.' });
 
@@ -590,6 +591,7 @@ app.post('/api/orders', async (req, res) => {
       data: {
         orderId, totalAmount: parseFloat(totalAmount), status: 'Pending Verification',
         paymentMethod: paymentMethod || 'cod', utrNumber: cleanUtr,
+        paymentScreenshot,
         amountPaid: amountPaid != null ? parseFloat(amountPaid) : null,
         shippingName, shippingAddress, shippingEmail, shippingPhone,
         productId: firstItem ? parseInt(firstItem.productId) : (productId ? parseInt(productId) : null),
