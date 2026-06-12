@@ -82,7 +82,7 @@
   box-shadow:
     8px 8px 0 var(--ux-ink),
     0 24px 60px rgba(0,0,0,0.6);
-  max-width: 460px;
+  max-width: 420px;
   width: 100%;
   max-height: calc(100vh - 32px);
   overflow-y: auto;
@@ -145,7 +145,7 @@
 .content {
   position: relative;
   z-index: 2;
-  padding: 30px 28px 26px;
+  padding: 22px 26px 22px;
   text-align: center;
 }
 
@@ -154,10 +154,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
-  font-size: 30px;
-  margin-bottom: 14px;
+  width: 52px;
+  height: 52px;
+  font-size: 26px;
+  margin-bottom: 10px;
   background: var(--ux-ink);
   color: var(--ux-bone);
   border: 3px solid var(--ux-ink);
@@ -169,9 +169,9 @@
 
 .headline {
   font-family: 'Oswald', sans-serif;
-  font-size: clamp(28px, 6vw, 38px);
+  font-size: clamp(26px, 5vw, 32px);
   font-weight: 700;
-  letter-spacing: 6px;
+  letter-spacing: 5px;
   color: var(--ux-ink);
   text-transform: uppercase;
   text-shadow: 3px 4px 0 var(--ux-bone), 5px 6px 0 var(--ux-ink);
@@ -185,7 +185,7 @@
   display: block;
   height: 4px;
   width: 60%;
-  margin: 14px auto 0;
+  margin: 10px auto 0;
   background: var(--ux-ink);
   transform-origin: left;
   animation: seamDraw 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both;
@@ -194,11 +194,13 @@
 .body {
   font-family: 'Inter', sans-serif;
   color: rgba(10,10,10,0.78);
-  font-size: 14px;
-  line-height: 1.65;
-  margin-bottom: 14px;
-  margin-top: 14px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  margin-bottom: 10px;
+  margin-top: 10px;
 }
+/* Second paragraph is redundant — hide to keep the card compact */
+.body:nth-of-type(2) { display: none; }
 
 .highlight {
   color: var(--ux-ink);
@@ -224,8 +226,8 @@
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 3px;
-  padding: 8px 18px;
-  margin: 14px 0;
+  padding: 7px 16px;
+  margin: 10px 0;
   box-shadow: 4px 4px 0 var(--ux-chalk);
   transform: rotate(-1.5deg);
   text-transform: uppercase;
@@ -236,8 +238,8 @@
 .features {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin: 18px 0;
+  gap: 7px;
+  margin: 12px 0;
   text-align: left;
 }
 
@@ -245,7 +247,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 11px 14px;
+  padding: 9px 14px;
   background: var(--ux-cement);
   border: 2px solid var(--ux-ink);
   box-shadow: 3px 3px 0 var(--ux-ink);
@@ -275,13 +277,13 @@
 /* CTA button — bone-on-ink stamp */
 .closeBtn {
   width: 100%;
-  margin-top: 18px;
-  padding: 18px 24px;
+  margin-top: 12px;
+  padding: 14px 24px;
   background: var(--ux-ink);
   color: var(--ux-bone);
   border: 3px solid var(--ux-ink);
   font-family: 'Oswald', sans-serif;
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: 4px;
   cursor: pointer;
