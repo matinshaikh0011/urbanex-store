@@ -621,6 +621,13 @@
    FOOTER
    ================================================================ */
 .footer {
+  --ux-cement:      #ebe9e6;
+  --ux-cement-deep: #d6d4cf;
+  --ux-asphalt:     #1c1c1e;
+  --ux-bone:        #f4f2ed;
+  --ux-ink:         #0a0a0a;
+  --ux-chalk:       #c8c5be;
+
   background: var(--ux-asphalt);
   border-top: 3px solid var(--ux-ink);
   margin-top: 60px;
@@ -660,4 +667,38 @@
   .footerContent { flex-direction: column; text-align: center; align-items: center; }
   .footerLinks { justify-content: center; gap: 20px; }
   .actions { grid-template-columns: 1fr; }
+  .main { padding: 20px 0; }
+  .container { padding: 0 14px; gap: 28px; }
+  .name { font-size: 22px; word-break: break-word; overflow-wrap: anywhere; }
+  .priceRow { flex-wrap: wrap; gap: 10px; margin-bottom: 18px; padding-bottom: 18px; }
+  .price { font-size: 32px; }
+  .description { font-size: 14px; margin-bottom: 24px; }
+  .sizeGrid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .sizeBtn { padding: 12px 8px; font-size: 16px; }
+  .features { grid-template-columns: 1fr; gap: 10px; padding: 16px; }
+  .info { padding: 16px; }
+  .relatedSection { margin: 48px auto 0; padding: 0 14px; }
+  .relatedSection::before { margin: 0 -14px 28px; }
+  .relatedGrid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .relatedTitle { font-size: 24px; }
+  .videoCallBtn { padding: 14px; font-size: 15px; }
+  .thumbnails { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .mainImage { box-shadow: 4px 4px 0 var(--ux-ink); }
+  .breadcrumb { font-size: 11px; gap: 5px; }
+}
+
+@media (max-width: 480px) {
+  .main { padding: 12px 0; }
+  .container { padding: 0 10px; gap: 20px; }
+  .name { font-size: 18px; }
+  .price { font-size: 28px; }
+  .originalPrice { font-size: 16px; }
+  .discount { font-size: 12px; padding: 4px 8px; }
+  .brand { font-size: 14px; padding: 3px 10px; }
+  .sizeGrid { grid-template-columns: repeat(3, 1fr); }
+  .addToCartBtn, .buyNowBtn { padding: 14px; font-size: 16px; }
+  .relatedGrid { gap: 10px; }
+  .relatedName { font-size: 12px; min-height: 32px; }
+  .relatedPrice { font-size: 17px; }
+  .relatedInfo { padding: 12px; }
 }
