@@ -45,21 +45,25 @@ function createScanJob() {
 
 dotenv.config();
 
-// ── Environment validation: fail hard if required vars are missing ──
+// ── Environment validation ──
+// Critical vars: missing → refuse to start (security/data integrity).
 const REQUIRED_ENV = [
   'JWT_SECRET',
   'ADMIN_PASSWORD_HASH',
   'DATABASE_URL',
   'FRONTEND_URL',
-  'NODE_ENV',
-  'CLOUDINARY_CLOUD_NAME',
-  'CLOUDINARY_API_KEY',
-  'CLOUDINARY_API_SECRET',
 ];
 const missingEnv = REQUIRED_ENV.filter(k => !process.env[k] || !process.env[k].trim());
 if (missingEnv.length > 0) {
   console.error(`FATAL: missing required environment variable(s): ${missingEnv.join(', ')}. Refusing to start.`);
   process.exit(1);
+}
+
+// Optional vars: feature degrades gracefully if absent → warn only.
+const OPTIONAL_ENV = ['NODE_ENV', 'CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_UPLOAD_PRESET'];
+const missingOptional = OPTIONAL_ENV.filter(k => !process.env[k] || !process.env[k].trim());
+if (missingOptional.length > 0) {
+  console.warn(`WARN: optional env var(s) not set: ${missingOptional.join(', ')}. Related features (e.g. scraper image upload) may be limited.`);
 }
 
 const JWT_SECRET = process.env.JWT_SECRET;
