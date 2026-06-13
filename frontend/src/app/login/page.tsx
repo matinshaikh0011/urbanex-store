@@ -23,30 +23,87 @@ export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ email: '', password: '', name: '', phone: '' });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [user, setUser] = useState<StoredUser | null>(null);
   const [orders, setOrders] = useState<HistoryOrder[]>([]);
 
   useEffect(() => {
+    // Honor /signup → /login?mode=register
     try {
-      const saved = localStorage.getItem('urbanex_user');
-      if (saved) setUser(JSON.parse(saved));
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('mode') === 'register') setIsLogin(false);
+    } catch { /* ignore */ }
+
+    // Load cached order history (Phase 2 will move this to DB)
+    try {
       const hist = localStorage.getItem('urbanex_orders');
       if (hist) setOrders(JSON.parse(hist));
     } catch { /* ignore */ }
+
+    // Verify real session from the server (persists across refresh)
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        if (data?.user) {
+          const u = { email: data.user.email, name: data.user.name || 'Customer' };
+          localStorage.setItem('urbanex_user', JSON.stringify(u));
+          setUser(u);
+        } else {
+          localStorage.removeItem('urbanex_user');
+        }
+      })
+      .catch(() => { /* offline — leave as guest */ });
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+
+    // Client-side validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
-      const u = { email: formData.email, name: formData.name || 'Customer' };
+    try {
+      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+      const body = isLogin
+        ? { email: formData.email, password: formData.password }
+        : { email: formData.email, password: formData.password, name: formData.name, phone: formData.phone };
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setError(data.error || 'Something went wrong. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      const u = { email: data.user.email, name: data.user.name || 'Customer' };
       localStorage.setItem('urbanex_user', JSON.stringify(u));
       setUser(u);
+    } catch {
+      setError('Could not reach the server. Please try again.');
+    } finally {
       setLoading(false);
-    }, 800);
+    }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    } catch { /* ignore */ }
     localStorage.removeItem('urbanex_user');
     setUser(null);
   };
@@ -126,10 +183,10 @@ export default function LoginPage() {
         <div className={styles.container}>
           <div className={styles.card}>
             <div className={styles.tabs}>
-              <button className={`${styles.tab} ${isLogin ? styles.active : ''}`} onClick={() => setIsLogin(true)}>
+              <button className={`${styles.tab} ${isLogin ? styles.active : ''}`} onClick={() => { setIsLogin(true); setError(''); }}>
                 LOGIN
               </button>
-              <button className={`${styles.tab} ${!isLogin ? styles.active : ''}`} onClick={() => setIsLogin(false)}>
+              <button className={`${styles.tab} ${!isLogin ? styles.active : ''}`} onClick={() => { setIsLogin(false); setError(''); }}>
                 REGISTER
               </button>
             </div>
@@ -186,6 +243,8 @@ export default function LoginPage() {
                   <Link href="#">Forgot Password?</Link>
                 </div>
               )}
+
+              {error && <p className={styles.errorMsg}>{error}</p>}
 
               <button type="submit" className={styles.submitBtn} disabled={loading}>
                 {loading ? 'PLEASE WAIT...' : isLogin ? 'LOGIN' : 'CREATE ACCOUNT'}
