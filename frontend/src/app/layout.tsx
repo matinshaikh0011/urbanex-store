@@ -2,7 +2,6 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { CartProvider } from '@/components/ClientProviders';
 import { WishlistProvider } from '@/components/WishlistProvider';
-import AnnouncementBar from '@/components/AnnouncementBar';
 import WhatsAppButton from '@/components/WhatsAppButton';
 
 export const metadata: Metadata = {
@@ -25,7 +24,6 @@ export default function RootLayout({
       <body>
         <CartProvider>
           <WishlistProvider>
-            <AnnouncementBar />
             {children}
             <WhatsAppButton />
           </WishlistProvider>
