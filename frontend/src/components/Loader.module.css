@@ -1,12 +1,11 @@
 /* ================================================================
-   LOADER — UrbanEx "Authentication Tag"
-   Concrete Diptych system. Monochrome ink/bone/cement. No red, no RGB.
+   LOADER — UrbanEx "Stamp Pulse"
+   Breathing wordmark + sweeping ink underline. No fake percentage.
+   Monochrome concrete. GPU-cheap (transform + opacity only).
    ================================================================ */
 .wrap {
-  /* Local mono palette tokens — matches homepage hero */
   --ux-cement:      #ebe9e6;
   --ux-cement-deep: #d6d4cf;
-  --ux-asphalt:     #1c1c1e;
   --ux-bone:        #f4f2ed;
   --ux-ink:         #0a0a0a;
   --ux-chalk:       #c8c5be;
@@ -15,272 +14,90 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 50vh;
+  gap: 18px;
+  min-height: 55vh;
   padding: 60px 20px;
-  background-color: transparent;
 }
 
-.shippingTag {
-  width: 100%;
-  max-width: 330px;
-  background: var(--ux-bone);
-  border: 3px solid var(--ux-ink);
-  box-shadow: 8px 8px 0 var(--ux-ink);
-  padding: 24px;
+.stamp {
   position: relative;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
-  gap: 20px;
-  overflow: hidden;
-  animation: tagDrop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  align-items: center;
+  animation: stampBreathe 1.6s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
-/* Concrete grain on the tag */
-.shippingTag::after {
+.word {
+  position: relative;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: clamp(44px, 9vw, 84px);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--ux-ink);
+  line-height: 1;
+  text-shadow: 4px 5px 0 var(--ux-cement-deep);
+}
+
+/* Ink sweep wiping across the wordmark */
+.word::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  color: var(--ux-ink);
+  -webkit-text-stroke: 1px var(--ux-ink);
+  clip-path: inset(0 100% 0 0);
+  animation: inkSweep 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+/* Sweeping underline bar */
+.underline {
+  margin-top: 16px;
+  width: clamp(160px, 30vw, 280px);
+  height: 6px;
+  background: var(--ux-cement-deep);
+  overflow: hidden;
+  position: relative;
+}
+.underline::before {
   content: '';
   position: absolute;
   inset: 0;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='500' height='500' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
-  background-size: 320px 320px;
-  mix-blend-mode: multiply;
-  opacity: 0.18;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Corner fold — bone-on-ink instead of red */
-.shippingTag::before {
-  content: '';
-  position: absolute;
-  top: -20px;
-  right: -20px;
-  width: 60px;
-  height: 60px;
+  width: 45%;
   background: var(--ux-ink);
-  transform: rotate(45deg);
-  border-bottom: 3px solid var(--ux-ink);
-  z-index: 10;
+  animation: barSweep 1.15s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
 
-.tagHeader {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: space-between;
-  font-family: monospace;
-  font-size: 11px;
-  font-weight: 700;
+.label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  letter-spacing: 6px;
   text-transform: uppercase;
-  color: rgba(10,10,10,0.55);
-  border-bottom: 2px dashed var(--ux-cement-deep);
-  padding-bottom: 8px;
+  color: rgba(10, 10, 10, 0.55);
+  animation: labelFade 1.6s ease-in-out infinite;
 }
 
-.barcodeWrap {
-  position: relative;
-  z-index: 1;
-  height: 60px;
-  background: var(--ux-bone);
-  border: 2px solid var(--ux-ink);
-  padding: 4px;
-  display: flex;
-  align-items: stretch;
-  overflow: hidden;
+@keyframes stampBreathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
 }
-
-.barcodeLines {
-  width: 100%;
-  height: 100%;
-  background: repeating-linear-gradient(
-    to right,
-    #0a0a0a 0,
-    #0a0a0a 4px,
-    transparent 4px,
-    transparent 6px,
-    #0a0a0a 6px,
-    #0a0a0a 12px,
-    transparent 12px,
-    transparent 16px,
-    #0a0a0a 16px,
-    #0a0a0a 18px,
-    transparent 18px,
-    transparent 24px,
-    #0a0a0a 24px,
-    #0a0a0a 32px,
-    transparent 32px,
-    transparent 34px
-  );
+@keyframes inkSweep {
+  0%   { clip-path: inset(0 100% 0 0); }
+  50%  { clip-path: inset(0 0 0 0); }
+  100% { clip-path: inset(0 0 0 100%); }
 }
-
-/* Scanner — ink, not red */
-.scannerLine {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: var(--ux-ink);
-  box-shadow: 0 0 6px rgba(10,10,10,0.6), 0 0 12px rgba(10,10,10,0.35);
-  animation: scan 1.8s linear infinite alternate;
-  z-index: 2;
+@keyframes barSweep {
+  0%   { transform: translateX(-120%); }
+  100% { transform: translateX(320%); }
 }
-
-.tagBody {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-/* Wordmark — clean ink offset-shadow glitch (no RGB) */
-.glitchText {
-  font-family: 'Oswald', sans-serif;
-  font-size: 38px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--ux-ink);
-  position: relative;
-  text-transform: uppercase;
-  text-align: center;
-  text-shadow: 3px 3px 0 var(--ux-cement-deep);
-  animation: textGlitch 4s infinite;
-}
-
-.glitchText::before, .glitchText::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--ux-bone);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-shadow: none;
-}
-
-.glitchText::before {
-  left: 3px;
-  color: rgba(10,10,10,0.7);
-  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
-  animation: glitchAnim1 2.5s infinite linear alternate-reverse;
-}
-
-.glitchText::after {
-  left: -3px;
-  color: var(--ux-ink);
-  clip-path: polygon(0 80%, 100% 20%, 100% 100%, 0 100%);
-  animation: glitchAnim2 3s infinite linear alternate-reverse;
-}
-
-.progressRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-
-.targetLabel {
-  font-family: monospace;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ux-ink);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.percentage {
-  font-family: 'Oswald', sans-serif;
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--ux-ink);
-  line-height: 1;
-}
-
-.progressBar {
-  width: 100%;
-  height: 12px;
-  background: var(--ux-cement-deep);
-  border: 2px solid var(--ux-ink);
-  padding: 1px;
-}
-
-.progressFill {
-  height: 100%;
-  background: var(--ux-ink);
-  transition: width 0.15s ease-out;
-  background-image: repeating-linear-gradient(
-    -45deg,
-    transparent,
-    transparent 5px,
-    rgba(244,242,237,0.25) 5px,
-    rgba(244,242,237,0.25) 10px
-  );
-}
-
-.tagFooter {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: space-between;
-  font-family: monospace;
-  font-size: 11px;
-  font-weight: 700;
-  color: rgba(10,10,10,0.55);
-  border-top: 2px dashed var(--ux-cement-deep);
-  padding-top: 12px;
-  margin-top: 10px;
-}
-
-.blink {
-  color: var(--ux-ink);
-  animation: blinking 1s infinite;
-}
-
-@keyframes tagDrop {
-  from { opacity: 0; transform: translateY(-24px) rotate(-2deg); }
-  to   { opacity: 1; transform: translateY(0) rotate(0deg); }
-}
-
-@keyframes scan {
-  0% { transform: translateY(-4px); }
-  100% { transform: translateY(64px); }
-}
-
-@keyframes textGlitch {
-  0%, 100% { transform: none; opacity: 1; }
-  92% { transform: skew(0deg); opacity: 1; }
-  94% { transform: skew(-12deg); opacity: 0.85; }
-  96% { transform: skew(8deg); opacity: 1; }
-  98% { transform: skew(-4deg); opacity: 0.92; }
-}
-
-@keyframes glitchAnim1 {
-  0% { clip-path: inset(20% 0 80% 0); }
-  20% { clip-path: inset(60% 0 10% 0); }
-  40% { clip-path: inset(40% 0 50% 0); }
-  60% { clip-path: inset(80% 0 5% 0); }
-  80% { clip-path: inset(10% 0 70% 0); }
-  100% { clip-path: inset(30% 0 50% 0); }
-}
-
-@keyframes glitchAnim2 {
-  0% { clip-path: inset(10% 0 60% 0); }
-  20% { clip-path: inset(30% 0 20% 0); }
-  40% { clip-path: inset(70% 0 10% 0); }
-  60% { clip-path: inset(20% 0 50% 0); }
-  80% { clip-path: inset(50% 0 30% 0); }
-  100% { clip-path: inset(5% 0 80% 0); }
-}
-
-@keyframes blinking {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+@keyframes labelFade {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 0.9; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scannerLine, .glitchText, .glitchText::before, .glitchText::after, .blink, .shippingTag { animation: none; }
+  .stamp, .word::after, .underline::before, .label { animation: none; }
+  .word::after { clip-path: inset(0 0 0 0); }
+  .underline::before { transform: none; width: 100%; }
 }
