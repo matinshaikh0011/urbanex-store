@@ -160,8 +160,11 @@ export default function ScraperPage() {
           {[
             { label: 'Overview', icon: '📊', href: '/admin' },
             { label: 'Orders', icon: '📦', href: '/admin' },
+            { label: 'Manage Payments', icon: '💳', href: '/admin' },
             { label: 'Products', icon: '👟', href: '/admin' },
             { label: 'Brands', icon: '🏷️', href: '/admin' },
+            { label: 'Categories', icon: '🗂️', href: '/admin' },
+            { label: 'Hero Banners', icon: '🖼️', href: '/admin' },
             { label: 'Coupons', icon: '🎟️', href: '/admin' },
             { label: 'Inventory', icon: '📈', href: '/admin' },
             { label: 'Import CSV', icon: '📥', href: '/admin' },
@@ -592,6 +595,19 @@ function CategoryStep({ products, categoryAssignments, setCategoryAssignments, o
 }) {
   const [bulkCat, setBulkCat] = useState('sneakers');
   const [bulkSub, setBulkSub] = useState('');
+  const [categoryList, setCategoryList] = useState<string[]>(VALID_CATEGORIES);
+
+  useEffect(() => {
+    fetch('/api/categories', { credentials: 'include' })
+      .then(r => r.json())
+      .then((data: { slug: string; active: boolean }[]) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const slugs = data.filter(c => c.active !== false).map(c => c.slug);
+          if (slugs.length > 0) setCategoryList(slugs);
+        }
+      })
+      .catch(() => { /* keep VALID_CATEGORIES fallback */ });
+  }, []);
 
   const getAssignment = (p: ScrapedProduct) => categoryAssignments.get(p.sourceId) || { category: p.suggestedCategory || 'sneakers', subcategory: p.suggestedSubcategory || null };
   const setAssignment = (sourceId: string, category: string, subcategory: string | null) => {
@@ -612,7 +628,7 @@ function CategoryStep({ products, categoryAssignments, setCategoryAssignments, o
       <div className={styles.bulkBar}>
         <span className={styles.bulkLabel}>Bulk Apply:</span>
         <select className={styles.selectInput} value={bulkCat} onChange={e => { setBulkCat(e.target.value); setBulkSub(''); }}>
-          {VALID_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+          {categoryList.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
         {SUBCATEGORY_MAP[bulkCat] && (
           <select className={styles.selectInput} value={bulkSub} onChange={e => setBulkSub(e.target.value)}>
@@ -634,7 +650,7 @@ function CategoryStep({ products, categoryAssignments, setCategoryAssignments, o
                   <td style={{ fontSize: 12, color: '#888' }}>{p.cartpeCategory || '—'}</td>
                   <td>
                     <select className={styles.selectInput} value={a.category} onChange={e => setAssignment(p.sourceId, e.target.value, null)}>
-                      {VALID_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                      {categoryList.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </td>
                   <td>
