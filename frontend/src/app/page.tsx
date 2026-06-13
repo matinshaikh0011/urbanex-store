@@ -588,6 +588,8 @@ export default function Home() {
                 <Link href="/products?sort=popular">Best Sellers</Link>
                 <Link href="/products?featured=true">Featured</Link>
                 <Link href="/brands">All Brands</Link>
+                <Link href="/privacy-policy">Privacy Policy</Link>
+                <Link href="/terms">Terms &amp; Conditions</Link>
               </div>
             </div>
           </div>

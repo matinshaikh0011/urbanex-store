@@ -1,0 +1,84 @@
+/* ================================================================
+   LEGAL PAGES — UrbanEx "Concrete Diptych"
+   Shared by /privacy-policy and /terms. Monochrome concrete.
+   ================================================================ */
+.main {
+  --ux-cement:      #ebe9e6;
+  --ux-cement-deep: #d6d4cf;
+  --ux-asphalt:     #1c1c1e;
+  --ux-bone:        #f4f2ed;
+  --ux-ink:         #0a0a0a;
+  --ux-chalk:       #c8c5be;
+
+  min-height: calc(100vh - 80px);
+  background: var(--ux-cement);
+}
+
+.hero {
+  background: var(--ux-bone);
+  border-bottom: 3px solid var(--ux-ink);
+  padding: 60px 24px;
+  text-align: center;
+}
+.title {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(34px, 6vw, 54px);
+  font-weight: 700;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--ux-ink);
+  text-shadow: 4px 5px 0 var(--ux-cement-deep);
+}
+.accent { color: var(--ux-chalk); }
+.updated { margin-top: 12px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; color: rgba(10,10,10,0.5); font-size: 14px; }
+
+.container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 48px 24px 72px;
+}
+
+.card {
+  background: var(--ux-bone);
+  border: 3px solid var(--ux-ink);
+  box-shadow: 6px 6px 0 var(--ux-ink);
+  padding: 36px 32px;
+}
+
+.section { margin-bottom: 30px; }
+.section:last-child { margin-bottom: 0; }
+.section h2 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ux-ink);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--ux-ink);
+}
+.section p,
+.section li {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+  color: rgba(10,10,10,0.78);
+}
+.section p { margin-bottom: 12px; }
+.section ul { padding-left: 22px; margin-bottom: 12px; }
+.section li { margin-bottom: 6px; }
+.section a { color: var(--ux-ink); font-weight: 700; text-decoration: underline; }
+
+.intro {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+  color: rgba(10,10,10,0.78);
+  margin-bottom: 28px;
+}
+
+@media (max-width: 600px) {
+  .card { padding: 24px 18px; }
+  .container { padding: 32px 14px 56px; }
+}
