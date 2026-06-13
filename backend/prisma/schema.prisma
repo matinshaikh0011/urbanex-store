@@ -63,13 +63,14 @@ model Product {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String?  @unique
-  phone     String?
-  name      String?
-  address   String?
-  orders    Order[]
-  createdAt DateTime @default(now()) @map("created_at")
+  id           Int      @id @default(autoincrement())
+  email        String?  @unique
+  phone        String?
+  name         String?
+  address      String?
+  passwordHash String?  @map("password_hash")
+  orders       Order[]
+  createdAt    DateTime @default(now()) @map("created_at")
 }
 
 model Order {

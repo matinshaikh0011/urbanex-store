@@ -8,6 +8,7 @@ import axios from 'axios';
 import FormData from 'form-data';
 import { PrismaClient } from '@prisma/client';
 import { subcategories } from './catalog.js';
+import authRouter from './routes/auth.js';
 import { validateProductData, buildProductData, slugify } from './productUtils.js';
 import { getProvider, detectProvider } from './scrapers/index.js';
 import { fetchProductDetail } from './scrapers/cartpeProvider.js';
@@ -44,6 +45,9 @@ const app = express();
 const PORT = process.env.PORT || 3005;
 const prisma = new PrismaClient();
 
+// Behind Render's proxy — needed so req.ip is the real client IP (rate limiter)
+app.set('trust proxy', 1);
+
 // ── CORS: allow credentials so HttpOnly cookies work cross-origin ──
 app.use(cors({
   origin: process.env.FRONTEND_URL || true,
@@ -53,6 +57,9 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use(cookieParser());
+
+// ── Customer auth routes (register/login/logout/me) ──
+app.use('/api/auth', authRouter);
 
 // ── Helpers ──
 function generateOrderId() {
