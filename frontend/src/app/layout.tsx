@@ -8,28 +8,28 @@ import { SITE_URL, SITE_NAME, SITE_TAGLINE, DEFAULT_OG_IMAGE } from '@/lib/site'
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} | ${SITE_TAGLINE}`,
+    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    'UrbanEx — India\'s premium destination for verified-original sneakers, luxury watches, glasses, handbags and streetwear. 100% authentic, fast pan-India shipping, easy 7-day returns.',
-  keywords: ['streetwear India', 'premium sneakers', 'luxury watches', 'original sneakers', 'UrbanEx', 'designer handbags', 'branded glasses'],
+    'UrbanEx brings you a curated edit of premium watches, eyewear and handbags. Verified quality, fast delivery across India, and easy 7-day returns — shop with confidence.',
+  keywords: ['premium watches India', 'designer sunglasses', 'luxury handbags', 'fashion accessories India', 'UrbanEx', 'curated accessories', 'branded eyewear'],
   applicationName: SITE_NAME,
   authors: [{ name: SITE_NAME }],
   alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     siteName: SITE_NAME,
-    title: `${SITE_NAME} | ${SITE_TAGLINE}`,
-    description: '100% verified-original sneakers, watches, glasses & handbags. Fast pan-India shipping.',
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: 'A curated collection of premium watches, eyewear and handbags. Verified quality, fast delivery across India, easy 7-day returns.',
     url: SITE_URL,
     locale: 'en_IN',
-    images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: SITE_NAME }],
+    images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: `${SITE_NAME} — Premium Fashion Accessories` }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${SITE_NAME} | ${SITE_TAGLINE}`,
-    description: '100% verified-original sneakers, watches, glasses & handbags. Fast pan-India shipping.',
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: 'Curated premium watches, eyewear and handbags. Verified quality, fast delivery across India.',
     images: [DEFAULT_OG_IMAGE],
   },
   robots: {
@@ -50,7 +50,9 @@ const orgJsonLd = {
   name: SITE_NAME,
   url: SITE_URL,
   logo: DEFAULT_OG_IMAGE,
-  description: 'Premium streetwear, sneakers, watches, glasses and handbags — 100% verified original, shipped across India.',
+  image: DEFAULT_OG_IMAGE,
+  description: 'UrbanEx is a premium fashion accessories brand offering a curated collection of watches, eyewear and handbags — verified quality, fast delivery across India.',
+  slogan: 'Curated Premium Fashion Accessories',
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Surat',

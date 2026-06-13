@@ -32,10 +32,10 @@ export function generateMetadata({ searchParams }: { searchParams: { category?: 
     };
   }
   return {
-    title: 'All Products — Premium Streetwear & Accessories',
-    description: 'Browse all premium products at UrbanEx — sneakers, luxury watches, glasses, handbags and clothing. 100% verified original, fast pan-India shipping.',
+    title: 'All Products — Premium Watches, Eyewear & Handbags',
+    description: 'Browse the full UrbanEx collection — premium watches, sunglasses, handbags and fashion accessories. Verified quality, fast pan-India delivery.',
     alternates: { canonical: '/products' },
-    openGraph: { title: 'All Products | UrbanEx', description: 'Browse all premium products — 100% verified original.', url: '/products' },
+    openGraph: { title: 'All Products | UrbanEx', description: 'Browse all premium fashion accessories — verified quality.', url: '/products' },
   };
 }
 

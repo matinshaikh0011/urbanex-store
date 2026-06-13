@@ -4,12 +4,12 @@ import type { Metadata } from 'next';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
-  title: 'About Us — Premium Streetwear in India',
-  description: 'UrbanEx is a Surat-based premium streetwear store offering 100% verified-original sneakers, luxury watches, glasses, handbags and clothing with fast pan-India shipping and easy 7-day returns.',
+  title: 'About Us — Premium Fashion Accessories in India',
+  description: 'UrbanEx is a Surat-based premium fashion accessories brand offering a curated collection of watches, eyewear, handbags and more — verified quality, fast pan-India delivery and easy 7-day returns.',
   alternates: { canonical: '/about' },
   openGraph: {
-    title: 'About UrbanEx — Premium Streetwear in India',
-    description: '100% verified-original sneakers, watches, glasses & handbags. Based in Surat, shipping across India.',
+    title: 'About UrbanEx — Premium Fashion Accessories in India',
+    description: 'A curated collection of premium watches, eyewear and handbags. Based in Surat, delivering across India.',
     url: '/about',
   },
 };
@@ -22,7 +22,7 @@ export default function AboutPage() {
       <main className={styles.main}>
         <div className={styles.hero}>
           <h1 className={styles.title}>ABOUT <span className={styles.accent}>URBANEX</span></h1>
-          <p className={styles.subtitle}>Your Trusted Destination for Premium Streetwear & Accessories</p>
+          <p className={styles.subtitle}>Your Trusted Destination for Premium Watches, Eyewear & Handbags</p>
         </div>
 
         <div className={styles.container}>
@@ -30,7 +30,7 @@ export default function AboutPage() {
             <div className={styles.intro}>
               <h2>WHO WE ARE</h2>
               <p>
-                UrbanEx is a premium streetwear destination dedicated to bringing you 100% premium products from the world&apos;s most sought-after brands. Based in Surat, Gujarat, India, we&apos;ve built a reputation for quality, authenticity, and exceptional customer service.
+                UrbanEx is a premium fashion accessories brand bringing you a carefully curated collection of watches, eyewear, handbags and more from the world&apos;s most sought-after labels. Based in Surat, Gujarat, India, we&apos;ve built a reputation for quality, authenticity, and exceptional customer service.
               </p>
             </div>
           </section>

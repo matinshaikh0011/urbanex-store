@@ -10,7 +10,7 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 
 export const API_BASE = (process.env.BACKEND_API_URL || 'https://urbanex-store.onrender.com').replace(/\/$/, '');
 
 export const SITE_NAME = 'UrbanEx';
-export const SITE_TAGLINE = 'Premium Streetwear, Sneakers, Watches, Glasses & Handbags';
+export const SITE_TAGLINE = 'Premium Watches, Sunglasses & Handbags';
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/urbanex-logo.png`;
 
 // Build a fully-qualified canonical URL from a path.
