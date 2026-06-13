@@ -28,9 +28,15 @@ function normaliseSizes(sizes) {
 /**
  * Validates a product data object.
  * @param {object} data
+ * @param {string[]} [allowedCategories] - If provided, overrides VALID_CATEGORIES.
+ *   Pass the current DB category slugs so newly created categories are accepted.
  * @returns {{ valid: boolean, error?: string }}
  */
-export function validateProductData(data) {
+export function validateProductData(data, allowedCategories) {
+  const cats = (Array.isArray(allowedCategories) && allowedCategories.length > 0)
+    ? allowedCategories
+    : VALID_CATEGORIES;
+
   if (!data.name || typeof data.name !== 'string' || !data.name.trim()) {
     return { valid: false, error: 'name is required' };
   }
@@ -47,8 +53,8 @@ export function validateProductData(data) {
       return { valid: false, error: 'brandId must be a positive integer' };
     }
   }
-  if (!data.category || !VALID_CATEGORIES.includes(data.category)) {
-    return { valid: false, error: `category must be one of: ${VALID_CATEGORIES.join(', ')}` };
+  if (!data.category || !cats.includes(data.category)) {
+    return { valid: false, error: `category must be one of: ${cats.join(', ')}` };
   }
   // source and sourceId must both be present or both absent
   const hasSource = data.source != null && data.source !== '';

@@ -8,7 +8,11 @@ import jwt from 'jsonwebtoken';
 // ════════════════════════════════════════════════════════════════
 
 export const CUSTOMER_COOKIE = 'urbanex_customer_token';
-const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_in_prod';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('FATAL: JWT_SECRET not set (customerAuth). Refusing to start.');
+  process.exit(1);
+}
 
 export function signCustomerToken(payload) {
   return jwt.sign({ ...payload, role: 'customer' }, JWT_SECRET, { expiresIn: '30d' });

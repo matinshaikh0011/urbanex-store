@@ -1,5 +1,8 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
@@ -9,6 +12,7 @@ import FormData from 'form-data';
 import { PrismaClient } from '@prisma/client';
 import { subcategories } from './catalog.js';
 import authRouter from './routes/auth.js';
+import { CUSTOMER_COOKIE } from './middleware/customerAuth.js';
 import { validateProductData, buildProductData, slugify } from './productUtils.js';
 import { getProvider, detectProvider } from './scrapers/index.js';
 import { fetchProductDetail } from './scrapers/cartpeProvider.js';
@@ -41,6 +45,26 @@ function createScanJob() {
 
 dotenv.config();
 
+// ── Environment validation: fail hard if required vars are missing ──
+const REQUIRED_ENV = [
+  'JWT_SECRET',
+  'ADMIN_PASSWORD_HASH',
+  'DATABASE_URL',
+  'FRONTEND_URL',
+  'NODE_ENV',
+  'CLOUDINARY_CLOUD_NAME',
+  'CLOUDINARY_API_KEY',
+  'CLOUDINARY_API_SECRET',
+];
+const missingEnv = REQUIRED_ENV.filter(k => !process.env[k] || !process.env[k].trim());
+if (missingEnv.length > 0) {
+  console.error(`FATAL: missing required environment variable(s): ${missingEnv.join(', ')}. Refusing to start.`);
+  process.exit(1);
+}
+
+const JWT_SECRET = process.env.JWT_SECRET;
+const FRONTEND_URL = process.env.FRONTEND_URL;
+
 const app = express();
 const PORT = process.env.PORT || 3005;
 const prisma = new PrismaClient();
@@ -48,15 +72,47 @@ const prisma = new PrismaClient();
 // Behind Render's proxy — needed so req.ip is the real client IP (rate limiter)
 app.set('trust proxy', 1);
 
-// ── CORS: allow credentials so HttpOnly cookies work cross-origin ──
+// ── Security headers (Helmet) ──
+// crossOriginResourcePolicy relaxed to allow the separate frontend origin
+// to consume API responses; CSP left off (API-only, no HTML served).
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  crossOriginEmbedderPolicy: false,
+}));
+
+// ── CORS: locked to the configured frontend origin only ──
 app.use(cors({
-  origin: process.env.FRONTEND_URL || true,
+  origin: FRONTEND_URL,
   credentials: true,
 }));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ limit: '5mb', extended: true }));
 
 app.use(cookieParser());
+
+// ── Global API rate limit: 100 req / 15 min / IP ──
+// Excludes the scraper status-poll route (admin-only, polled frequently
+// during long imports) so legitimate progress polling isn't throttled.
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please slow down and try again shortly.' },
+  skip: (req) => req.path.startsWith('/api/admin/scraper/scan/status'),
+});
+app.use('/api/', globalLimiter);
+
+// ── Registration rate limit: 5 / hour / IP ──
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many accounts created from this network. Please try again later.' },
+});
+app.use('/api/auth/register', registerLimiter);
 
 // ── Customer auth routes (register/login/logout/me) ──
 app.use('/api/auth', authRouter);
@@ -74,7 +130,7 @@ const adminAuth = (req, res, next) => {
   const token = req.cookies?.urbanex_admin_token;
   if (!token) return res.status(401).json({ error: 'Unauthorized' });
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret_change_in_prod');
+    const decoded = jwt.verify(token, JWT_SECRET);
     if (decoded.role !== 'admin') return res.status(401).json({ error: 'Unauthorized' });
     next();
   } catch {
@@ -91,20 +147,17 @@ app.post('/api/admin/login', async (req, res) => {
     const { password } = req.body;
     const passwordHash = process.env.ADMIN_PASSWORD_HASH;
 
-    // Fallback for dev: allow hardcoded password if no hash set
-    let isValid = false;
-    if (passwordHash) {
-      isValid = await bcrypt.compare(password, passwordHash);
-    } else {
-      // Dev fallback — remove in production
-      isValid = password === 'urbanex@admin2026';
+    if (!passwordHash) {
+      console.error('ADMIN_PASSWORD_HASH not set — admin login disabled.');
+      return res.status(500).json({ error: 'Admin login is not configured.' });
     }
+    const isValid = await bcrypt.compare(password || '', passwordHash);
 
     if (!isValid) return res.status(401).json({ error: 'Incorrect password' });
 
     const token = jwt.sign(
       { role: 'admin' },
-      process.env.JWT_SECRET || 'dev_secret_change_in_prod',
+      JWT_SECRET,
       { expiresIn: '24h' }
     );
 
@@ -520,7 +573,9 @@ app.get('/api/products/:slug', async (req, res) => {
 
 app.post('/api/products', adminAuth, async (req, res) => {
   try {
-    const validation = validateProductData(req.body);
+    const dbCats = await prisma.category.findMany({ where: { active: true }, select: { slug: true } }).catch(() => []);
+    const allowedCats = dbCats.length > 0 ? dbCats.map(c => c.slug) : undefined;
+    const validation = validateProductData(req.body, allowedCats);
     if (!validation.valid) return res.status(400).json({ error: validation.error });
     const product = await prisma.product.create({
       data: buildProductData(req.body),
@@ -535,7 +590,9 @@ app.post('/api/products', adminAuth, async (req, res) => {
 
 app.put('/api/products/:id', adminAuth, async (req, res) => {
   try {
-    const validation = validateProductData(req.body);
+    const dbCats = await prisma.category.findMany({ where: { active: true }, select: { slug: true } }).catch(() => []);
+    const allowedCats = dbCats.length > 0 ? dbCats.map(c => c.slug) : undefined;
+    const validation = validateProductData(req.body, allowedCats);
     if (!validation.valid) return res.status(400).json({ error: validation.error });
     const product = await prisma.product.update({
       where: { id: parseInt(req.params.id) },
@@ -576,47 +633,115 @@ app.put('/api/products/:id/stock', adminAuth, async (req, res) => {
 
 app.post('/api/orders', async (req, res) => {
   try {
-    const { productId, size, color, quantity, totalAmount, paymentMethod, utrNumber, amountPaid, shippingName, shippingAddress, shippingEmail, shippingPhone, items, couponCode, discountAmount } = req.body;
+    const {
+      productId, size, color, quantity,
+      paymentMethod, utrNumber,
+      shippingName, shippingAddress, shippingEmail, shippingPhone,
+      items, couponCode,
+    } = req.body;
     const paymentScreenshot = req.body.paymentScreenshot || null;
+
     const cleanUtr = (utrNumber || '').toString().trim();
     if (!/^\d{12}$/.test(cleanUtr)) return res.status(400).json({ error: 'A valid 12-digit UTR / Transaction ID is required.' });
 
-    // Update coupon usage if provided
-    if (couponCode) {
-      const coupon = await prisma.coupon.findFirst({ where: { code: couponCode.toUpperCase(), isActive: true } });
-      if (coupon) {
-        await prisma.coupon.update({
-          where: { id: coupon.id },
-          data: { usedCount: { increment: 1 } },
-        });
-      }
+    if (!shippingName || !shippingAddress || !shippingPhone) {
+      return res.status(400).json({ error: 'Shipping name, address and phone are required.' });
     }
 
+    // ── Optionally link to the logged-in customer (guest checkout still allowed) ──
+    let userId = null;
+    const customerToken = req.cookies?.[CUSTOMER_COOKIE];
+    if (customerToken) {
+      try {
+        const decoded = jwt.verify(customerToken, JWT_SECRET);
+        if (decoded.role === 'customer') userId = parseInt(decoded.sub);
+      } catch { /* invalid customer token — treat as guest */ }
+    }
+
+    // ── C2: build a normalised line-item list, then price EVERYTHING from the DB ──
+    const lineItems = Array.isArray(items) && items.length > 0
+      ? items.map(i => ({ productId: parseInt(i.productId), size: i.size || null, color: i.color || null, quantity: Math.max(1, parseInt(i.quantity) || 1) }))
+      : (productId ? [{ productId: parseInt(productId), size: size || null, color: color || null, quantity: Math.max(1, parseInt(quantity) || 1) }] : []);
+
+    if (lineItems.length === 0) return res.status(400).json({ error: 'No products in order.' });
+
+    const productIds = [...new Set(lineItems.map(li => li.productId).filter(Number.isInteger))];
+    const dbProducts = await prisma.product.findMany({ where: { id: { in: productIds } } });
+    const priceMap = new Map(dbProducts.map(p => [p.id, Number(p.price)]));
+
+    let subtotal = 0;
+    for (const li of lineItems) {
+      const unit = priceMap.get(li.productId);
+      if (unit == null) return res.status(400).json({ error: 'One or more products in your order no longer exist.' });
+      subtotal += unit * li.quantity;
+    }
+
+    // ── C3: recompute discount server-side + atomically redeem the coupon ──
+    let appliedCouponCode = null;
+    let discountAmount = 0;
+    if (couponCode) {
+      const code = couponCode.toString().toUpperCase();
+      // Atomic guard: only increment if active, not expired, and under the usage limit.
+      const result = await prisma.coupon.updateMany({
+        where: {
+          code,
+          isActive: true,
+          usedCount: { lt: prisma.coupon.fields.usageLimit },
+          OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+        },
+        data: { usedCount: { increment: 1 } },
+      });
+      if (result.count === 1) {
+        const coupon = await prisma.coupon.findFirst({ where: { code } });
+        if (coupon && Number(coupon.minimumOrder) <= subtotal) {
+          let d = coupon.type === 'percentage'
+            ? (subtotal * Number(coupon.value)) / 100
+            : Number(coupon.value);
+          if (coupon.maximumDiscount) d = Math.min(d, Number(coupon.maximumDiscount));
+          discountAmount = Math.min(Math.round(d), subtotal);
+          appliedCouponCode = code;
+        } else {
+          // Did not actually qualify — roll the increment back.
+          await prisma.coupon.update({ where: { id: coupon.id }, data: { usedCount: { decrement: 1 } } }).catch(() => {});
+        }
+      }
+      // If result.count === 0 the coupon was invalid/expired/exhausted → silently ignored (no discount)
+    }
+
+    const totalAmount = subtotal - discountAmount;
+
+    // ── Server decides what "amount paid" means based on payment method ──
+    const ADVANCE_AMOUNT = 300;
+    const amountPaid = paymentMethod === 'prepaid' ? totalAmount : ADVANCE_AMOUNT;
+
     const orderId = generateOrderId();
-    const firstItem = items && items.length > 0 ? items[0] : null;
+    const first = lineItems[0];
     const order = await prisma.order.create({
       data: {
-        orderId, totalAmount: parseFloat(totalAmount), status: 'Pending Verification',
-        paymentMethod: paymentMethod || 'cod', utrNumber: cleanUtr,
+        orderId, totalAmount, status: 'Pending Verification',
+        paymentMethod: paymentMethod === 'prepaid' ? 'prepaid' : 'cod',
+        utrNumber: cleanUtr,
         paymentScreenshot,
-        amountPaid: amountPaid != null ? parseFloat(amountPaid) : null,
-        shippingName, shippingAddress, shippingEmail, shippingPhone,
-        productId: firstItem ? parseInt(firstItem.productId) : (productId ? parseInt(productId) : null),
-        size: firstItem ? firstItem.size : (size || null),
-        color: firstItem ? firstItem.color : (color || null),
-        quantity: firstItem ? (firstItem.quantity || 1) : (quantity || 1),
-        couponCode: couponCode ? couponCode.toUpperCase() : null,
-        discountAmount: discountAmount ? parseFloat(discountAmount) : null,
+        amountPaid,
+        userId,
+        shippingName, shippingAddress, shippingEmail: shippingEmail || null, shippingPhone,
+        productId: first.productId,
+        size: first.size,
+        color: first.color,
+        quantity: first.quantity,
+        couponCode: appliedCouponCode,
+        discountAmount: discountAmount || null,
       },
     });
-    res.status(201).json(order);
+    res.status(201).json({ orderId: order.orderId, totalAmount: Number(order.totalAmount), amountPaid: Number(order.amountPaid), status: order.status });
   } catch (error) {
-    console.error(error);
+    console.error('[orders/create]', error.message);
     res.status(500).json({ error: 'Failed to create order' });
   }
 });
 
-app.get('/api/orders', async (req, res) => {
+// Admin: full order list (PII included) — protected
+app.get('/api/orders', adminAuth, async (req, res) => {
   try {
     const orders = await prisma.order.findMany({ orderBy: { createdAt: 'desc' }, include: { product: { include: { brand: true } } } });
     res.json(orders);
@@ -625,20 +750,35 @@ app.get('/api/orders', async (req, res) => {
   }
 });
 
+// Public order tracking — returns ONLY non-sensitive fields (no PII, no UTR, no screenshot)
 app.get('/api/orders/:orderId', async (req, res) => {
   try {
-    const order = await prisma.order.findFirst({ where: { orderId: req.params.orderId } });
+    const order = await prisma.order.findFirst({
+      where: { orderId: req.params.orderId },
+      include: { product: { select: { name: true } } },
+    });
     if (!order) return res.status(404).json({ error: 'Order not found' });
-    res.json(order);
+    res.json({
+      orderId: order.orderId,
+      status: order.status,
+      advancePaid: order.advancePaid,
+      size: order.size,
+      quantity: order.quantity,
+      totalAmount: Number(order.totalAmount),
+      createdAt: order.createdAt,
+      product: order.product ? { name: order.product.name } : null,
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch order' });
   }
 });
 
-app.put('/api/orders/:orderId/status', async (req, res) => {
+// Status changes — admin only
+app.put('/api/orders/:orderId/status', adminAuth, async (req, res) => {
   try {
     const { status } = req.body;
-    if (!status) return res.status(400).json({ error: 'Status is required' });
+    const ALLOWED = ['Pending Advance', 'Pending Verification', 'Verified', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'];
+    if (!status || !ALLOWED.includes(status)) return res.status(400).json({ error: 'Invalid status' });
     const updated = await prisma.order.update({ where: { orderId: req.params.orderId }, data: { status } });
     res.json(updated);
   } catch (error) {
@@ -646,7 +786,8 @@ app.put('/api/orders/:orderId/status', async (req, res) => {
   }
 });
 
-app.delete('/api/orders/:orderId', async (req, res) => {
+// Delete — admin only
+app.delete('/api/orders/:orderId', adminAuth, async (req, res) => {
   try {
     await prisma.order.delete({ where: { orderId: req.params.orderId } });
     res.json({ success: true, orderId: req.params.orderId });
@@ -942,9 +1083,16 @@ app.post('/api/admin/scraper/import', adminAuth, async (req, res) => {
   // supplier-url mode: images already set from detail fetch, no uploads needed
 
   // Phase 2.5 — Final price validation (now that detail pages have enriched prices)
+  // Fetch live category slugs so newly-created categories are accepted.
+  let allowedCategories;
+  try {
+    const dbCats = await prisma.category.findMany({ where: { active: true }, select: { slug: true } });
+    if (dbCats.length > 0) allowedCategories = dbCats.map(c => c.slug);
+  } catch { /* fallback to VALID_CATEGORIES inside validateProductData */ }
+
   const finalValidProducts = [];
   for (const p of validProducts) {
-    const validation = validateProductData(p);
+    const validation = validateProductData(p, allowedCategories);
     if (!validation.valid) {
       failureCount++;
       log.push({ sourceId: p.sourceId, operation: 'failed', errorMessage: validation.error });
