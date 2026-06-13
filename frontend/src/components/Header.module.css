@@ -219,7 +219,7 @@
   right: 0;
   z-index: 199;
   animation: megaFadeIn 0.2s ease forwards;
-  padding-top: 6px;
+  padding-top: 0;
 }
 
 .megaMenu {
