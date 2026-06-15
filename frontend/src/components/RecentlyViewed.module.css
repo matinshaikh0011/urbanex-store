@@ -12,7 +12,7 @@
   margin-bottom: 28px;
   text-shadow: 3px 3px 0 rgba(0,0,0,0.1);
 }
-.accent { color: var(--accent-primary); }
+.accent { color: rgba(10, 10, 10, 0.42); }
 
 .track {
   display: flex;
@@ -21,11 +21,11 @@
   padding: 6px 2px 18px;
   scroll-snap-type: x mandatory;
   scrollbar-width: thin;
-  scrollbar-color: var(--accent-primary) var(--bg-tertiary);
+  scrollbar-color: #0a0a0a var(--bg-tertiary);
 }
 .track::-webkit-scrollbar { height: 8px; }
 .track::-webkit-scrollbar-track { background: var(--bg-tertiary); border: 1px solid var(--border-color); }
-.track::-webkit-scrollbar-thumb { background: var(--accent-primary); }
+.track::-webkit-scrollbar-thumb { background: #0a0a0a; }
 
 .card {
   flex: 0 0 200px;
@@ -53,7 +53,7 @@
   font-family: 'Bebas Neue', sans-serif;
   font-size: 11px;
   letter-spacing: 2px;
-  color: var(--accent-primary);
+  color: rgba(10, 10, 10, 0.5);
   text-transform: uppercase;
 }
 .name {

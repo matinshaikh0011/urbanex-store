@@ -1,3 +1,4 @@
+/* Sticky add-to-cart (mobile) — Concrete Diptych (ink / bone) */
 .bar {
   position: fixed;
   left: 0;
@@ -6,11 +7,11 @@
   z-index: 100;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.6rem 0.9rem;
-  background: #fff;
-  border-top: 1px solid rgba(0,0,0,0.1);
-  box-shadow: 0 -4px 18px rgba(0,0,0,0.08);
+  gap: 0.7rem;
+  padding: 0.65rem 0.9rem;
+  background: #f4f2ed;
+  border-top: 3px solid #0a0a0a;
+  box-shadow: 0 -4px 0 rgba(10, 10, 10, 0.12);
   transform: translateY(100%);
   transition: transform 0.25s ease;
 }
@@ -21,11 +22,11 @@
 
 .thumb {
   position: relative;
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   flex-shrink: 0;
-  background: #f6f5f1;
-  border-radius: 4px;
+  background: #ebe9e6;
+  border: 2px solid #0a0a0a;
   overflow: hidden;
 }
 
@@ -39,7 +40,7 @@
 
 .name {
   font-size: 0.75rem;
-  color: #1a1a1a;
+  color: #0a0a0a;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -47,33 +48,38 @@
 }
 
 .price {
-  font-family: 'Impact', 'Arial Black', sans-serif;
-  font-size: 0.95rem;
-  color: #1a1a1a;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #0a0a0a;
   letter-spacing: 0.02em;
 }
 
 .button {
-  padding: 0.7rem 1rem;
-  background: #cc0000;
-  color: #fff;
-  border: none;
-  border-radius: 3px;
-  font-family: 'Impact', 'Arial Black', sans-serif;
-  font-size: 0.85rem;
-  letter-spacing: 0.05em;
+  padding: 0.75rem 1.1rem;
+  background: #0a0a0a;
+  color: #f4f2ed;
+  border: 2px solid #0a0a0a;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 0.88rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
   flex-shrink: 0;
+  box-shadow: 3px 3px 0 #c8c5be;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .button:hover {
-  background: #1a1a1a;
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #c8c5be;
 }
 
 .button:disabled {
-  background: #999;
+  opacity: 0.45;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 @media (min-width: 769px) {

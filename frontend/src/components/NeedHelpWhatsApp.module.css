@@ -1,23 +1,25 @@
+/* Need help — WhatsApp keeps brand green, concrete hard-edge framing */
 .card {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-  padding: 1rem 1.1rem;
-  margin: 1.25rem 0;
-  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-  border-radius: 4px;
+  gap: 0.95rem;
+  padding: 1.1rem 1.2rem;
+  margin: 1.5rem 0;
+  background: #128C7E;
+  border: 3px solid #0a0a0a;
+  box-shadow: 5px 5px 0 #0a0a0a;
   color: #fff;
   text-decoration: none;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.12s var(--ease-spring), box-shadow 0.12s ease;
 }
 
 .card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(37,211,102,0.3);
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 #0a0a0a;
 }
 
 .icon {
-  font-size: 1.8rem;
+  font-size: 1.9rem;
   line-height: 1;
   flex-shrink: 0;
 }
@@ -30,9 +32,10 @@
 }
 
 .title {
-  font-family: 'Impact', 'Arial Black', sans-serif;
-  font-size: 0.95rem;
-  letter-spacing: 0.05em;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -42,7 +45,7 @@
 }
 
 .arrow {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   flex-shrink: 0;
   opacity: 0.9;
 }

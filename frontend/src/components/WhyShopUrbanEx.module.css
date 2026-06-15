@@ -1,108 +1,149 @@
+/* WHY SHOP URBANEX — Concrete Diptych dark asphalt slab */
 .section {
-  background: #1a1a1a;
-  color: #f6f5f1;
-  padding: clamp(2.5rem, 6vw, 5rem) clamp(1rem, 4vw, 3rem);
+  --ux-asphalt:     #1c1c1e;
+  --ux-asphalt-mid: #26262a;
+  --ux-bone:        #f4f2ed;
+  --ux-ink:         #0a0a0a;
+  --ux-chalk:       #c8c5be;
+
   position: relative;
+  background: var(--ux-asphalt);
+  color: var(--ux-bone);
+  padding: clamp(3rem, 6vw, 5.5rem) clamp(1rem, 4vw, 3rem);
   overflow: hidden;
+  isolation: isolate;
+}
+.section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cfilter id='nw'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='500' height='500' filter='url(%23nw)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 360px 360px;
+  mix-blend-mode: screen;
+  opacity: 0.13;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .head {
+  position: relative;
+  z-index: 2;
   text-align: center;
-  margin-bottom: clamp(2rem, 4vw, 3rem);
-  max-width: 720px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto clamp(2.25rem, 4vw, 3.25rem);
+  max-width: 760px;
 }
 
 .kicker {
   display: inline-block;
-  font-family: 'Courier New', monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.25em;
-  color: #cc0000;
-  margin-bottom: 0.75rem;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.35em;
   text-transform: uppercase;
+  color: var(--ux-ink);
+  background: var(--ux-chalk);
+  border: 2px solid var(--ux-ink);
+  box-shadow: 3px 3px 0 var(--ux-ink);
+  padding: 4px 14px;
+  transform: rotate(-1.5deg);
+  margin-bottom: 1.1rem;
 }
 
 .title {
-  font-family: 'Impact', 'Arial Black', sans-serif;
-  font-size: clamp(1.8rem, 4vw, 3rem);
-  font-weight: 900;
-  letter-spacing: -0.02em;
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(2rem, 4.5vw, 3.4rem);
+  font-weight: 700;
+  letter-spacing: 3px;
   line-height: 1.05;
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.9rem;
   text-transform: uppercase;
+  color: var(--ux-bone);
+  text-shadow: 4px 5px 0 var(--ux-ink);
 }
 
 .accent {
-  color: #cc0000;
+  color: var(--ux-chalk);
 }
 
 .subtitle {
-  color: #aaa;
-  font-size: 0.95rem;
+  color: rgba(244, 242, 237, 0.68);
+  font-size: clamp(0.95rem, 1.5vw, 1.05rem);
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .grid {
+  position: relative;
+  z-index: 2;
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 18px;
 }
 
 .card {
-  background: #1a1a1a;
-  padding: clamp(1.25rem, 3vw, 2rem);
+  background: var(--ux-asphalt-mid);
+  border: 2px solid var(--ux-ink);
+  box-shadow: 5px 5px 0 var(--ux-ink);
+  padding: clamp(1.4rem, 3vw, 2rem);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.65rem;
-  transition: background 0.25s ease;
+  gap: 0.7rem;
   position: relative;
+  overflow: hidden;
+  transition: transform 0.15s var(--ease-spring), box-shadow 0.15s ease;
 }
-
 .card:hover {
-  background: #222;
+  transform: translate(-3px, -3px);
+  box-shadow: 8px 8px 0 var(--ux-chalk);
 }
 
+/* top accent bar — chalk, reveals on hover */
 .card::after {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 2px;
-  background: transparent;
-  transition: background 0.25s ease;
+  height: 3px;
+  background: var(--ux-chalk);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s var(--ease-out);
 }
-
-.card:hover::after {
-  background: #cc0000;
-}
+.card:hover::after { transform: scaleX(1); }
 
 .icon {
-  font-size: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  font-size: 1.7rem;
   line-height: 1;
+  background: var(--ux-bone);
+  border: 2px solid var(--ux-ink);
+  box-shadow: 3px 3px 0 var(--ux-ink);
+  filter: grayscale(1);
 }
 
 .cardTitle {
-  font-family: 'Impact', 'Arial Black', sans-serif;
-  font-size: 1.1rem;
-  letter-spacing: 0.04em;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   margin: 0;
+  color: var(--ux-bone);
 }
 
 .cardText {
   margin: 0;
-  font-size: 0.88rem;
-  color: #bbb;
-  line-height: 1.5;
+  font-size: 0.9rem;
+  color: rgba(244, 242, 237, 0.62);
+  line-height: 1.55;
 }
 
 @media (max-width: 900px) {

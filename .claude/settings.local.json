@@ -23,7 +23,9 @@
       "Bash(npx --version)",
       "Bash(npx *)",
       "Bash(grep *)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(ls -la globals.css)",
+      "Bash(ls layout.tsx page.tsx page.module.css)"
     ]
   }
 }
