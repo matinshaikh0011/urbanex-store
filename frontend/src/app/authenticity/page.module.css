@@ -1,0 +1,304 @@
+.main {
+  background: #f6f5f1;
+  color: #1a1a1a;
+  padding-top: 1rem;
+}
+
+.hero {
+  background: #1a1a1a;
+  color: #f6f5f1;
+  padding: clamp(3rem, 8vw, 6rem) clamp(1rem, 4vw, 3rem);
+  text-align: center;
+  border-bottom: 2px solid #cc0000;
+  position: relative;
+}
+
+.heroKicker {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  color: #cc0000;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: clamp(2.2rem, 6vw, 4.5rem);
+  margin: 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.heroSub {
+  max-width: 720px;
+  margin: 1rem auto 0;
+  color: #bbb;
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+.badgeWrap {
+  margin-top: 1.5rem;
+  display: inline-flex;
+}
+
+.accent { color: #cc0000; }
+
+.section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(2.5rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.section:last-of-type { border-bottom: 0; }
+
+.sectionTitle {
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: clamp(1.7rem, 4vw, 2.8rem);
+  text-transform: uppercase;
+  margin: 0 0 1rem;
+  letter-spacing: -0.01em;
+}
+
+.kicker {
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  color: #cc0000;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.lead {
+  font-size: 1.05rem;
+  color: #333;
+  line-height: 1.65;
+  max-width: 740px;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+.step {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 1.5rem;
+  position: relative;
+}
+
+.stepNum {
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: 2.4rem;
+  color: #cc0000;
+  line-height: 1;
+}
+
+.stepTitle {
+  margin: 0.5rem 0 0.4rem;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+}
+
+.stepText {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: #444;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.galleryItem {
+  aspect-ratio: 1 / 1;
+  background: #1a1a1a;
+  color: #f6f5f1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
+  padding: 1rem;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.galleryEmoji { font-size: 3rem; }
+
+.galleryLabel { font-size: 0.95rem; }
+
+.invoiceCard {
+  background: #fff;
+  border: 1px dashed rgba(0,0,0,0.25);
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: #222;
+  max-width: 520px;
+}
+
+.invoiceHead {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0,0,0,0.2);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+}
+
+.invoiceRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.invoiceTotal {
+  border-top: 1px solid rgba(0,0,0,0.2);
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+  font-weight: 700;
+}
+
+.assuranceList {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem 2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.assuranceItem {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.checkIcon {
+  color: #cc0000;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.faq {
+  margin-top: 1.5rem;
+}
+
+.faqItem {
+  border-bottom: 1px solid rgba(0,0,0,0.15);
+}
+
+.faqQ {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  padding: 1rem 0;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #1a1a1a;
+}
+
+.faqQ:hover { color: #cc0000; }
+
+.faqIcon {
+  color: #cc0000;
+  font-size: 1.4rem;
+  transition: transform 0.2s ease;
+}
+
+.faqIconOpen { transform: rotate(45deg); }
+
+.faqA {
+  padding: 0 0 1rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #444;
+}
+
+.cta {
+  background: #1a1a1a;
+  color: #f6f5f1;
+  text-align: center;
+  padding: clamp(2.5rem, 6vw, 4rem) 1.5rem;
+  margin-top: 0;
+}
+
+.ctaTitle {
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  text-transform: uppercase;
+  margin: 0 0 0.75rem;
+}
+
+.ctaButtons {
+  display: inline-flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.ctaBtn {
+  display: inline-block;
+  background: #cc0000;
+  color: #fff;
+  padding: 0.9rem 2rem;
+  text-decoration: none;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 2px solid #cc0000;
+  transition: background 0.2s ease;
+}
+
+.ctaBtn:hover { background: #a30000; border-color: #a30000; }
+
+.ctaBtnOutline {
+  display: inline-block;
+  background: transparent;
+  color: #f6f5f1;
+  padding: 0.9rem 2rem;
+  text-decoration: none;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 2px solid #f6f5f1;
+  transition: all 0.2s ease;
+}
+
+.ctaBtnOutline:hover { background: #f6f5f1; color: #1a1a1a; }
+
+@media (max-width: 768px) {
+  .steps,
+  .gallery {
+    grid-template-columns: 1fr;
+  }
+  .assuranceList {
+    grid-template-columns: 1fr;
+  }
+}

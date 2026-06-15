@@ -1,21 +1,24 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import UrbanExVerified from './UrbanExVerified';
 import styles from './ProductReviews.module.css';
 
-interface Review {
-  name: string;
+interface ApiReview {
+  id: number;
+  customerName: string;
   rating: number;
   text: string;
-  date: string;
-  verified: boolean;
+  source: 'direct' | 'whatsapp' | 'instagram';
+  imageUrls: string[];
+  videoUrl: string | null;
+  whatsappScreenshotUrl: string | null;
+  approved: boolean;
+  featured: boolean;
+  displayDate: string;
+  createdAt: string;
 }
-
-const SAMPLE_REVIEWS: Review[] = [
-  { name: 'Rahul S.', rating: 5, text: 'Amazing quality! Exactly as described. Fast delivery too.', date: '2026-04-18', verified: true },
-  { name: 'Priya M.', rating: 5, text: 'Love it! Great packaging and authentic product.', date: '2026-04-10', verified: true },
-  { name: 'Arjun K.', rating: 4, text: 'Good product, slightly delayed delivery but worth it.', date: '2026-03-29', verified: true },
-];
 
 function Stars({ value, size = 16 }: { value: number; size?: number }) {
   return (
@@ -27,136 +30,102 @@ function Stars({ value, size = 16 }: { value: number; size?: number }) {
   );
 }
 
+function sourceLabel(source: string) {
+  if (source === 'whatsapp') return '💬 WhatsApp';
+  if (source === 'instagram') return '📸 Instagram';
+  return '✓ Verified Purchase';
+}
+
 export default function ProductReviews({ slug }: { slug: string }) {
-  const storageKey = `urbanex_reviews_${slug}`;
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [form, setForm] = useState({ name: '', rating: 0, text: '' });
-  const [hoverStar, setHoverStar] = useState(0);
+  const [reviews, setReviews] = useState<ApiReview[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [lightbox, setLightbox] = useState<string | null>(null);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(storageKey);
-      const custom: Review[] = saved ? JSON.parse(saved) : [];
-      setReviews([...custom, ...SAMPLE_REVIEWS]);
-    } catch {
-      setReviews(SAMPLE_REVIEWS);
-    }
-  }, [storageKey]);
+    setLoading(true);
+    fetch(`/api/reviews?productSlug=${encodeURIComponent(slug)}&limit=50`)
+      .then(res => res.json())
+      .then(data => {
+        setReviews(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [slug]);
 
   const avg = reviews.length
-    ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length)
+    ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
     : 0;
-
-  const submitReview = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.name.trim() || form.rating === 0 || !form.text.trim()) {
-      alert('Please fill in your name, a star rating, and your review.');
-      return;
-    }
-    // Format name as "First L."
-    const parts = form.name.trim().split(/\s+/);
-    const displayName = parts.length > 1
-      ? `${parts[0]} ${parts[parts.length - 1][0].toUpperCase()}.`
-      : parts[0];
-
-    const newReview: Review = {
-      name: displayName,
-      rating: form.rating,
-      text: form.text.trim(),
-      date: new Date().toISOString().slice(0, 10),
-      verified: true,
-    };
-    try {
-      const saved = localStorage.getItem(storageKey);
-      const custom: Review[] = saved ? JSON.parse(saved) : [];
-      const updated = [newReview, ...custom];
-      localStorage.setItem(storageKey, JSON.stringify(updated));
-      setReviews([newReview, ...reviews]);
-    } catch {
-      setReviews([newReview, ...reviews]);
-    }
-    setForm({ name: '', rating: 0, text: '' });
-    setModalOpen(false);
-  };
 
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+  if (!loading && reviews.length === 0) {
+    return (
+      <section className={styles.section}>
+        <div className={styles.head}>
+          <h2 className={styles.title}>CUSTOMER <span className={styles.accent}>REVIEWS</span></h2>
+        </div>
+        <p className={styles.emptyState}>Be the first to share your experience. Message us on WhatsApp after delivery to add your review.</p>
+      </section>
+    );
+  }
 
   return (
     <section className={styles.section}>
       <div className={styles.head}>
         <h2 className={styles.title}>CUSTOMER <span className={styles.accent}>REVIEWS</span></h2>
-        <button className={styles.writeBtn} onClick={() => setModalOpen(true)}>✍️ WRITE A REVIEW</button>
+        <UrbanExVerified variant="dark" size="sm" />
       </div>
 
       <div className={styles.summary}>
         <div className={styles.avgBox}>
           <span className={styles.avgNum}>{avg.toFixed(1)}</span>
           <Stars value={Math.round(avg)} size={20} />
-          <span className={styles.reviewCount}>{reviews.length} reviews</span>
+          <span className={styles.reviewCount}>{reviews.length} review{reviews.length !== 1 ? 's' : ''}</span>
         </div>
       </div>
 
       <div className={styles.list}>
-        {reviews.map((r, i) => (
-          <div key={i} className={styles.review}>
+        {reviews.map((r) => (
+          <div key={r.id} className={styles.review}>
             <div className={styles.reviewTop}>
-              <span className={styles.reviewName}>{r.name}</span>
-              {r.verified && <span className={styles.verified}>✓ Verified Purchase</span>}
+              <span className={styles.reviewName}>{r.customerName}</span>
+              <span className={styles.verified}>{sourceLabel(r.source)}</span>
             </div>
             <div className={styles.reviewMeta}>
               <Stars value={r.rating} />
-              <span className={styles.reviewDate}>{formatDate(r.date)}</span>
+              <span className={styles.reviewDate}>{formatDate(r.displayDate)}</span>
             </div>
             <p className={styles.reviewText}>{r.text}</p>
+
+            {(r.imageUrls.length > 0 || r.videoUrl || r.whatsappScreenshotUrl) && (
+              <div className={styles.media}>
+                {r.imageUrls.map((url, i) => (
+                  <button key={i} className={styles.mediaThumb} onClick={() => setLightbox(url)} type="button">
+                    <Image src={url} alt={`Review by ${r.customerName} - ${i + 1}`} fill sizes="80px" style={{ objectFit: 'cover' }} />
+                  </button>
+                ))}
+                {r.whatsappScreenshotUrl && (
+                  <button className={styles.mediaThumb} onClick={() => setLightbox(r.whatsappScreenshotUrl!)} type="button">
+                    <Image src={r.whatsappScreenshotUrl} alt="WhatsApp screenshot" fill sizes="80px" style={{ objectFit: 'cover' }} />
+                    <span className={styles.mediaBadge}>💬</span>
+                  </button>
+                )}
+                {r.videoUrl && (
+                  <a href={r.videoUrl} target="_blank" rel="noopener noreferrer" className={styles.mediaThumb}>
+                    <span className={styles.videoIcon}>▶</span>
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         ))}
       </div>
 
-      {modalOpen && (
-        <div className={styles.modalOverlay} onClick={() => setModalOpen(false)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHead}>
-              <h3>WRITE A <span className={styles.accent}>REVIEW</span></h3>
-              <button className={styles.modalClose} onClick={() => setModalOpen(false)}>✕</button>
-            </div>
-            <form onSubmit={submitReview} className={styles.form}>
-              <label className={styles.label}>Your Name *</label>
-              <input
-                type="text"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="e.g. Rahul Sharma"
-                className={styles.input}
-              />
-
-              <label className={styles.label}>Your Rating *</label>
-              <div className={styles.starPicker}>
-                {[1, 2, 3, 4, 5].map(i => (
-                  <button
-                    type="button"
-                    key={i}
-                    className={(hoverStar || form.rating) >= i ? styles.pickOn : styles.pickOff}
-                    onClick={() => setForm({ ...form, rating: i })}
-                    onMouseEnter={() => setHoverStar(i)}
-                    onMouseLeave={() => setHoverStar(0)}
-                  >★</button>
-                ))}
-              </div>
-
-              <label className={styles.label}>Your Review *</label>
-              <textarea
-                value={form.text}
-                onChange={(e) => setForm({ ...form, text: e.target.value })}
-                placeholder="Share your experience with this product..."
-                rows={4}
-                className={styles.textarea}
-              />
-
-              <button type="submit" className={styles.submitBtn}>SUBMIT REVIEW</button>
-            </form>
-          </div>
+      {lightbox && (
+        <div className={styles.lightbox} onClick={() => setLightbox(null)}>
+          <button className={styles.lightboxClose} onClick={() => setLightbox(null)} aria-label="Close">✕</button>
+          <img src={lightbox} alt="Review media" />
         </div>
       )}
     </section>

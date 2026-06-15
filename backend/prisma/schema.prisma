@@ -51,6 +51,7 @@ model Product {
   inStock       Boolean    @default(true) @map("in_stock")
   isFeatured    Boolean    @default(false) @map("is_featured")
   orders        Order[]
+  reviews       Review[]
   createdAt     DateTime   @default(now()) @map("created_at")
 
   // ── Source tracking (scraper) ──
@@ -153,4 +154,25 @@ model HeroSlide {
   sortOrder Int      @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Review {
+  id                    Int       @id @default(autoincrement())
+  product               Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productId             Int?      @map("product_id")
+  customerName          String    @map("customer_name")
+  rating                Int
+  text                  String
+  source                String    @default("direct")
+  imageUrls             String[]  @map("image_urls")
+  videoUrl              String?   @map("video_url")
+  whatsappScreenshotUrl String?   @map("whatsapp_screenshot_url")
+  approved              Boolean   @default(true)
+  featured              Boolean   @default(false)
+  displayDate           DateTime  @default(now()) @map("display_date")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@index([productId])
+  @@index([approved, displayDate])
 }

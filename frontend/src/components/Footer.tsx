@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import styles from './Footer.module.css';
 
 export default function Footer() {
@@ -35,8 +36,11 @@ export default function Footer() {
           </a>
         </div>
         <div className={styles.links}>
+          <Link href="/authenticity">Authenticity Guarantee</Link>
+          <Link href="/faq">FAQ</Link>
+          <Link href="/return-exchange">Returns</Link>
           <p>© 2026 UrbanEx. All rights reserved.</p>
-          <p>WhatsApp: +91 92651 10277</p>
+          <p>WhatsApp: +91 98982 85850</p>
         </div>
       </div>
     </footer>

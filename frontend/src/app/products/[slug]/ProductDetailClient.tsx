@@ -10,6 +10,12 @@ import GlobalPopup from '@/components/GlobalPopup';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import ProductReviews from '@/components/ProductReviews';
 import Loader from '@/components/Loader';
+import PdpTrustStrip from '@/components/PdpTrustStrip';
+import EstimatedDelivery from '@/components/EstimatedDelivery';
+import StickyAddToCart from '@/components/StickyAddToCart';
+import ProductFaqAccordion from '@/components/ProductFaqAccordion';
+import NeedHelpWhatsApp from '@/components/NeedHelpWhatsApp';
+import UrbanExVerified from '@/components/UrbanExVerified';
 import { addRecentlyViewed } from '@/lib/recentlyViewed';
 import styles from './page.module.css';
 
@@ -296,7 +302,7 @@ export default function ProductDetailClient({ params }: { params: { slug: string
               {selectedSize && <p className={styles.selectedSize}>Size {selectedSize} selected</p>}
             </div>
 
-            <div className={styles.actions}>
+            <div className={styles.actions} data-pdp-actions>
               <button className={`${styles.addToCartBtn} ${addedToCart ? styles.added : ''}`} onClick={handleAddToCart} disabled={!selectedSize}>
                 {addedToCart ? '✓ ADDED TO CART' : 'ADD TO CART'}
               </button>
@@ -305,14 +311,26 @@ export default function ProductDetailClient({ params }: { params: { slug: string
               </button>
             </div>
 
-            <a 
+            <PdpTrustStrip />
+
+            <EstimatedDelivery />
+
+            <a
               href={`https://wa.me/919898285850?text=Hi, I would like to request a live video call for ${encodeURIComponent(product.name)}`}
-              target="_blank" 
+              target="_blank"
               rel="noopener noreferrer"
               className={styles.videoCallBtn}
             >
               📹 REQUEST A LIVE VIDEO CALL
             </a>
+
+            <div style={{ margin: '1rem 0' }}>
+              <UrbanExVerified variant="dark" size="lg" linkToAuthenticity />
+            </div>
+
+            <NeedHelpWhatsApp productName={product.name} />
+
+            <ProductFaqAccordion />
 
             <div className={styles.features}>
               <div className={styles.feature}><span>✓</span> 100% Premium Guaranteed</div>
@@ -378,6 +396,14 @@ export default function ProductDetailClient({ params }: { params: { slug: string
         <RecentlyViewed currentSlug={product.slug} />
       </main>
 
+      <StickyAddToCart
+        image={product.images[0]}
+        name={product.name}
+        price={product.price}
+        selectedSize={selectedSize}
+        onAdd={handleAddToCart}
+      />
+
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
           <div className={styles.footerBrand}>
@@ -386,6 +412,7 @@ export default function ProductDetailClient({ params }: { params: { slug: string
           </div>
           <div className={styles.footerLinks}>
             <Link href="/about">About Us</Link>
+            <Link href="/authenticity">Authenticity</Link>
             <Link href="/track-order">Track Order</Link>
             <Link href="/return-exchange">Returns</Link>
             <p>WhatsApp: +91 9898285850</p>

@@ -28,6 +28,20 @@ async function getProduct(slug: string): Promise<ProductSEO | null> {
   }
 }
 
+async function getReviewStats(slug: string): Promise<{ count: number; average: number } | null> {
+  try {
+    const res = await fetch(`${API_BASE}/api/reviews/stats?productSlug=${encodeURIComponent(slug)}`, {
+      next: { revalidate: 600 },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (typeof data?.count === 'number' && typeof data?.average === 'number') return data;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 // Clean up scraped/underscore names into readable text for titles & descriptions.
 function readable(name: string) {
   return name.replace(/[_]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -72,14 +86,17 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {
-  const product = await getProduct(params.slug);
+  const [product, stats] = await Promise.all([
+    getProduct(params.slug),
+    getReviewStats(params.slug),
+  ]);
 
   // Product + Breadcrumb structured data (only when the product resolves server-side)
   let jsonLd: string | null = null;
   if (product) {
     const name = readable(product.name);
     const url = `${SITE_URL}/products/${product.slug}`;
-    const productSchema = {
+    const productSchema: Record<string, unknown> = {
       '@context': 'https://schema.org',
       '@type': 'Product',
       name,
@@ -98,6 +115,15 @@ export default async function ProductPage({ params }: { params: { slug: string }
         seller: { '@type': 'Organization', name: SITE_NAME },
       },
     };
+    if (stats && stats.count > 0 && stats.average > 0) {
+      productSchema.aggregateRating = {
+        '@type': 'AggregateRating',
+        ratingValue: stats.average,
+        reviewCount: stats.count,
+        bestRating: 5,
+        worstRating: 1,
+      };
+    }
     const breadcrumbSchema = {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',

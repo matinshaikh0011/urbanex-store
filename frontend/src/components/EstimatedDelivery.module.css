@@ -1,0 +1,89 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 4px;
+  margin: 0.75rem 0;
+}
+
+.icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.title {
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #1a1a1a;
+}
+
+.eta {
+  font-size: 0.85rem;
+  color: #1a1a1a;
+}
+
+.etaHighlight {
+  font-weight: 700;
+  color: #cc0000;
+}
+
+.form {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+}
+
+.input {
+  flex: 1;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 3px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  min-width: 0;
+}
+
+.input:focus {
+  border-color: #1a1a1a;
+}
+
+.button {
+  padding: 0.5rem 0.85rem;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.button:hover {
+  background: #cc0000;
+}
+
+.error {
+  font-size: 0.75rem;
+  color: #cc0000;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 480px) {
+  .wrap { flex-direction: column; align-items: flex-start; }
+  .icon { font-size: 1.2rem; }
+}

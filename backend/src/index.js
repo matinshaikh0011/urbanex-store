@@ -1372,6 +1372,210 @@ app.delete('/api/admin/hero-slides/:id', adminAuth, async (req, res) => {
   }
 });
 
+// ════════════════════════════════════════════════════════════════
+// REVIEWS
+// ════════════════════════════════════════════════════════════════
+
+const VALID_REVIEW_SOURCES = ['direct', 'whatsapp', 'instagram'];
+
+function serializeReview(r) {
+  return {
+    id: r.id,
+    productId: r.productId,
+    product: r.product ? {
+      id: r.product.id,
+      name: r.product.name,
+      slug: r.product.slug,
+      image: Array.isArray(r.product.images) && r.product.images.length > 0 ? r.product.images[0] : null,
+    } : null,
+    customerName: r.customerName,
+    rating: r.rating,
+    text: r.text,
+    source: r.source,
+    imageUrls: r.imageUrls || [],
+    videoUrl: r.videoUrl || null,
+    whatsappScreenshotUrl: r.whatsappScreenshotUrl || null,
+    approved: r.approved,
+    featured: r.featured,
+    displayDate: r.displayDate,
+    createdAt: r.createdAt,
+  };
+}
+
+function validateReviewBody(body) {
+  const name = (body.customerName || '').toString().trim();
+  if (!name) return { valid: false, error: 'customerName is required' };
+  if (name.length > 120) return { valid: false, error: 'customerName too long' };
+  const rating = parseInt(body.rating);
+  if (isNaN(rating) || rating < 1 || rating > 5) return { valid: false, error: 'rating must be 1-5' };
+  const text = (body.text || '').toString().trim();
+  if (!text) return { valid: false, error: 'text is required' };
+  if (text.length > 2000) return { valid: false, error: 'text too long (max 2000)' };
+  const source = (body.source || 'direct').toString().toLowerCase();
+  if (!VALID_REVIEW_SOURCES.includes(source)) return { valid: false, error: `source must be one of: ${VALID_REVIEW_SOURCES.join(', ')}` };
+  const imageUrls = Array.isArray(body.imageUrls) ? body.imageUrls.filter(u => typeof u === 'string' && u.trim()).slice(0, 8) : [];
+  return {
+    valid: true,
+    data: {
+      customerName: name,
+      rating,
+      text,
+      source,
+      imageUrls,
+      videoUrl: body.videoUrl ? String(body.videoUrl).trim() : null,
+      whatsappScreenshotUrl: body.whatsappScreenshotUrl ? String(body.whatsappScreenshotUrl).trim() : null,
+      productId: body.productId ? parseInt(body.productId) : null,
+      approved: body.approved !== false,
+      featured: body.featured === true,
+      displayDate: body.displayDate ? new Date(body.displayDate) : new Date(),
+    },
+  };
+}
+
+// Public: list reviews. Filters: productSlug, source, featured, limit.
+app.get('/api/reviews', async (req, res) => {
+  try {
+    const { productSlug, productId, source, featured, limit } = req.query;
+    const where = { approved: true };
+    if (productSlug) {
+      const p = await prisma.product.findUnique({ where: { slug: productSlug }, select: { id: true } });
+      if (!p) return res.json([]);
+      where.productId = p.id;
+    } else if (productId) {
+      where.productId = parseInt(productId);
+    }
+    if (source && VALID_REVIEW_SOURCES.includes(source)) where.source = source;
+    if (featured === 'true') where.featured = true;
+    const take = Math.min(100, Math.max(1, parseInt(limit) || 50));
+    const reviews = await prisma.review.findMany({
+      where,
+      include: { product: { select: { id: true, name: true, slug: true, images: true } } },
+      orderBy: [{ featured: 'desc' }, { displayDate: 'desc' }],
+      take,
+    });
+    res.json(reviews.map(serializeReview));
+  } catch (error) {
+    console.error('[reviews/list]', error);
+    res.status(500).json({ error: 'Failed to fetch reviews' });
+  }
+});
+
+// Public: aggregate stats (count + avg) for a product slug or global
+app.get('/api/reviews/stats', async (req, res) => {
+  try {
+    const { productSlug } = req.query;
+    const where = { approved: true };
+    if (productSlug) {
+      const p = await prisma.product.findUnique({ where: { slug: productSlug }, select: { id: true } });
+      if (!p) return res.json({ count: 0, average: 0 });
+      where.productId = p.id;
+    }
+    const agg = await prisma.review.aggregate({
+      where,
+      _avg: { rating: true },
+      _count: { _all: true },
+    });
+    res.json({
+      count: agg._count._all || 0,
+      average: agg._avg.rating ? Number(agg._avg.rating.toFixed(2)) : 0,
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch review stats' });
+  }
+});
+
+// Admin: list all reviews (incl. unapproved)
+app.get('/api/admin/reviews', adminAuth, async (req, res) => {
+  try {
+    const { approved, source, productId } = req.query;
+    const where = {};
+    if (approved === 'true') where.approved = true;
+    if (approved === 'false') where.approved = false;
+    if (source && VALID_REVIEW_SOURCES.includes(source)) where.source = source;
+    if (productId) where.productId = parseInt(productId);
+    const reviews = await prisma.review.findMany({
+      where,
+      include: { product: { select: { id: true, name: true, slug: true, images: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(reviews.map(serializeReview));
+  } catch (error) {
+    console.error('[admin/reviews/list]', error);
+    res.status(500).json({ error: 'Failed to fetch reviews' });
+  }
+});
+
+// Admin: create review
+app.post('/api/admin/reviews', adminAuth, async (req, res) => {
+  const validation = validateReviewBody(req.body);
+  if (!validation.valid) return res.status(400).json({ error: validation.error });
+  try {
+    if (validation.data.productId) {
+      const exists = await prisma.product.findUnique({ where: { id: validation.data.productId }, select: { id: true } });
+      if (!exists) return res.status(400).json({ error: 'productId does not exist' });
+    }
+    const review = await prisma.review.create({
+      data: validation.data,
+      include: { product: { select: { id: true, name: true, slug: true, images: true } } },
+    });
+    res.status(201).json(serializeReview(review));
+  } catch (error) {
+    console.error('[admin/reviews/create]', error);
+    res.status(500).json({ error: 'Failed to create review' });
+  }
+});
+
+// Admin: update review
+app.put('/api/admin/reviews/:id', adminAuth, async (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid id' });
+  const validation = validateReviewBody(req.body);
+  if (!validation.valid) return res.status(400).json({ error: validation.error });
+  try {
+    const review = await prisma.review.update({
+      where: { id },
+      data: validation.data,
+      include: { product: { select: { id: true, name: true, slug: true, images: true } } },
+    });
+    res.json(serializeReview(review));
+  } catch (error) {
+    console.error('[admin/reviews/update]', error);
+    res.status(500).json({ error: 'Failed to update review' });
+  }
+});
+
+// Admin: toggle approved / featured
+app.patch('/api/admin/reviews/:id', adminAuth, async (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid id' });
+  const data = {};
+  if (typeof req.body.approved === 'boolean') data.approved = req.body.approved;
+  if (typeof req.body.featured === 'boolean') data.featured = req.body.featured;
+  if (Object.keys(data).length === 0) return res.status(400).json({ error: 'Nothing to update' });
+  try {
+    const review = await prisma.review.update({
+      where: { id },
+      data,
+      include: { product: { select: { id: true, name: true, slug: true, images: true } } },
+    });
+    res.json(serializeReview(review));
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update review' });
+  }
+});
+
+// Admin: delete review
+app.delete('/api/admin/reviews/:id', adminAuth, async (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid id' });
+  try {
+    await prisma.review.delete({ where: { id } });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete review' });
+  }
+});
+
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 app.listen(PORT, () => console.log(`🚀 UrbanEx API running on port ${PORT}`));

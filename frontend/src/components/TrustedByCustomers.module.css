@@ -1,0 +1,120 @@
+.section {
+  position: relative;
+  background: #f6f5f1;
+  padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1rem, 4vw, 3rem);
+  border-top: 2px solid #1a1a1a;
+  border-bottom: 2px solid #1a1a1a;
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1.5rem, 3vw, 3rem);
+  align-items: center;
+}
+
+.kicker {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  color: #888;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.statBlock {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  position: relative;
+}
+
+.statBlock + .statBlock::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15%;
+  bottom: 15%;
+  width: 1px;
+  background: rgba(26, 26, 26, 0.15);
+}
+
+.statNum {
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #1a1a1a;
+  line-height: 1;
+}
+
+.statSuffix {
+  color: #cc0000;
+}
+
+.statLabel {
+  font-family: 'Arial', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #1a1a1a;
+}
+
+.stars {
+  display: inline-flex;
+  gap: 2px;
+  font-size: 1.25rem;
+  color: #f5c400;
+  line-height: 1;
+}
+
+.starOff {
+  color: rgba(245, 196, 0, 0.25);
+}
+
+.ratingNum {
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #1a1a1a;
+  line-height: 1;
+}
+
+.ratingMeta {
+  font-size: 0.78rem;
+  color: #555;
+  margin-top: 0.25rem;
+}
+
+.satisfaction {
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.4;
+  max-width: 240px;
+}
+
+.satisfaction strong {
+  color: #1a1a1a;
+}
+
+@media (max-width: 768px) {
+  .inner {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .statBlock + .statBlock::before {
+    left: 15%;
+    right: 15%;
+    top: 0;
+    bottom: auto;
+    height: 1px;
+    width: auto;
+  }
+}

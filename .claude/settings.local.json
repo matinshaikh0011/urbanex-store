@@ -14,7 +14,16 @@
       "Bash(powershell -Command \"Stop-Process -Id 3252 -Force -ErrorAction SilentlyContinue\")",
       "Bash(powershell *)",
       "Bash(Start-Sleep *)",
-      "Bash(curl.exe *)"
+      "Bash(curl.exe *)",
+      "WebFetch(domain:github.com)",
+      "Bash(bash)",
+      "Bash(powershell.exe *)",
+      "Bash(cmd.exe *)",
+      "Read(//tmp/**)",
+      "Bash(npx --version)",
+      "Bash(npx *)",
+      "Bash(grep *)",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }

@@ -20,6 +20,12 @@ export default function FaqClient() {
             <div className={styles.badge}>HELP CENTER</div>
             <h1 className={styles.title}>FREQUENTLY ASKED <span className={styles.accent}>QUESTIONS</span></h1>
             <p className={styles.sub}>Everything about sizing, authenticity, shipping, returns and payments.</p>
+            <p className={styles.sub} style={{ marginTop: '0.75rem' }}>
+              Looking for product authenticity proof?{' '}
+              <Link href="/authenticity" style={{ color: '#cc0000', textDecoration: 'underline', fontWeight: 700 }}>
+                See our Authenticity Guarantee →
+              </Link>
+            </p>
           </div>
         </div>
 

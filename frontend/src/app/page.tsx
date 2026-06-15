@@ -10,6 +10,10 @@ import ScrollReveal from '@/components/ScrollReveal';
 import HeroBanner from '@/components/HeroBanner';
 import FeaturedRow from '@/components/FeaturedRow';
 import Loader from '@/components/Loader';
+import TrustedByCustomers from '@/components/TrustedByCustomers';
+import WhyShopUrbanEx from '@/components/WhyShopUrbanEx';
+import HomeReviewsCarousel from '@/components/HomeReviewsCarousel';
+import CustomerGallery from '@/components/CustomerGallery';
 import styles from './page.module.css';
 
 // ——————————————————————————————————————
@@ -243,6 +247,12 @@ export default function Home() {
       <main className={styles.main}>
         {/* HERO */}
         <HeroBanner />
+
+        {/* TRUSTED BY CUSTOMERS — stats below hero */}
+        <TrustedByCustomers />
+
+        {/* WHY SHOP URBANEX — 6 trust icons */}
+        <WhyShopUrbanEx />
 
         {/* Crack divider into marquee */}
         <div className={styles.crackDivider} aria-hidden />
@@ -480,6 +490,20 @@ export default function Home() {
           </div>
         </section>
 
+        {/* HOMEPAGE REVIEWS CAROUSEL */}
+        <div className={styles.crackDivider} aria-hidden />
+        <section className={`${styles.slab} ${styles.slabLight}`}>
+          <div className={styles.slabGrain} aria-hidden />
+          <HomeReviewsCarousel />
+        </section>
+
+        {/* CUSTOMER GALLERY */}
+        <div className={styles.crackDivider} aria-hidden />
+        <section className={`${styles.slab} ${styles.slabLight}`}>
+          <div className={styles.slabGrain} aria-hidden />
+          <CustomerGallery />
+        </section>
+
         {/* COP CTA — full diptych echo of hero */}
         <div className={styles.crackDivider} aria-hidden />
         <section className={styles.cta}>
@@ -571,6 +595,7 @@ export default function Home() {
               <h3 className={styles.footerTitle}>SUPPORT</h3>
               <div className={styles.footerLinks}>
                 <Link href="/about">About Us</Link>
+                <Link href="/authenticity">Authenticity Guarantee</Link>
                 <Link href="/track-order">Track Order</Link>
                 <Link href="/faq">FAQ</Link>
                 <Link href="/return-exchange">Return & Exchange</Link>

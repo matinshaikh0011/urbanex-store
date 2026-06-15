@@ -43,6 +43,22 @@ interface HeroSlide {
   id: number; image: string; label: string; tagline: string; spec: string;
   emoji: string; href: string; active: boolean; sortOrder: number;
 }
+interface Review {
+  id: number;
+  productId: number | null;
+  product: { id: number; name: string; slug: string } | null;
+  customerName: string;
+  rating: number;
+  text: string;
+  source: 'direct' | 'whatsapp' | 'instagram';
+  imageUrls: string[];
+  videoUrl: string | null;
+  whatsappScreenshotUrl: string | null;
+  approved: boolean;
+  featured: boolean;
+  displayDate: string;
+  createdAt: string;
+}
 
 // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const fmt = (n: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(n);
@@ -79,7 +95,7 @@ async function api(path: string, opts?: RequestInit) {
 export default function AdminPage() {
   const router = useRouter();
   const { toasts, show } = useToast();
-  const [section, setSection] = useState<'overview' | 'orders' | 'payments' | 'products' | 'brands' | 'categories' | 'hero' | 'coupons' | 'inventory' | 'csv'>('overview');
+  const [section, setSection] = useState<'overview' | 'orders' | 'payments' | 'products' | 'brands' | 'categories' | 'hero' | 'coupons' | 'inventory' | 'reviews' | 'csv'>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Verify auth on mount
@@ -102,6 +118,7 @@ export default function AdminPage() {
     { id: 'hero', icon: '🖼️', label: 'Hero Banners' },
     { id: 'coupons', icon: '🎟️', label: 'Coupons' },
     { id: 'inventory', icon: '📈', label: 'Inventory' },
+    { id: 'reviews', icon: '⭐', label: 'Reviews' },
     { id: 'csv', icon: '📥', label: 'Import CSV' },
   ] as const;
 
@@ -151,6 +168,7 @@ export default function AdminPage() {
           {section === 'categories' && <CategoriesSection show={show} />}
           {section === 'coupons' && <CouponsSection show={show} />}
           {section === 'inventory' && <InventorySection show={show} />}
+          {section === 'reviews' && <ReviewsSection show={show} />}
           {section === 'csv' && <CSVSection show={show} />}
           {section === 'hero' && <HeroSection show={show} />}
         </div>
@@ -1831,6 +1849,304 @@ function HeroSlideForm({ initial, onClose, onSave }: { initial: Partial<HeroSlid
           <div className={styles.modalActions}>
             <button type="button" className={styles.btnSecondary} onClick={onClose} disabled={saving}>CANCEL</button>
             <button type="submit" className={styles.btnPrimary} disabled={saving}>{saving ? 'SAVING...' : 'SAVE SLIDE'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// REVIEWS SECTION
+// ════════════════════════════════════════════════════════════════
+const REVIEW_SOURCE_LABELS: Record<string, string> = {
+  direct: 'Direct Purchase',
+  whatsapp: 'WhatsApp',
+  instagram: 'Instagram',
+};
+
+function ReviewsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<Review | Partial<Review> | null>(null);
+  const [filter, setFilter] = useState<'all' | 'approved' | 'pending'>('all');
+  const [sourceFilter, setSourceFilter] = useState<string>('all');
+
+  const fetchReviews = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (filter === 'approved') params.set('approved', 'true');
+      if (filter === 'pending') params.set('approved', 'false');
+      if (sourceFilter !== 'all') params.set('source', sourceFilter);
+      const res = await api(`/api/admin/reviews?${params.toString()}`);
+      if (res.ok) setReviews(await res.json());
+      else show('Failed to fetch reviews', 'err');
+    } catch { show('Network error', 'err'); }
+    setLoading(false);
+  }, [show, filter, sourceFilter]);
+
+  useEffect(() => { fetchReviews(); }, [fetchReviews]);
+  useEffect(() => {
+    api('/api/products').then(r => r.json()).then(d => setProducts(Array.isArray(d) ? d : [])).catch(() => {});
+  }, []);
+
+  const saveReview = async (r: Partial<Review>) => {
+    try {
+      const isNew = !r.id;
+      const res = await api(isNew ? '/api/admin/reviews' : `/api/admin/reviews/${r.id}`, {
+        method: isNew ? 'POST' : 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(r),
+      });
+      if (res.ok) {
+        show(isNew ? 'Review added' : 'Review updated');
+        setEditing(null);
+        fetchReviews();
+      } else {
+        const d = await res.json().catch(() => ({}));
+        show(d.error || 'Failed to save review', 'err');
+      }
+    } catch { show('Network error', 'err'); }
+  };
+
+  const delReview = async (id: number) => {
+    if (!confirm('Delete this review?')) return;
+    try {
+      const res = await api(`/api/admin/reviews/${id}`, { method: 'DELETE' });
+      if (res.ok) { show('Review deleted'); fetchReviews(); }
+      else show('Failed to delete', 'err');
+    } catch { show('Network error', 'err'); }
+  };
+
+  const togglePatch = async (id: number, body: Record<string, boolean>) => {
+    try {
+      const res = await api(`/api/admin/reviews/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setReviews(prev => prev.map(r => r.id === id ? updated : r));
+      } else show('Update failed', 'err');
+    } catch { show('Network error', 'err'); }
+  };
+
+  return (
+    <div>
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>Reviews ({reviews.length})</h2>
+        <button className={styles.btnPrimary} onClick={() => setEditing({
+          customerName: '', rating: 5, text: '', source: 'direct',
+          imageUrls: [], videoUrl: '', whatsappScreenshotUrl: '',
+          approved: true, featured: false, productId: null,
+          displayDate: new Date().toISOString().slice(0, 10),
+        })}>+ ADD REVIEW</button>
+      </div>
+
+      <div className={styles.filters} style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
+        <select value={filter} onChange={e => setFilter(e.target.value as 'all' | 'approved' | 'pending')}>
+          <option value="all">All status</option>
+          <option value="approved">Approved</option>
+          <option value="pending">Pending / Disabled</option>
+        </select>
+        <select value={sourceFilter} onChange={e => setSourceFilter(e.target.value)}>
+          <option value="all">All sources</option>
+          {Object.entries(REVIEW_SOURCE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+        </select>
+      </div>
+
+      {loading ? <div className={styles.loading}>Loading reviews...</div> : (
+        <div className={styles.tableWrap}>
+          <table className={styles.table}>
+            <thead><tr><th>Customer</th><th>Rating</th><th>Product</th><th>Source</th><th>Media</th><th>Approved</th><th>Featured</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody>
+              {reviews.length === 0 ? <tr><td colSpan={9} style={{ textAlign: 'center', padding: 20 }}>No reviews</td></tr> : reviews.map(r => (
+                <tr key={r.id}>
+                  <td>
+                    <strong>{r.customerName}</strong>
+                    <div style={{ fontSize: 12, color: '#666', maxWidth: 320, marginTop: 4 }}>{r.text.slice(0, 110)}{r.text.length > 110 ? '…' : ''}</div>
+                  </td>
+                  <td>{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</td>
+                  <td>{r.product ? r.product.name : <em style={{ color: '#888' }}>Global</em>}</td>
+                  <td><span className={styles.badge} style={{ background: '#1a1a1a' }}>{REVIEW_SOURCE_LABELS[r.source] || r.source}</span></td>
+                  <td>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      {r.imageUrls.slice(0, 3).map((u, i) => <img key={i} src={u} alt="" style={{ height: 36, width: 36, objectFit: 'cover', borderRadius: 4 }} />)}
+                      {r.videoUrl && <span title="Has video">🎬</span>}
+                      {r.whatsappScreenshotUrl && <span title="WhatsApp screenshot">💬</span>}
+                    </div>
+                  </td>
+                  <td>
+                    <label className={styles.checkboxLabel}>
+                      <input type="checkbox" checked={r.approved} onChange={e => togglePatch(r.id, { approved: e.target.checked })} />
+                    </label>
+                  </td>
+                  <td>
+                    <label className={styles.checkboxLabel}>
+                      <input type="checkbox" checked={r.featured} onChange={e => togglePatch(r.id, { featured: e.target.checked })} />
+                    </label>
+                  </td>
+                  <td>{fmtDate(r.displayDate)}</td>
+                  <td>
+                    <div className={styles.actionRow}>
+                      <button className={styles.actionBtn} onClick={() => setEditing(r)}>Edit</button>
+                      <button className={styles.actionBtn} onClick={() => delReview(r.id)} style={{ color: '#CC0000' }}>Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {editing && <ReviewForm initial={editing} products={products} onClose={() => setEditing(null)} onSave={saveReview} />}
+    </div>
+  );
+}
+
+function ReviewForm({ initial, products, onClose, onSave }: { initial: Partial<Review>; products: Product[]; onClose: () => void; onSave: (r: Partial<Review>) => Promise<void> }) {
+  const [form, setForm] = useState<Partial<Review>>({
+    ...initial,
+    displayDate: initial.displayDate ? String(initial.displayDate).slice(0, 10) : new Date().toISOString().slice(0, 10),
+  });
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const set = (k: keyof Review, v: unknown) => setForm(f => ({ ...f, [k]: v }));
+
+  const uploadFile = async (file: File, target: 'images' | 'video' | 'whatsapp'): Promise<string | null> => {
+    const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const preset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+    if (!cloud || !preset) {
+      alert('Cloudinary not configured. Paste a URL instead.');
+      return null;
+    }
+    if (target === 'video' && file.size > 50 * 1024 * 1024) { alert('Video too large (max 50MB)'); return null; }
+    if (target !== 'video' && file.size > 10 * 1024 * 1024) { alert('Image too large (max 10MB)'); return null; }
+    setUploading(true);
+    const fd = new FormData(); fd.append('file', file); fd.append('upload_preset', preset);
+    const endpoint = target === 'video'
+      ? `https://api.cloudinary.com/v1_1/${cloud}/video/upload`
+      : `https://api.cloudinary.com/v1_1/${cloud}/image/upload`;
+    try {
+      const r = await fetch(endpoint, { method: 'POST', body: fd });
+      const d = await r.json();
+      if (d.secure_url) return d.secure_url;
+      alert(d?.error?.message || 'Upload failed');
+      return null;
+    } catch { alert('Network error'); return null; }
+    finally { setUploading(false); }
+  };
+
+  const addImage = async (file: File) => {
+    const url = await uploadFile(file, 'images');
+    if (url) set('imageUrls', [...(form.imageUrls || []), url]);
+  };
+
+  const removeImage = (idx: number) => {
+    set('imageUrls', (form.imageUrls || []).filter((_, i) => i !== idx));
+  };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    await onSave({
+      ...form,
+      rating: Number(form.rating) || 5,
+      productId: form.productId ? Number(form.productId) : null,
+    });
+    setSaving(false);
+  };
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modal} onClick={e => e.stopPropagation()} style={{ maxWidth: 820 }}>
+        <h3 className={styles.modalTitle}>{initial.id ? 'Edit Review' : 'Add Review'}</h3>
+        <form onSubmit={submit} className={styles.formStack}>
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>Customer Name *</label>
+              <input value={form.customerName || ''} onChange={e => set('customerName', e.target.value)} required maxLength={120} />
+            </div>
+            <div className={styles.formGroup} style={{ flex: '0 0 140px' }}>
+              <label>Rating *</label>
+              <select value={form.rating || 5} onChange={e => set('rating', Number(e.target.value))}>
+                {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{'★'.repeat(n)} ({n})</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>Product (optional — leave blank for site-wide testimonial)</label>
+              <select value={form.productId ?? ''} onChange={e => set('productId', e.target.value ? Number(e.target.value) : null)}>
+                <option value="">— Global / no product —</option>
+                {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </select>
+            </div>
+            <div className={styles.formGroup} style={{ flex: '0 0 180px' }}>
+              <label>Source *</label>
+              <select value={form.source || 'direct'} onChange={e => set('source', e.target.value as Review['source'])}>
+                {Object.entries(REVIEW_SOURCE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+            <label>Review Text *</label>
+            <textarea value={form.text || ''} onChange={e => set('text', e.target.value)} rows={4} required maxLength={2000} />
+          </div>
+
+          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+            <label>Customer Images {uploading && <em>(uploading…)</em>}</label>
+            <input type="file" accept="image/*" onChange={e => { if (e.target.files?.[0]) addImage(e.target.files[0]); e.target.value = ''; }} className={styles.fileInput} />
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
+              {(form.imageUrls || []).map((u, i) => (
+                <div key={i} style={{ position: 'relative' }}>
+                  <img src={u} alt="" style={{ height: 70, width: 70, objectFit: 'cover', borderRadius: 6 }} />
+                  <button type="button" onClick={() => removeImage(i)} style={{ position: 'absolute', top: -6, right: -6, background: '#CC0000', color: '#fff', border: 0, borderRadius: '50%', width: 20, height: 20, cursor: 'pointer', fontSize: 12 }}>×</button>
+                </div>
+              ))}
+            </div>
+            <input value={form.imageUrls?.[0] && false ? '' : ''} placeholder="(or paste image URL and click Add)" style={{ marginTop: 8, display: 'none' }} readOnly />
+          </div>
+
+          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+            <label>WhatsApp Screenshot (optional)</label>
+            <input type="file" accept="image/*" onChange={async e => { if (e.target.files?.[0]) { const u = await uploadFile(e.target.files[0], 'whatsapp'); if (u) set('whatsappScreenshotUrl', u); } e.target.value = ''; }} className={styles.fileInput} />
+            <input value={form.whatsappScreenshotUrl || ''} onChange={e => set('whatsappScreenshotUrl', e.target.value)} placeholder="Or paste image URL" style={{ marginTop: 8 }} />
+            {form.whatsappScreenshotUrl && <img src={form.whatsappScreenshotUrl} alt="WA preview" style={{ maxHeight: 140, marginTop: 8, borderRadius: 6 }} />}
+          </div>
+
+          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+            <label>Video Review URL (optional)</label>
+            <input type="file" accept="video/*" onChange={async e => { if (e.target.files?.[0]) { const u = await uploadFile(e.target.files[0], 'video'); if (u) set('videoUrl', u); } e.target.value = ''; }} className={styles.fileInput} />
+            <input value={form.videoUrl || ''} onChange={e => set('videoUrl', e.target.value)} placeholder="Or paste video URL (mp4, YouTube embed, etc.)" style={{ marginTop: 8 }} />
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>Display Date</label>
+              <input type="date" value={typeof form.displayDate === 'string' ? form.displayDate.slice(0, 10) : ''} onChange={e => set('displayDate', e.target.value)} />
+            </div>
+            <div className={styles.formGroup} style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <label className={styles.checkboxLabel}>
+                <input type="checkbox" checked={form.approved ?? true} onChange={e => set('approved', e.target.checked)} />
+                APPROVED (visible)
+              </label>
+              <label className={styles.checkboxLabel}>
+                <input type="checkbox" checked={form.featured ?? false} onChange={e => set('featured', e.target.checked)} />
+                FEATURED (homepage carousel)
+              </label>
+            </div>
+          </div>
+
+          <div className={styles.modalActions}>
+            <button type="button" className={styles.btnSecondary} onClick={onClose} disabled={saving}>CANCEL</button>
+            <button type="submit" className={styles.btnPrimary} disabled={saving || uploading}>{saving ? 'SAVING...' : 'SAVE REVIEW'}</button>
           </div>
         </form>
       </div>
