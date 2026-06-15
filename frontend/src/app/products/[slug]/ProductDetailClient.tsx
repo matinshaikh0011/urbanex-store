@@ -325,7 +325,7 @@ export default function ProductDetailClient({ params }: { params: { slug: string
             </a>
 
             <div style={{ margin: '1rem 0' }}>
-              <UrbanExVerified variant="dark" size="lg" linkToAuthenticity />
+              <UrbanExVerified variant="dark" size="lg" withLink />
             </div>
 
             <NeedHelpWhatsApp productName={product.name} />
