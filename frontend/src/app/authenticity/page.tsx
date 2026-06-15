@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import AuthenticityClient, { AUTHENTICITY_FAQ } from './AuthenticityClient';
+import AuthenticityClient from './AuthenticityClient';
+import { AUTHENTICITY_FAQ } from './authenticityData';
 
 export const metadata: Metadata = {
   title: 'Authenticity — 100% Verified Original Products',
