@@ -134,10 +134,11 @@ export default function HeroBanner() {
     });
   }, []);
 
-  // On mount: if we're playing, schedule the ~2s auto-lift; always clean up timers.
+  // On mount: if we're playing, lift the shutter immediately (one closed
+  // paint frame, then it parts) so the reveal plays without blocking entry.
   useEffect(() => {
     if (shutterState !== 'closed') return;
-    const auto = window.setTimeout(() => liftShutter(), 2000);
+    const auto = window.setTimeout(() => liftShutter(), 60);
     shutterTimers.current.push(auto);
     const timers = shutterTimers.current;
     return () => { timers.forEach(t => clearTimeout(t)); };
