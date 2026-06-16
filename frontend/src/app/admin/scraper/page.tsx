@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { api, useToast, fmtINR as fmt, fmtDate, slugify } from '../../../lib/admin/api';
 import adminStyles from '../page.module.css';
 import styles from './page.module.css';
 
@@ -41,26 +42,6 @@ interface ImportHistoryRecord {
 }
 
 // ── Helpers ───────────────────────────────────────────────────
-function useToast() {
-  const [toasts, setToasts] = useState<{ id: number; msg: string; type: 'ok' | 'err' | 'info' }[]>([]);
-  const show = useCallback((msg: string, type: 'ok' | 'err' | 'info' = 'ok') => {
-    const id = Date.now();
-    setToasts(t => [...t, { id, msg, type }]);
-    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3500);
-  }, []);
-  return { toasts, show };
-}
-
-async function api(path: string, opts?: RequestInit) {
-  const res = await fetch(path, { credentials: 'include', ...opts });
-  if (res.status === 401) { window.location.href = '/admin/login'; throw new Error('Unauthorized'); }
-  return res;
-}
-
-function slugify(s: string) {
-  return s.toLowerCase().replace(/["']/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-}
-
 function calculatePrice(sourcePrice: number, rule: PricingRule, rounding: string, manualOverride?: number): number {
   if (manualOverride !== undefined && manualOverride > 0) return manualOverride;
   if (sourcePrice <= 0) return 0;
@@ -102,14 +83,12 @@ const SUBCATEGORY_MAP: Record<string, string[]> = {
   glasses: ['mens-glasses','womens-glasses'],
   clothing: ['track-pants','jeans','shirts','tshirts','denims'],
 };
-const fmt = (n: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(n);
-const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
 // ── Main Page ─────────────────────────────────────────────────
 export default function ScraperPage() {
   const router = useRouter();
   const { toasts, show } = useToast();
-  const [activeTab, setActiveTab] = useState<'wizard' | 'history' | 'sync'>('wizard');
+  const [activeTab, setActiveTab] = useState<'wizard' | 'history' | 'sync' | 'jobs'>('wizard');
   const [step, setStep] = useState(1);
   const [url, setUrl] = useState('');
   const [scope, setScope] = useState<'full' | 'category' | 'product'>('category');
@@ -187,9 +166,9 @@ export default function ScraperPage() {
         </header>
         <div className={adminStyles.content}>
           <div className={styles.tabRow}>
-            {(['wizard','history','sync'] as const).map(t => (
+            {(['wizard','history','sync','jobs'] as const).map(t => (
               <button key={t} className={`${styles.tab} ${activeTab === t ? styles.tabActive : ''}`} onClick={() => setActiveTab(t)}>
-                {t === 'wizard' ? '🕷 Import Wizard' : t === 'history' ? '📋 History' : '🔄 Sync'}
+                {t === 'wizard' ? '🕷 Import Wizard' : t === 'history' ? '📋 History' : t === 'sync' ? '🔄 Sync' : '⚙ Jobs'}
               </button>
             ))}
           </div>
@@ -365,6 +344,7 @@ export default function ScraperPage() {
           )}
           {activeTab === 'history' && <HistoryTab show={show} onReimport={(u) => { setUrl(u); setActiveTab('wizard'); setStep(1); }} />}
           {activeTab === 'sync' && <SyncTab show={show} brands={brands} />}
+          {activeTab === 'jobs' && <JobsTab show={show} />}
         </div>
       </div>
     </div>
@@ -1350,6 +1330,76 @@ function SyncTab({ show, brands }: { show: (m: string, t?: 'ok' | 'err') => void
           </tbody>
         </table>
       </div>
+    </div>
+  );
+}
+
+// ── Jobs Tab — scan job status dashboard ──────────────────────
+interface ScanJobRecord {
+  id: string; status: string; provider: string | null; url: string | null;
+  scope: string | null; pagesScanned: number; productsFound: number;
+  error: string | null; startedAt: string; completedAt: string | null;
+}
+
+function JobsTab({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
+  const [jobs, setJobs] = useState<ScanJobRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(() => {
+    api('/api/admin/scraper/jobs').then(r => r.json()).then(d => setJobs(Array.isArray(d.jobs) ? d.jobs : [])).catch(() => show('Failed to load jobs', 'err')).finally(() => setLoading(false));
+  }, [show]);
+
+  useEffect(() => {
+    load();
+    // Auto-refresh every 5s so running jobs update live
+    const t = setInterval(load, 5000);
+    return () => clearInterval(t);
+  }, [load]);
+
+  const cancelJob = async (id: string) => {
+    if (!confirm('Cancel this running scan job?')) return;
+    const r = await api(`/api/admin/scraper/scan/cancel/${id}`, { method: 'POST' });
+    if (r.ok) { show('Job cancelled'); load(); }
+    else show('Failed to cancel', 'err');
+  };
+
+  const statusBadge = (s: string) => s === 'running' ? '#F5C400' : s === 'done' ? '#22C55E' : '#CC0000';
+  const fmtDateTime = (d: string | null) => d ? new Date(d).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
+
+  if (loading) return <div className={adminStyles.loading}>Loading scan jobs…</div>;
+
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <h2 className={adminStyles.sectionTitle} style={{ margin: 0 }}>Scan Jobs</h2>
+        <span style={{ fontSize: 12, color: '#888' }}>Auto-refreshing every 5s</span>
+        <button className={adminStyles.btnSmall} onClick={load} style={{ marginLeft: 'auto' }}>↻ Refresh</button>
+      </div>
+      {jobs.length === 0 ? <div className={styles.emptyState}><p>No scan jobs yet.</p></div> : (
+        <div className={adminStyles.tableWrap} style={{ marginTop: 16 }}>
+          <table className={adminStyles.table}>
+            <thead><tr><th>Status</th><th>Provider</th><th>URL</th><th>Pages</th><th>Products</th><th>Started</th><th>Completed</th><th>Actions</th></tr></thead>
+            <tbody>
+              {jobs.map(j => (
+                <tr key={j.id}>
+                  <td><span className={adminStyles.badge} style={{ background: statusBadge(j.status) }}>{j.status}</span></td>
+                  <td>{j.provider || '—'}</td>
+                  <td style={{ maxWidth: 220, fontSize: 12, color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={j.url || ''}>{j.url || '—'}</td>
+                  <td>{j.pagesScanned}</td>
+                  <td>{j.productsFound}</td>
+                  <td style={{ fontSize: 12, color: '#aaa' }}>{fmtDateTime(j.startedAt)}</td>
+                  <td style={{ fontSize: 12, color: '#aaa' }}>{fmtDateTime(j.completedAt)}</td>
+                  <td>
+                    {j.status === 'running'
+                      ? <button className={adminStyles.iconBtnDanger} onClick={() => cancelJob(j.id)}>Cancel</button>
+                      : j.error ? <span style={{ color: '#CC0000', fontSize: 12 }} title={j.error}>{j.error.slice(0, 40)}</span> : '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

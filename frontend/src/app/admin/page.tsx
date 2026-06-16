@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { api, useToast, fmtINR as fmt, fmtDate, slugify } from '../../lib/admin/api';
 import styles from './page.module.css';
 
 // â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -62,10 +63,6 @@ interface Review {
 }
 
 // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const fmt = (n: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(n);
-const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-
 const STATUS_COLORS: Record<string, string> = {
   'pending advance': '#F5C400', 'pending verification': '#F5C400',
   'confirmed': '#3B82F6', 'verified': '#3B82F6',
@@ -74,26 +71,8 @@ const STATUS_COLORS: Record<string, string> = {
 
 function statusColor(s: string) { return STATUS_COLORS[s.toLowerCase()] || '#888'; }
 
-// â”€â”€ Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function useToast() {
-  const [toasts, setToasts] = useState<{ id: number; msg: string; type: 'ok' | 'err' }[]>([]);
-  const show = useCallback((msg: string, type: 'ok' | 'err' = 'ok') => {
-    const id = Date.now();
-    setToasts(t => [...t, { id, msg, type }]);
-    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3500);
-  }, []);
-  return { toasts, show };
-}
-
-// â”€â”€ API helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-async function api(path: string, opts?: RequestInit) {
-  const res = await fetch(path, { credentials: 'include', ...opts });
-  if (res.status === 401) { window.location.href = '/admin/login'; throw new Error('Unauthorized'); }
-  return res;
-}
-
 // â”€â”€ Main Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const SECTIONS = ['overview', 'orders', 'payments', 'products', 'brands', 'categories', 'hero', 'coupons', 'inventory', 'reviews', 'csv'] as const;
+const SECTIONS = ['overview', 'orders', 'payments', 'products', 'brands', 'categories', 'hero', 'coupons', 'inventory', 'reviews', 'csv', 'audit'] as const;
 type Section = typeof SECTIONS[number];
 
 function AdminDashboard() {
@@ -132,6 +111,7 @@ function AdminDashboard() {
     { id: 'inventory', icon: '📈', label: 'Inventory' },
     { id: 'reviews', icon: '⭐', label: 'Reviews' },
     { id: 'csv', icon: '📥', label: 'Import CSV' },
+    { id: 'audit', icon: '📜', label: 'Audit Log' },
   ] as const;
 
   return (
@@ -183,6 +163,7 @@ function AdminDashboard() {
           {section === 'reviews' && <ReviewsSection show={show} />}
           {section === 'csv' && <CSVSection show={show} />}
           {section === 'hero' && <HeroSection show={show} />}
+          {section === 'audit' && <AuditLogSection show={show} />}
         </div>
       </div>
     </div>
@@ -523,15 +504,20 @@ function PaymentsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
 
   const filtered = orders.filter(o => {
     if (onlyWithProof && !o.paymentScreenshot) return false;
-    const q = search.toLowerCase();
-    return !q || (o.shippingName || '').toLowerCase().includes(q) || o.orderId.toLowerCase().includes(q) || (o.utrNumber || '').includes(q);
+    const q = search.toLowerCase().trim();
+    if (!q) return true;
+    const amount = String(o.amountPaid ?? o.totalAmount ?? '');
+    return (o.shippingName || '').toLowerCase().includes(q)
+      || o.orderId.toLowerCase().includes(q)
+      || (o.utrNumber || '').includes(q)
+      || amount.includes(q);
   });
 
   return (
     <div>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>Manage Payments</h2>
-        <input className={styles.searchInput} placeholder="Search name, order ID, UTR..." value={search} onChange={e => setSearch(e.target.value)} />
+        <input className={styles.searchInput} placeholder="Search name, order ID, UTR, amount..." value={search} onChange={e => setSearch(e.target.value)} />
       </div>
       <div className={styles.filterRow}>
         <button className={`${styles.filterBtn} ${!onlyWithProof ? styles.filterActive : ''}`} onClick={() => setOnlyWithProof(false)}>All</button>
@@ -783,6 +769,12 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
     else show('Failed to delete', 'err');
   };
 
+  const cloneProduct = async (id: number, name: string) => {
+    const res = await api(`/api/products/${id}/clone`, { method: 'POST' });
+    if (res.ok) { show(`Cloned "${name}"`); load(); }
+    else { const d = await res.json().catch(() => ({})); show(d.error || 'Failed to clone', 'err'); }
+  };
+
   const bulkDelete = async () => {
     if (!confirm(`Delete ${selected.size} selected products? This cannot be undone.`)) return;
     setBulkSaving(true);
@@ -920,6 +912,7 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
                   <td>
                     <div className={styles.actionRow}>
                       <button className={styles.btnSmall} onClick={() => setEditing(p)}>Edit</button>
+                      <button className={styles.btnSmall} onClick={() => cloneProduct(p.id, p.name)} title="Duplicate this product">⧉ Clone</button>
                       <button className={styles.btnDanger} onClick={() => deleteProduct(p.id, p.name)}>Delete</button>
                     </div>
                   </td>
@@ -1815,6 +1808,8 @@ function HeroSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) 
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<HeroSlide | Partial<HeroSlide> | null>(null);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [savingOrder, setSavingOrder] = useState(false);
 
   const fetchSlides = useCallback(async () => {
     setLoading(true);
@@ -1827,6 +1822,27 @@ function HeroSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) 
   }, [show]);
 
   useEffect(() => { fetchSlides(); }, [fetchSlides]);
+
+  const persistOrder = async (ordered: HeroSlide[]) => {
+    setSavingOrder(true);
+    const res = await api('/api/admin/hero-slides/reorder', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order: ordered.map(s => s.id) }),
+    });
+    setSavingOrder(false);
+    if (res.ok) show('Order saved');
+    else { show('Failed to save order', 'err'); fetchSlides(); }
+  };
+
+  const onDrop = (targetIdx: number) => {
+    if (dragIndex === null || dragIndex === targetIdx) { setDragIndex(null); return; }
+    const reordered = [...slides];
+    const [moved] = reordered.splice(dragIndex, 1);
+    reordered.splice(targetIdx, 0, moved);
+    setSlides(reordered.map((s, i) => ({ ...s, sortOrder: i })));
+    setDragIndex(null);
+    persistOrder(reordered);
+  };
 
   const saveSlide = async (s: Partial<HeroSlide>) => {
     try {
@@ -1858,16 +1874,25 @@ function HeroSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) 
   return (
     <div>
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Hero Banners</h2>
-        <button className={styles.btnPrimary} onClick={() => setEditing({ active: true, sortOrder: 0, image: '', label: '', tagline: '', spec: '', emoji: '', href: '' })}>+ ADD SLIDE</button>
+        <h2 className={styles.sectionTitle}>Hero Banners {savingOrder && <span style={{ fontSize: 12, color: '#888' }}>(saving order…)</span>}</h2>
+        <button className={styles.btnPrimary} onClick={() => setEditing({ active: true, sortOrder: slides.length, image: '', label: '', tagline: '', spec: '', emoji: '', href: '' })}>+ ADD SLIDE</button>
       </div>
+      <p style={{ fontSize: 12, color: '#888', marginBottom: 10 }}>⠿ Drag rows to reorder. Order is saved automatically.</p>
 
       <div className={styles.tableWrap}>
         <table className={styles.table}>
-          <thead><tr><th>Image</th><th>Label</th><th>Tagline</th><th>Status</th><th>Order</th><th>Actions</th></tr></thead>
+          <thead><tr><th style={{ width: 28 }}></th><th>Image</th><th>Label</th><th>Tagline</th><th>Status</th><th>Order</th><th>Actions</th></tr></thead>
           <tbody>
-            {slides.length === 0 ? <tr><td colSpan={6} style={{ textAlign: 'center', padding: 20 }}>No slides configured</td></tr> : slides.map(s => (
-              <tr key={s.id}>
+            {slides.length === 0 ? <tr><td colSpan={7} style={{ textAlign: 'center', padding: 20 }}>No slides configured</td></tr> : slides.map((s, idx) => (
+              <tr
+                key={s.id}
+                draggable
+                onDragStart={() => setDragIndex(idx)}
+                onDragOver={e => e.preventDefault()}
+                onDrop={() => onDrop(idx)}
+                style={{ ...(dragIndex === idx ? { opacity: 0.4 } : {}), cursor: 'grab' }}
+              >
+                <td style={{ textAlign: 'center', color: '#666', fontSize: 18 }}>⠿</td>
                 <td>{s.image && <img src={s.image} alt={s.label} style={{ height: 40, borderRadius: 4, objectFit: 'cover' }} />}</td>
                 <td><strong>{s.emoji} {s.label}</strong></td>
                 <td>{s.tagline}</td>
@@ -2318,6 +2343,81 @@ function ReviewForm({ initial, products, onClose, onSave }: { initial: Partial<R
           </div>
         </form>
       </div>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// AUDIT LOG SECTION
+// ════════════════════════════════════════════════════════════════
+interface AuditRecord {
+  id: number; actor: string; action: string; entityType: string;
+  entityId: string | null; summary: string | null; ip: string | null; createdAt: string;
+}
+
+function AuditLogSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
+  const [records, setRecords] = useState<AuditRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [entityType, setEntityType] = useState('');
+  const LIMIT = 50;
+
+  const load = useCallback(() => {
+    setLoading(true);
+    const params = new URLSearchParams({ page: String(page), limit: String(LIMIT) });
+    if (entityType) params.set('entityType', entityType);
+    api(`/api/admin/audit-log?${params.toString()}`).then(r => r.json()).then(d => {
+      setRecords(Array.isArray(d.records) ? d.records : []);
+      setTotal(d.total || 0);
+    }).catch(() => show('Failed to load audit log', 'err')).finally(() => setLoading(false));
+  }, [page, entityType, show]);
+
+  useEffect(() => { setPage(1); }, [entityType]);
+  useEffect(() => { load(); }, [load]);
+
+  const totalPages = Math.max(1, Math.ceil(total / LIMIT));
+  const ENTITY_TYPES = ['', 'order', 'product', 'auth', 'hero-slide'];
+  const fmtDateTime = (d: string) => new Date(d).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const actionColor = (a: string) => a.includes('delete') ? '#CC0000' : a.includes('create') ? '#22C55E' : a.includes('login') ? '#3B82F6' : '#888';
+
+  return (
+    <div>
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>Audit Log ({total})</h2>
+        <select className={styles.statusSelect} value={entityType} onChange={e => setEntityType(e.target.value)} style={{ padding: '8px 12px', fontSize: 13 }}>
+          {ENTITY_TYPES.map(t => <option key={t} value={t}>{t || 'All types'}</option>)}
+        </select>
+      </div>
+      {loading ? <div className={styles.loading}>Loading…</div> : (
+        <div className={styles.tableWrap}>
+          <table className={styles.table}>
+            <thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Entity</th><th>Summary</th><th>IP</th></tr></thead>
+            <tbody>
+              {records.length === 0
+                ? <tr><td colSpan={6} style={{ textAlign: 'center', color: '#888', padding: 20 }}>No audit records</td></tr>
+                : records.map(r => (
+                  <tr key={r.id}>
+                    <td style={{ fontSize: 12, color: '#aaa', whiteSpace: 'nowrap' }}>{fmtDateTime(r.createdAt)}</td>
+                    <td>{r.actor}</td>
+                    <td><span className={styles.badge} style={{ background: actionColor(r.action) }}>{r.action}</span></td>
+                    <td style={{ fontSize: 12 }}>{r.entityType}{r.entityId ? ` #${r.entityId}` : ''}</td>
+                    <td style={{ fontSize: 13 }}>{r.summary || '—'}</td>
+                    <td className={styles.mono} style={{ fontSize: 11, color: '#666' }}>{r.ip || '—'}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      )}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', marginTop: 16 }}>
+          <button className={styles.btnSmall} disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}>← Prev</button>
+          <span style={{ fontSize: 13, color: '#aaa' }}>Page {page} of {totalPages}</span>
+          <button className={styles.btnSmall} disabled={page >= totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>Next →</button>
+        </div>
+      )}
     </div>
   );
 }

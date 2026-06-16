@@ -16,32 +16,63 @@ import { CUSTOMER_COOKIE } from './middleware/customerAuth.js';
 import { validateProductData, buildProductData, slugify } from './productUtils.js';
 import { getProvider, detectProvider } from './scrapers/index.js';
 import { fetchProductDetail } from './scrapers/cartpeProvider.js';
+import { audit } from './utils/audit.js';
 
-// ── Background Scan Job Store ─────────────────────────────────
+// ── Background Scan Job Store (DB-backed) ─────────────────────
 // Scan jobs run in the background so the HTTP response returns
 // immediately, avoiding Render's 30-second timeout for large catalogs.
 //
-// Jobs are stored in-memory (sufficient for a single-instance server).
-// Each job has the shape:
-//   { status, pagesScanned, productsFound, products, error, startedAt, completedAt }
+// Jobs are persisted to the ScanJob table so they survive a backend
+// restart. A small in-memory cache holds high-frequency progress
+// counters; those are flushed to the DB on a throttle (every ~3s) and
+// always on completion. Status/products/error are the source of truth
+// in the DB so polling still works after a restart.
 
-const scanJobs = new Map();
+const scanProgressCache = new Map(); // jobId -> { pagesScanned, productsFound, lastFlush }
 
-function createScanJob() {
-  const jobId = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-  scanJobs.set(jobId, {
-    status: 'running',     // 'running' | 'done' | 'error'
-    pagesScanned: 0,
-    productsFound: 0,
-    products: null,        // null while running, array when done
-    error: null,
-    startedAt: new Date().toISOString(),
-    completedAt: null,
+async function createScanJob(meta = {}) {
+  const jobId = Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+  await prisma.scanJob.create({
+    data: {
+      id: jobId,
+      status: 'running',
+      provider: meta.provider || null,
+      url: meta.url || null,
+      scope: meta.scope || null,
+      pagesScanned: 0,
+      productsFound: 0,
+    },
   });
-  // Auto-expire after 30 minutes to avoid memory leaks
-  setTimeout(() => scanJobs.delete(jobId), 30 * 60 * 1000);
+  scanProgressCache.set(jobId, { pagesScanned: 0, productsFound: 0, lastFlush: 0 });
   return jobId;
 }
+
+// Throttled progress update — keeps DB writes bounded during long scans.
+async function updateScanProgress(jobId, pagesScanned, productsFound) {
+  const cache = scanProgressCache.get(jobId) || { lastFlush: 0 };
+  cache.pagesScanned = pagesScanned;
+  cache.productsFound = productsFound;
+  scanProgressCache.set(jobId, cache);
+  const now = Date.now();
+  if (now - cache.lastFlush > 3000) {
+    cache.lastFlush = now;
+    await prisma.scanJob.update({ where: { id: jobId }, data: { pagesScanned, productsFound } }).catch(() => {});
+  }
+}
+
+async function completeScanJob(jobId, fields) {
+  scanProgressCache.delete(jobId);
+  await prisma.scanJob.update({
+    where: { id: jobId },
+    data: { ...fields, completedAt: new Date() },
+  }).catch(err => console.error('[scanJob] complete failed:', err.message));
+}
+
+// Periodically purge old completed/errored jobs (older than 24h)
+setInterval(() => {
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  prisma.scanJob.deleteMany({ where: { completedAt: { lt: cutoff } } }).catch(() => {});
+}, 60 * 60 * 1000).unref?.();
 
 dotenv.config();
 
@@ -148,6 +179,7 @@ const adminAuth = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     if (decoded.role !== 'admin') return res.status(401).json({ error: 'Unauthorized' });
+    req.admin = { username: decoded.username || 'admin' };
     next();
   } catch {
     return res.status(401).json({ error: 'Invalid token' });
@@ -160,19 +192,34 @@ const adminAuth = (req, res, next) => {
 
 app.post('/api/admin/login', adminLoginLimiter, async (req, res) => {
   try {
-    const { password } = req.body;
+    const { password, username } = req.body;
     const passwordHash = process.env.ADMIN_PASSWORD_HASH;
+    const expectedUsername = process.env.ADMIN_USERNAME; // optional
 
     if (!passwordHash) {
       console.error('ADMIN_PASSWORD_HASH not set — admin login disabled.');
       return res.status(500).json({ error: 'Admin login is not configured.' });
     }
+
+    // If a username is configured, it must match (case-insensitive).
+    // Backwards-compatible: when ADMIN_USERNAME is unset, password-only login still works.
+    if (expectedUsername) {
+      const provided = (username || '').toString().trim().toLowerCase();
+      if (provided !== expectedUsername.trim().toLowerCase()) {
+        audit(prisma, req, { action: 'login_failed', entityType: 'auth', summary: 'Bad username' });
+        return res.status(401).json({ error: 'Incorrect username or password' });
+      }
+    }
+
     const isValid = await bcrypt.compare(password || '', passwordHash);
+    if (!isValid) {
+      audit(prisma, req, { action: 'login_failed', entityType: 'auth', summary: 'Bad password' });
+      return res.status(401).json({ error: expectedUsername ? 'Incorrect username or password' : 'Incorrect password' });
+    }
 
-    if (!isValid) return res.status(401).json({ error: 'Incorrect password' });
-
+    const adminUsername = expectedUsername || 'admin';
     const token = jwt.sign(
-      { role: 'admin' },
+      { role: 'admin', username: adminUsername },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -184,6 +231,7 @@ app.post('/api/admin/login', adminLoginLimiter, async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
+    audit(prisma, req, { action: 'login', entityType: 'auth', summary: `${adminUsername} logged in` });
     res.json({ success: true });
   } catch (error) {
     console.error(error);
@@ -202,7 +250,27 @@ app.post('/api/admin/logout', (req, res) => {
 
 // Verify token (used by middleware/frontend to check auth)
 app.get('/api/admin/verify', adminAuth, (req, res) => {
-  res.json({ authenticated: true });
+  res.json({ authenticated: true, username: req.admin?.username || 'admin' });
+});
+
+// ── Admin audit log (paginated, filterable by entityType/action) ──
+app.get('/api/admin/audit-log', adminAuth, async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(200, Math.max(1, parseInt(req.query.limit) || 50));
+    const skip = (page - 1) * limit;
+    const where = {};
+    if (req.query.entityType) where.entityType = req.query.entityType;
+    if (req.query.action) where.action = req.query.action;
+    const [records, total] = await Promise.all([
+      prisma.auditLog.findMany({ where, orderBy: { createdAt: 'desc' }, skip, take: limit }),
+      prisma.auditLog.count({ where }),
+    ]);
+    res.json({ records, total, page, limit });
+  } catch (error) {
+    console.error('[audit-log]', error);
+    res.status(500).json({ error: 'Failed to fetch audit log' });
+  }
 });
 
 // ════════════════════════════════════════════════════════════════
@@ -337,6 +405,7 @@ app.put('/api/admin/orders/:orderId/status', adminAuth, async (req, res) => {
       where: { orderId: req.params.orderId },
       data: { status },
     });
+    audit(prisma, req, { action: 'update', entityType: 'order', entityId: req.params.orderId, summary: `Status → ${status}` });
     res.json(order);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update status' });
@@ -364,12 +433,14 @@ app.delete('/api/admin/orders/:orderId', adminAuth, async (req, res) => {
     // Hard delete only when explicitly requested; default is soft-delete (archive)
     if (req.query.hard === 'true') {
       await prisma.order.delete({ where: { orderId: req.params.orderId } });
+      audit(prisma, req, { action: 'delete', entityType: 'order', entityId: req.params.orderId, summary: 'Permanently deleted' });
       return res.json({ success: true, hardDeleted: true });
     }
     const updated = await prisma.order.update({
       where: { orderId: req.params.orderId },
       data: { archived: true },
     });
+    audit(prisma, req, { action: 'archive', entityType: 'order', entityId: req.params.orderId, summary: 'Archived' });
     res.json({ success: true, archived: true, orderId: updated.orderId });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete order' });
@@ -383,6 +454,7 @@ app.post('/api/admin/orders/:orderId/restore', adminAuth, async (req, res) => {
       where: { orderId: req.params.orderId },
       data: { archived: false },
     });
+    audit(prisma, req, { action: 'restore', entityType: 'order', entityId: req.params.orderId, summary: 'Restored from archive' });
     res.json({ success: true, orderId: updated.orderId });
   } catch (error) {
     res.status(500).json({ error: 'Failed to restore order' });
@@ -753,6 +825,7 @@ app.put('/api/products/bulk', adminAuth, async (req, res) => {
     }
 
     const result = await prisma.product.updateMany({ where: { id: { in: intIds } }, data });
+    audit(prisma, req, { action: 'bulk_update', entityType: 'product', summary: `${action} on ${result.count} products`, metadata: { ids: intIds, action, value } });
     res.json({ success: true, updated: result.count });
   } catch (error) {
     console.error('[products/bulk]', error);
@@ -772,6 +845,7 @@ app.delete('/api/products/bulk', adminAuth, async (req, res) => {
 
     await prisma.order.updateMany({ where: { productId: { in: intIds } }, data: { productId: null } });
     const result = await prisma.product.deleteMany({ where: { id: { in: intIds } } });
+    audit(prisma, req, { action: 'bulk_delete', entityType: 'product', summary: `Deleted ${result.count} products`, metadata: { ids: intIds } });
     res.json({ success: true, deleted: result.count });
   } catch (error) {
     console.error('[products/bulk delete]', error);
@@ -837,10 +911,55 @@ app.post('/api/products', adminAuth, async (req, res) => {
       data: buildProductData(req.body),
       include: { brand: true },
     });
+    audit(prisma, req, { action: 'create', entityType: 'product', entityId: product.id, summary: `Created "${product.name}"` });
     res.status(201).json({ ...product, price: Number(product.price), originalPrice: product.originalPrice != null ? Number(product.originalPrice) : null });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to create product' });
+  }
+});
+
+// Admin: clone/duplicate a product
+app.post('/api/products/:id/clone', adminAuth, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: 'Invalid product id' });
+    const orig = await prisma.product.findUnique({ where: { id } });
+    if (!orig) return res.status(404).json({ error: 'Product not found' });
+
+    // Build a unique slug and a "(Copy)" name. Source tracking is dropped so
+    // the clone is treated as a fresh, independently-managed product.
+    let baseSlug = `${orig.slug}-copy`;
+    let slug = baseSlug;
+    let n = 2;
+    while (await prisma.product.findUnique({ where: { slug } })) {
+      slug = `${baseSlug}-${n++}`;
+    }
+
+    const clone = await prisma.product.create({
+      data: {
+        name: `${orig.name} (Copy)`,
+        slug,
+        category: orig.category,
+        subcategory: orig.subcategory,
+        description: orig.description,
+        price: orig.price,
+        originalPrice: orig.originalPrice,
+        brandId: orig.brandId,
+        sizes: orig.sizes,
+        colors: orig.colors,
+        inStock: orig.inStock,
+        isFeatured: false,
+        images: orig.images,
+        source: null, sourceId: null, sourceUrl: null, lastSync: null,
+      },
+      include: { brand: true },
+    });
+    audit(prisma, req, { action: 'clone', entityType: 'product', entityId: clone.id, summary: `Cloned from #${id} "${orig.name}"` });
+    res.status(201).json({ ...clone, price: Number(clone.price), originalPrice: clone.originalPrice != null ? Number(clone.originalPrice) : null });
+  } catch (error) {
+    console.error('[products/clone]', error);
+    res.status(500).json({ error: 'Failed to clone product' });
   }
 });
 
@@ -855,6 +974,7 @@ app.put('/api/products/:id', adminAuth, async (req, res) => {
       data: buildProductData(req.body),
       include: { brand: true },
     });
+    audit(prisma, req, { action: 'update', entityType: 'product', entityId: product.id, summary: `Updated "${product.name}"` });
     res.json({ ...product, price: Number(product.price), originalPrice: product.originalPrice != null ? Number(product.originalPrice) : null });
   } catch (error) {
     res.status(500).json({ error: 'Failed to update product' });
@@ -865,6 +985,7 @@ app.delete('/api/products/:id', adminAuth, async (req, res) => {
   try {
     await prisma.order.updateMany({ where: { productId: parseInt(req.params.id) }, data: { productId: null } });
     await prisma.product.delete({ where: { id: parseInt(req.params.id) } });
+    audit(prisma, req, { action: 'delete', entityType: 'product', entityId: req.params.id, summary: 'Deleted product' });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete product' });
@@ -1117,8 +1238,7 @@ app.post('/api/admin/scraper/scan', adminAuth, async (req, res) => {
   }
 
   // Create a background job and return its ID immediately
-  const jobId = createScanJob();
-  const job = scanJobs.get(jobId);
+  const jobId = await createScanJob({ provider: resolvedKey, url, scope });
 
   // Run the scan asynchronously (do NOT await — this is intentional)
   (async () => {
@@ -1126,10 +1246,7 @@ app.post('/api/admin/scraper/scan', adminAuth, async (req, res) => {
       const scrapeResult = await provider.scrape(url, scope, {
         delayMs,
         onProgress: (pagesScanned, productsFound) => {
-          if (scanJobs.has(jobId)) {
-            job.pagesScanned = pagesScanned;
-            job.productsFound = productsFound;
-          }
+          updateScanProgress(jobId, pagesScanned, productsFound);
         },
       });
 
@@ -1169,31 +1286,27 @@ app.post('/api/admin/scraper/scan', adminAuth, async (req, res) => {
       }
 
       // Mark job complete
-      if (scanJobs.has(jobId)) {
-        job.status = 'done';
-        job.products = enriched;
-        job.productsFound = enriched.length;
-        job.completedAt = new Date().toISOString();
-        job.provider = resolvedKey;
-        job.stats = {
-          productsFound: scrapeStats?.productsFound ?? enriched.length,
-          productsReturned: enriched.length,
-          duplicateCount: enriched.filter(p => p.duplicateStatus !== 'new').length,
-          failedCount: (scrapeStats?.failedCount || 0),
-          pagesFetched: scrapeStats?.pagesFetched || pagesFetched || 0,
-          scanDuration: scrapeStats?.scanDuration || 0,
-          total: enriched.length,
-          failed: scrapeStats?.failedCount || 0,
-          failedUrls: failedUrls || [],
-        };
-      }
+      const stats = {
+        productsFound: scrapeStats?.productsFound ?? enriched.length,
+        productsReturned: enriched.length,
+        duplicateCount: enriched.filter(p => p.duplicateStatus !== 'new').length,
+        failedCount: (scrapeStats?.failedCount || 0),
+        pagesFetched: scrapeStats?.pagesFetched || pagesFetched || 0,
+        scanDuration: scrapeStats?.scanDuration || 0,
+        total: enriched.length,
+        failed: scrapeStats?.failedCount || 0,
+        failedUrls: failedUrls || [],
+      };
+      await completeScanJob(jobId, {
+        status: 'done',
+        products: enriched,
+        productsFound: enriched.length,
+        provider: resolvedKey,
+        stats,
+      });
     } catch (err) {
       console.error('[scraper/scan background]', err);
-      if (scanJobs.has(jobId)) {
-        job.status = 'error';
-        job.error = err.message;
-        job.completedAt = new Date().toISOString();
-      }
+      await completeScanJob(jobId, { status: 'error', error: err.message });
     }
   })();
 
@@ -1202,33 +1315,69 @@ app.post('/api/admin/scraper/scan', adminAuth, async (req, res) => {
 });
 
 // GET /api/admin/scraper/scan/status/:jobId — poll for scan progress
-app.get('/api/admin/scraper/scan/status/:jobId', adminAuth, (req, res) => {
-  const job = scanJobs.get(req.params.jobId);
-  if (!job) return res.status(404).json({ error: 'Job not found or expired' });
+app.get('/api/admin/scraper/scan/status/:jobId', adminAuth, async (req, res) => {
+  try {
+    const job = await prisma.scanJob.findUnique({ where: { id: req.params.jobId } });
+    if (!job) return res.status(404).json({ error: 'Job not found or expired' });
 
-  if (job.status === 'running') {
-    return res.json({
-      status: 'running',
-      pagesScanned: job.pagesScanned,
-      productsFound: job.productsFound,
+    if (job.status === 'running') {
+      // Prefer the live in-memory counters if present (fresher than DB)
+      const cache = scanProgressCache.get(job.id);
+      return res.json({
+        status: 'running',
+        pagesScanned: cache?.pagesScanned ?? job.pagesScanned,
+        productsFound: cache?.productsFound ?? job.productsFound,
+      });
+    }
+
+    if (job.status === 'error') {
+      return res.json({ status: 'error', error: job.error });
+    }
+
+    // status === 'done'
+    res.json({
+      status: 'done',
+      provider: job.provider,
+      products: job.products,
+      stats: job.stats,
+      completedAt: job.completedAt,
     });
+  } catch (error) {
+    console.error('[scraper/scan/status]', error);
+    res.status(500).json({ error: 'Failed to fetch job status' });
   }
+});
 
-  if (job.status === 'error') {
-    return res.json({ status: 'error', error: job.error });
+// GET /api/admin/scraper/jobs — list recent scan jobs (status dashboard)
+app.get('/api/admin/scraper/jobs', adminAuth, async (req, res) => {
+  try {
+    const jobs = await prisma.scanJob.findMany({
+      orderBy: { startedAt: 'desc' },
+      take: 50,
+      select: {
+        id: true, status: true, provider: true, url: true, scope: true,
+        pagesScanned: true, productsFound: true, error: true,
+        startedAt: true, completedAt: true,
+      },
+    });
+    res.json({ jobs });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch scan jobs' });
   }
+});
 
-  // status === 'done'
-  res.json({
-    status: 'done',
-    provider: job.provider,
-    products: job.products,
-    stats: job.stats,
-    completedAt: job.completedAt,
-  });
-
-  // Clean up completed job after it's been fetched
-  scanJobs.delete(req.params.jobId);
+// POST /api/admin/scraper/jobs/:jobId/cancel — mark a running job as cancelled
+app.post('/api/admin/scraper/scan/cancel/:jobId', adminAuth, async (req, res) => {
+  try {
+    const job = await prisma.scanJob.findUnique({ where: { id: req.params.jobId } });
+    if (!job) return res.status(404).json({ error: 'Job not found' });
+    if (job.status === 'running') {
+      await completeScanJob(req.params.jobId, { status: 'error', error: 'Cancelled by admin' });
+    }
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to cancel job' });
+  }
 });
 
 // POST /api/admin/scraper/import
@@ -1593,6 +1742,25 @@ app.get('/api/admin/hero-slides', adminAuth, async (req, res) => {
   }
 });
 
+// Admin: reorder hero slides — accepts an ordered array of slide IDs
+app.put('/api/admin/hero-slides/reorder', adminAuth, async (req, res) => {
+  try {
+    const { order } = req.body;
+    if (!Array.isArray(order) || order.length === 0) {
+      return res.status(400).json({ error: 'order array of slide ids is required' });
+    }
+    const ids = order.map(Number).filter(Number.isInteger);
+    await prisma.$transaction(
+      ids.map((id, idx) => prisma.heroSlide.update({ where: { id }, data: { sortOrder: idx } }))
+    );
+    audit(prisma, req, { action: 'reorder', entityType: 'hero-slide', summary: `Reordered ${ids.length} slides` });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[hero-slides/reorder]', error);
+    res.status(500).json({ error: 'Failed to reorder slides' });
+  }
+});
+
 // ── Hero slide field whitelist — prevents arbitrary fields reaching Prisma ──
 function buildHeroSlideData(body) {
   const data = {};
@@ -1686,6 +1854,19 @@ function validateReviewBody(body) {
   const source = (body.source || 'direct').toString().toLowerCase();
   if (!VALID_REVIEW_SOURCES.includes(source)) return { valid: false, error: `source must be one of: ${VALID_REVIEW_SOURCES.join(', ')}` };
   const imageUrls = Array.isArray(body.imageUrls) ? body.imageUrls.filter(u => typeof u === 'string' && u.trim()).slice(0, 8) : [];
+
+  // Validate display date: reject future dates and anything older than 5 years.
+  let displayDate = new Date();
+  if (body.displayDate) {
+    const d = new Date(body.displayDate);
+    if (isNaN(d.getTime())) return { valid: false, error: 'displayDate is not a valid date' };
+    const now = new Date();
+    if (d.getTime() > now.getTime() + 24 * 60 * 60 * 1000) return { valid: false, error: 'displayDate cannot be in the future' };
+    const fiveYearsAgo = new Date(); fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+    if (d.getTime() < fiveYearsAgo.getTime()) return { valid: false, error: 'displayDate cannot be more than 5 years in the past' };
+    displayDate = d;
+  }
+
   return {
     valid: true,
     data: {
@@ -1699,7 +1880,7 @@ function validateReviewBody(body) {
       productId: body.productId ? parseInt(body.productId) : null,
       approved: body.approved !== false,
       featured: body.featured === true,
-      displayDate: body.displayDate ? new Date(body.displayDate) : new Date(),
+      displayDate,
     },
   };
 }

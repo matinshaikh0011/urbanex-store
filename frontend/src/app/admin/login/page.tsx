@@ -8,6 +8,7 @@ import styles from './page.module.css';
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,7 +29,7 @@ function LoginForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username, password }),
       });
       if (res.ok) {
         const from = searchParams.get('from') || '/admin';
@@ -51,7 +52,16 @@ function LoginForm() {
           <span className={styles.logoText}>URBAN<span className={styles.accent}>EX</span></span>
         </div>
         <h1 className={styles.title}>ADMIN PANEL</h1>
-        <p className={styles.sub}>Enter your admin password to continue</p>
+        <p className={styles.sub}>Enter your admin credentials to continue</p>
+
+        <input
+          type="text"
+          value={username}
+          onChange={e => { setUsername(e.target.value); setError(''); }}
+          placeholder="Username (optional)"
+          className={styles.input}
+          autoComplete="username"
+        />
 
         <input
           type="password"

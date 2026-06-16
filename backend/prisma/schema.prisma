@@ -179,3 +179,37 @@ model Review {
   @@index([productId])
   @@index([approved, displayDate])
 }
+
+// ── Admin audit log: who changed what, when ──
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  actor      String   @default("admin")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id")
+  summary    String?
+  metadata   Json?
+  ip         String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([entityType, createdAt])
+  @@index([createdAt])
+}
+
+// ── Persisted scan jobs (survive backend restarts) ──
+model ScanJob {
+  id           String    @id
+  status       String    @default("running")
+  provider     String?
+  url          String?
+  scope        String?
+  pagesScanned Int       @default(0) @map("pages_scanned")
+  productsFound Int      @default(0) @map("products_found")
+  products     Json?
+  stats        Json?
+  error        String?
+  startedAt    DateTime  @default(now()) @map("started_at")
+  completedAt  DateTime? @map("completed_at")
+
+  @@index([status, startedAt])
+}
