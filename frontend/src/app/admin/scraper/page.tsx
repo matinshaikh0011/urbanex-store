@@ -215,6 +215,7 @@ export default function ScraperPage() {
 
                     // 2. Poll until done
                     let pollInterval: ReturnType<typeof setInterval> | null = null;
+                    let consecutiveErrors = 0;
                     await new Promise<void>((resolve, reject) => {
                       pollInterval = setInterval(async () => {
                         // User cancelled
@@ -225,6 +226,28 @@ export default function ScraperPage() {
                         }
                         try {
                           const statusRes = await api(`/api/admin/scraper/scan/status/${jobId}`);
+
+                          // Transient server states (429 rate-limit, 502/503/504
+                          // cold-starts) must NOT be treated as "scan finished".
+                          // Keep polling — the background job is still running.
+                          if (statusRes.status === 429 || statusRes.status >= 500) {
+                            consecutiveErrors++;
+                            // Only give up after many consecutive failures (~2 min)
+                            if (consecutiveErrors >= 40) {
+                              if (pollInterval) clearInterval(pollInterval);
+                              reject(new Error(`Lost connection to scan job (HTTP ${statusRes.status} repeatedly). The scan may still be running — check the Jobs tab.`));
+                            }
+                            return;
+                          }
+
+                          if (!statusRes.ok) {
+                            // 404 = job genuinely gone/expired; other 4xx = unexpected
+                            if (pollInterval) clearInterval(pollInterval);
+                            reject(new Error(`Scan job unavailable (HTTP ${statusRes.status}). Check the Jobs tab.`));
+                            return;
+                          }
+
+                          consecutiveErrors = 0;
                           const statusData = await statusRes.json();
 
                           if (statusData.status === 'running') {
@@ -235,14 +258,20 @@ export default function ScraperPage() {
                             return;
                           }
 
-                          if (pollInterval) clearInterval(pollInterval);
-
                           if (statusData.status === 'error') {
+                            if (pollInterval) clearInterval(pollInterval);
                             reject(new Error(statusData.error || 'Scan failed'));
                             return;
                           }
 
+                          if (statusData.status !== 'done') {
+                            // Unknown/unexpected status — keep polling rather than
+                            // falsely reporting completion with 0 products.
+                            return;
+                          }
+
                           // status === 'done'
+                          if (pollInterval) clearInterval(pollInterval);
                           setScanProgress(100);
                           setScannedProducts(statusData.products || []);
                           setScanStats({
@@ -262,10 +291,15 @@ export default function ScraperPage() {
                           setTimeout(() => { setStep(2); setScanProgress(0); }, 500);
                           resolve();
                         } catch (pollErr) {
-                          if (pollInterval) clearInterval(pollInterval);
-                          reject(pollErr);
+                          // Network-level failure (not an HTTP status). Treat as
+                          // transient and keep polling, matching the 429/5xx logic.
+                          consecutiveErrors++;
+                          if (consecutiveErrors >= 40) {
+                            if (pollInterval) clearInterval(pollInterval);
+                            reject(pollErr);
+                          }
                         }
-                      }, 2000);
+                      }, 3000);
                     });
                   } catch (e: unknown) {
                     const msg = e instanceof Error ? e.message : 'Scan failed';

@@ -127,15 +127,28 @@ app.use(express.urlencoded({ limit: '5mb', extended: true }));
 app.use(cookieParser());
 
 // ── Global API rate limit: 100 req / 15 min / IP ──
-// Excludes the scraper status-poll route (admin-only, polled frequently
-// during long imports) so legitimate progress polling isn't throttled.
+// Excludes admin scraper polling routes (status + jobs list), which are
+// admin-only and polled frequently during long imports, so legitimate
+// progress polling isn't throttled.
+//
+// NOTE: this limiter is mounted at '/api/', so inside the middleware
+// Express has already stripped the '/api' prefix from req.path. We check
+// req.originalUrl (which keeps the full path) to match reliably.
+const RATE_LIMIT_EXEMPT = [
+  '/api/admin/scraper/scan/status',
+  '/api/admin/scraper/jobs',
+  '/api/admin/scraper/import',
+];
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests. Please slow down and try again shortly.' },
-  skip: (req) => req.path.startsWith('/api/admin/scraper/scan/status'),
+  skip: (req) => {
+    const path = (req.originalUrl || req.url || '').split('?')[0];
+    return RATE_LIMIT_EXEMPT.some(p => path.startsWith(p));
+  },
 });
 app.use('/api/', globalLimiter);
 
