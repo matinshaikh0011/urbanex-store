@@ -118,6 +118,18 @@ const registerLimiter = rateLimit({
 });
 app.use('/api/auth/register', registerLimiter);
 
+// ── Admin login rate limit: brute-force protection ──
+// Only failed attempts count (skipSuccessfulRequests) so a working admin
+// session is never throttled. Far stricter than the global limiter.
+const adminLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  message: { error: 'Too many failed login attempts. Please try again in 15 minutes.' },
+});
+
 // ── Customer auth routes (register/login/logout/me) ──
 app.use('/api/auth', authRouter);
 
@@ -146,7 +158,7 @@ const adminAuth = (req, res, next) => {
 // AUTH ENDPOINTS
 // ════════════════════════════════════════════════════════════════
 
-app.post('/api/admin/login', async (req, res) => {
+app.post('/api/admin/login', adminLoginLimiter, async (req, res) => {
   try {
     const { password } = req.body;
     const passwordHash = process.env.ADMIN_PASSWORD_HASH;
@@ -534,7 +546,14 @@ app.get('/api/products', async (req, res) => {
     if (subcategory) where.subcategory = subcategory;
     if (featured === 'true') where.isFeatured = true;
     if (brand) where.brand = { slug: brand };
-    const products = await prisma.product.findMany({ where, include: { brand: true } });
+    const products = await prisma.product.findMany({
+      where,
+      include: { brand: true },
+      orderBy: [
+        { isFeatured: 'desc' },
+        { id: 'desc' },
+      ],
+    });
     res.json(products.map(p => ({
       id: p.id, name: p.name, slug: p.slug, description: p.description,
       price: Number(p.price), originalPrice: p.originalPrice != null ? Number(p.originalPrice) : null,
@@ -741,16 +760,6 @@ app.post('/api/orders', async (req, res) => {
   } catch (error) {
     console.error('[orders/create]', error.message);
     res.status(500).json({ error: 'Failed to create order' });
-  }
-});
-
-// Admin: full order list (PII included) — protected
-app.get('/api/orders', adminAuth, async (req, res) => {
-  try {
-    const orders = await prisma.order.findMany({ orderBy: { createdAt: 'desc' }, include: { product: { include: { brand: true } } } });
-    res.json(orders);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch orders' });
   }
 });
 
@@ -1038,8 +1047,6 @@ app.post('/api/admin/scraper/import', adminAuth, async (req, res) => {
             p.originalPrice = detail.originalPrice;
           }
 
-          console.log(`[PRICE DEBUG] "${p.name}" finalPrice=${p.price} originalPrice=${p.originalPrice}`);
-
           if (detail.images && detail.images.length > 0) p.images = detail.images;
           if (detail.description) p.description = detail.description;
           p.inStock = detail.inStock;
@@ -1196,7 +1203,6 @@ app.post('/api/admin/scraper/sync/:id', adminAuth, async (req, res) => {
       if (updateData.originalPrice <= updateData.price) {
         updateData.originalPrice = Math.round(updateData.price * 1.4);
       }
-      console.log(`[PRICE DEBUG] sync name="${product.name}" price=${updateData.price} originalPrice=${updateData.originalPrice}`);
     }
 
     // Legacy optional flags kept for backwards compat but no longer needed
@@ -1335,11 +1341,25 @@ app.get('/api/admin/hero-slides', adminAuth, async (req, res) => {
   }
 });
 
+// ── Hero slide field whitelist — prevents arbitrary fields reaching Prisma ──
+function buildHeroSlideData(body) {
+  const data = {};
+  if (body.image !== undefined) data.image = String(body.image);
+  if (body.label !== undefined) data.label = String(body.label);
+  if (body.tagline !== undefined) data.tagline = String(body.tagline);
+  if (body.spec !== undefined) data.spec = String(body.spec);
+  if (body.emoji !== undefined) data.emoji = String(body.emoji);
+  if (body.href !== undefined) data.href = String(body.href);
+  if (body.active !== undefined) data.active = Boolean(body.active);
+  if (body.sortOrder !== undefined) data.sortOrder = parseInt(body.sortOrder) || 0;
+  return data;
+}
+
 // Admin: Create hero slide
 app.post('/api/admin/hero-slides', adminAuth, async (req, res) => {
   try {
     const slide = await prisma.heroSlide.create({
-      data: req.body,
+      data: buildHeroSlideData(req.body),
     });
     res.status(201).json(slide);
   } catch (error) {
@@ -1352,7 +1372,7 @@ app.put('/api/admin/hero-slides/:id', adminAuth, async (req, res) => {
   try {
     const slide = await prisma.heroSlide.update({
       where: { id: parseInt(req.params.id) },
-      data: req.body,
+      data: buildHeroSlideData(req.body),
     });
     res.json(slide);
   } catch (error) {
@@ -1575,7 +1595,5 @@ app.delete('/api/admin/reviews/:id', adminAuth, async (req, res) => {
     res.status(500).json({ error: 'Failed to delete review' });
   }
 });
-
-app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 app.listen(PORT, () => console.log(`🚀 UrbanEx API running on port ${PORT}`));

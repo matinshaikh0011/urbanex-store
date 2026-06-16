@@ -1,0 +1,2 @@
+[    4190ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal) @ https://www.shopurbanex.com/api/reviews?featured=true&limit=12:0
+[    4190ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal) @ https://www.shopurbanex.com/api/reviews?limit=50:0

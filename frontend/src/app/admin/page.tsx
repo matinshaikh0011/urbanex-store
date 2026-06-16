@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import styles from './page.module.css';
 
 // â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -92,11 +93,22 @@ async function api(path: string, opts?: RequestInit) {
 }
 
 // â”€â”€ Main Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-export default function AdminPage() {
+const SECTIONS = ['overview', 'orders', 'payments', 'products', 'brands', 'categories', 'hero', 'coupons', 'inventory', 'reviews', 'csv'] as const;
+type Section = typeof SECTIONS[number];
+
+function AdminDashboard() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toasts, show } = useToast();
-  const [section, setSection] = useState<'overview' | 'orders' | 'payments' | 'products' | 'brands' | 'categories' | 'hero' | 'coupons' | 'inventory' | 'reviews' | 'csv'>('overview');
+  const initialSection = (searchParams.get('section') as Section) || 'overview';
+  const [section, setSection] = useState<Section>(SECTIONS.includes(initialSection) ? initialSection : 'overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Keep section in sync if the URL query changes (e.g. deep-link from scraper nav)
+  useEffect(() => {
+    const s = searchParams.get('section') as Section | null;
+    if (s && SECTIONS.includes(s)) setSection(s);
+  }, [searchParams]);
 
   // Verify auth on mount
   useEffect(() => {
@@ -137,7 +149,7 @@ export default function AdminPage() {
         <nav className={styles.nav}>
           {NAV.map(n => (
             <button key={n.id} className={`${styles.navItem} ${section === n.id ? styles.navActive : ''}`}
-              onClick={() => { setSection(n.id as typeof section); setSidebarOpen(false); }}>
+              onClick={() => { setSection(n.id as Section); setSidebarOpen(false); }}>
               <span>{n.icon}</span> {n.label}
             </button>
           ))}
@@ -174,6 +186,14 @@ export default function AdminPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminPage() {
+  return (
+    <Suspense fallback={<div style={{ background: '#111', minHeight: '100vh' }} />}>
+      <AdminDashboard />
+    </Suspense>
   );
 }
 
@@ -356,7 +376,7 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
                   <td>
                     <div className={styles.actionRow}>
                       <select className={styles.statusSelect} value={o.status} onChange={e => updateStatus(o.orderId, e.target.value)}>
-                        {['Confirmed', 'Shipped', 'Delivered', 'Cancelled'].map(s => <option key={s}>{s}</option>)}
+                        {['Pending Verification', 'Verified', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'].map(s => <option key={s}>{s}</option>)}
                       </select>
                       <button className={styles.iconBtn} title="Add note" onClick={() => { setNoteOrder(o.orderId); setNoteText(''); }}>📝</button>
                       <button className={styles.iconBtn} title="View details" onClick={() => setDetailOrder(o)}>👁</button>
@@ -1664,7 +1684,7 @@ function CSVSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
                 {rows.map((r, i) => (
                   <tr key={i} className={r._errors?.length ? styles.errorRow : ''}>
                     <td>{r.name}</td><td>{r.category}</td><td>{r.brand_id}</td><td>{r.price}</td>
-                    <td>{r._errors?.length ? <span className={styles.errorText}>{r._errors.join(', ')}</span> : <span className={styles.okText}>❌“ Ready</span>}</td>
+                    <td>{r._errors?.length ? <span className={styles.errorText}>{r._errors.join(', ')}</span> : <span className={styles.okText}>✓ Ready</span>}</td>
                   </tr>
                 ))}
               </tbody>
@@ -2015,6 +2035,7 @@ function ReviewForm({ initial, products, onClose, onSave }: { initial: Partial<R
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [imgUrlDraft, setImgUrlDraft] = useState('');
   const set = (k: keyof Review, v: unknown) => setForm(f => ({ ...f, [k]: v }));
 
   const uploadFile = async (file: File, target: 'images' | 'video' | 'whatsapp'): Promise<string | null> => {
@@ -2044,6 +2065,13 @@ function ReviewForm({ initial, products, onClose, onSave }: { initial: Partial<R
   const addImage = async (file: File) => {
     const url = await uploadFile(file, 'images');
     if (url) set('imageUrls', [...(form.imageUrls || []), url]);
+  };
+
+  const addImageUrl = () => {
+    const u = imgUrlDraft.trim();
+    if (!u) return;
+    set('imageUrls', [...(form.imageUrls || []), u]);
+    setImgUrlDraft('');
   };
 
   const removeImage = (idx: number) => {
@@ -2102,7 +2130,14 @@ function ReviewForm({ initial, products, onClose, onSave }: { initial: Partial<R
 
           <div className={`${styles.formGroup} ${styles.fullWidth}`}>
             <label>Customer Images {uploading && <em>(uploading…)</em>}</label>
-            <input type="file" accept="image/*" onChange={e => { if (e.target.files?.[0]) addImage(e.target.files[0]); e.target.value = ''; }} className={styles.fileInput} />
+            <label className={styles.imageUploadArea} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); Array.from(e.dataTransfer.files).forEach(f => addImage(f)); }}>
+              <p>{uploading ? 'Uploading…' : '📷 Click to upload, or drag & drop images here'}</p>
+              <input type="file" accept="image/*" multiple onChange={e => { Array.from(e.target.files || []).forEach(f => addImage(f)); e.target.value = ''; }} className={styles.fileInput} />
+            </label>
+            <div className={styles.urlRow}>
+              <input value={imgUrlDraft} onChange={e => setImgUrlDraft(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addImageUrl(); } }} placeholder="Or paste image URL" />
+              <button type="button" className={styles.btnSmall} onClick={addImageUrl}>+ Add URL</button>
+            </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
               {(form.imageUrls || []).map((u, i) => (
                 <div key={i} style={{ position: 'relative' }}>
@@ -2111,19 +2146,24 @@ function ReviewForm({ initial, products, onClose, onSave }: { initial: Partial<R
                 </div>
               ))}
             </div>
-            <input value={form.imageUrls?.[0] && false ? '' : ''} placeholder="(or paste image URL and click Add)" style={{ marginTop: 8, display: 'none' }} readOnly />
           </div>
 
           <div className={`${styles.formGroup} ${styles.fullWidth}`}>
             <label>WhatsApp Screenshot (optional)</label>
-            <input type="file" accept="image/*" onChange={async e => { if (e.target.files?.[0]) { const u = await uploadFile(e.target.files[0], 'whatsapp'); if (u) set('whatsappScreenshotUrl', u); } e.target.value = ''; }} className={styles.fileInput} />
+            <label className={styles.imageUploadArea} onDragOver={e => e.preventDefault()} onDrop={async e => { e.preventDefault(); if (e.dataTransfer.files?.[0]) { const u = await uploadFile(e.dataTransfer.files[0], 'whatsapp'); if (u) set('whatsappScreenshotUrl', u); } }}>
+              <p>{uploading ? 'Uploading…' : '📷 Click to upload, or drag & drop'}</p>
+              <input type="file" accept="image/*" onChange={async e => { if (e.target.files?.[0]) { const u = await uploadFile(e.target.files[0], 'whatsapp'); if (u) set('whatsappScreenshotUrl', u); } e.target.value = ''; }} className={styles.fileInput} />
+            </label>
             <input value={form.whatsappScreenshotUrl || ''} onChange={e => set('whatsappScreenshotUrl', e.target.value)} placeholder="Or paste image URL" style={{ marginTop: 8 }} />
             {form.whatsappScreenshotUrl && <img src={form.whatsappScreenshotUrl} alt="WA preview" style={{ maxHeight: 140, marginTop: 8, borderRadius: 6 }} />}
           </div>
 
           <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-            <label>Video Review URL (optional)</label>
-            <input type="file" accept="video/*" onChange={async e => { if (e.target.files?.[0]) { const u = await uploadFile(e.target.files[0], 'video'); if (u) set('videoUrl', u); } e.target.value = ''; }} className={styles.fileInput} />
+            <label>Video Review (optional)</label>
+            <label className={styles.imageUploadArea} onDragOver={e => e.preventDefault()} onDrop={async e => { e.preventDefault(); if (e.dataTransfer.files?.[0]) { const u = await uploadFile(e.dataTransfer.files[0], 'video'); if (u) set('videoUrl', u); } }}>
+              <p>{uploading ? 'Uploading…' : '🎥 Click to upload, or drag & drop video'}</p>
+              <input type="file" accept="video/*" onChange={async e => { if (e.target.files?.[0]) { const u = await uploadFile(e.target.files[0], 'video'); if (u) set('videoUrl', u); } e.target.value = ''; }} className={styles.fileInput} />
+            </label>
             <input value={form.videoUrl || ''} onChange={e => set('videoUrl', e.target.value)} placeholder="Or paste video URL (mp4, YouTube embed, etc.)" style={{ marginTop: 8 }} />
           </div>
 

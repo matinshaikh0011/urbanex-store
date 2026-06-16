@@ -132,6 +132,7 @@ export default function ScraperPage() {
   const [manualPrices, setManualPrices] = useState<Map<string, number>>(new Map());
   const [brands, setBrands] = useState<Brand[]>([]);
   const [importing, setImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
   const [importResult, setImportResult] = useState<{ successCount: number; updatedCount: number; failureCount: number; skippedCount: number; log: Array<{ sourceId: string; operation: string; errorMessage?: string }> } | null>(null);
   const [providerKey, setProviderKey] = useState('cartpe');
 
@@ -158,16 +159,16 @@ export default function ScraperPage() {
         <div className={adminStyles.sidebarLogo}>URBAN<span className={adminStyles.red}>EX</span></div>
         <nav className={adminStyles.nav}>
           {[
-            { label: 'Overview', icon: '📊', href: '/admin' },
-            { label: 'Orders', icon: '📦', href: '/admin' },
-            { label: 'Manage Payments', icon: '💳', href: '/admin' },
-            { label: 'Products', icon: '👟', href: '/admin' },
-            { label: 'Brands', icon: '🏷️', href: '/admin' },
-            { label: 'Categories', icon: '🗂️', href: '/admin' },
-            { label: 'Hero Banners', icon: '🖼️', href: '/admin' },
-            { label: 'Coupons', icon: '🎟️', href: '/admin' },
-            { label: 'Inventory', icon: '📈', href: '/admin' },
-            { label: 'Import CSV', icon: '📥', href: '/admin' },
+            { label: 'Overview', icon: '📊', href: '/admin?section=overview' },
+            { label: 'Orders', icon: '📦', href: '/admin?section=orders' },
+            { label: 'Manage Payments', icon: '💳', href: '/admin?section=payments' },
+            { label: 'Products', icon: '👟', href: '/admin?section=products' },
+            { label: 'Brands', icon: '🏷️', href: '/admin?section=brands' },
+            { label: 'Categories', icon: '🗂️', href: '/admin?section=categories' },
+            { label: 'Hero Banners', icon: '🖼️', href: '/admin?section=hero' },
+            { label: 'Coupons', icon: '🎟️', href: '/admin?section=coupons' },
+            { label: 'Inventory', icon: '📈', href: '/admin?section=inventory' },
+            { label: 'Import CSV', icon: '📥', href: '/admin?section=csv' },
           ].map(n => (
             <a key={n.label} href={n.href} className={adminStyles.navItem} style={{ textDecoration: 'none' }}>
               <span>{n.icon}</span> {n.label}
@@ -300,9 +301,9 @@ export default function ScraperPage() {
               {step === 4 && <CategoryStep products={selectedProducts} categoryAssignments={categoryAssignments} setCategoryAssignments={setCategoryAssignments} onNext={() => setStep(5)} show={show} />}
               {step === 5 && <BrandAssignmentStep products={selectedProducts} brands={brands} brandResolutions={brandResolutions} brandAssignments={brandAssignments} setBrandAssignments={setBrandAssignments} show={show} onNext={() => setStep(6)} />}
               {step === 6 && <ImportSettingsStep products={selectedProducts} pricingRule={pricingRule} setPricingRule={setPricingRule} rounding={rounding} setRounding={setRounding} imageMode={imageMode} setImageMode={setImageMode} manualPrices={manualPrices} setManualPrices={setManualPrices} onNext={() => setStep(7)} />}
-              {step === 7 && <ImportStep products={selectedProducts} categoryAssignments={categoryAssignments} brandAssignments={brandAssignments} pricingRule={pricingRule} rounding={rounding} imageMode={imageMode} manualPrices={manualPrices} source={providerKey} sourceUrl={url} importing={importing} importResult={importResult} show={show}
+              {step === 7 && <ImportStep products={selectedProducts} categoryAssignments={categoryAssignments} brandAssignments={brandAssignments} pricingRule={pricingRule} rounding={rounding} imageMode={imageMode} manualPrices={manualPrices} source={providerKey} sourceUrl={url} importing={importing} importProgress={importProgress} importResult={importResult} show={show}
                 onImport={async () => {
-                  setImporting(true); setImportResult(null);
+                  setImporting(true); setImportResult(null); setImportProgress(0);
                   const payload = selectedProducts.map(p => {
                     const cat = categoryAssignments.get(p.sourceId);
                     const brandId = brandAssignments.get(p.sourceId);
@@ -351,6 +352,7 @@ export default function ScraperPage() {
                       if (d.log) allLogs.push(...d.log);
                       if (d.imageFailures) allImageFailures.push(...d.imageFailures);
                       if (d.historyId) lastHistoryId = d.historyId;
+                      setImportProgress(Math.round(((bi + 1) / batches.length) * 100));
                     }
 
                     const combined = { successCount: totalSuccess, updatedCount: totalUpdated, failureCount: totalFailed, skippedCount: totalSkipped, log: allLogs as Array<{ sourceId: string; operation: string; errorMessage?: string }> };
@@ -1129,11 +1131,11 @@ function ImportSettingsStep({ products, pricingRule, setPricingRule, rounding, s
 }
 
 // ── Step 7: Import ────────────────────────────────────────────
-function ImportStep({ products, categoryAssignments, brandAssignments, pricingRule, rounding, imageMode, manualPrices, source, sourceUrl, importing, importResult, show, onImport, onViewHistory }: {
+function ImportStep({ products, categoryAssignments, brandAssignments, pricingRule, rounding, imageMode, manualPrices, source, sourceUrl, importing, importProgress, importResult, show, onImport, onViewHistory }: {
   products: ScrapedProduct[]; categoryAssignments: Map<string, { category: string; subcategory: string | null }>;
   brandAssignments: Map<string, number | 'no-brand'>; pricingRule: PricingRule; rounding: string;
   imageMode: string; manualPrices: Map<string, number>; source: string; sourceUrl: string;
-  importing: boolean; importResult: { successCount: number; updatedCount: number; failureCount: number; skippedCount: number; log: Array<{ sourceId: string; operation: string; errorMessage?: string }> } | null;
+  importing: boolean; importProgress: number; importResult: { successCount: number; updatedCount: number; failureCount: number; skippedCount: number; log: Array<{ sourceId: string; operation: string; errorMessage?: string }> } | null;
   show: (m: string, t?: 'ok' | 'err') => void; onImport: () => void; onViewHistory: () => void;
 }) {
   const toImport = products;
@@ -1150,10 +1152,10 @@ function ImportStep({ products, categoryAssignments, brandAssignments, pricingRu
       </div>
       {!importResult && (
         <button className={adminStyles.btnPrimary} onClick={onImport} disabled={importing || toImport.length === 0}>
-          {importing ? 'IMPORTING…' : `IMPORT ${toImport.length} PRODUCTS`}
+          {importing ? `IMPORTING… ${importProgress}%` : `IMPORT ${toImport.length} PRODUCTS`}
         </button>
       )}
-      {importing && <div className={styles.progressWrap} style={{ marginTop: 12 }}><div className={styles.progressFill} style={{ width: '60%', animation: 'none' }} /></div>}
+      {importing && <div className={styles.progressWrap} style={{ marginTop: 12 }}><div className={styles.progressFill} style={{ width: `${importProgress}%`, transition: 'width 0.4s ease' }} /></div>}
       {importResult && (
         <div style={{ marginTop: 20 }}>
           <div className={styles.resultGrid}>

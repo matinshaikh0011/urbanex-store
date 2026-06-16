@@ -40,7 +40,9 @@
       ],
       "disabled": false,
       "autoApprove": [
-        "browser_take_screenshot"
+        "browser_take_screenshot",
+        "browser_snapshot",
+        "browser_evaluate"
       ]
     }
   }
