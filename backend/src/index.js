@@ -212,13 +212,13 @@ app.get('/api/admin/verify', adminAuth, (req, res) => {
 app.get('/api/admin/stats', adminAuth, async (req, res) => {
   try {
     const [totalOrders, pendingOrders, totalProducts, outOfStock, revenue, activeCoupons, recentOrders, outOfStockProducts] = await Promise.all([
-      prisma.order.count(),
-      prisma.order.count({ where: { status: { in: ['Pending Advance', 'Pending Verification'] } } }),
+      prisma.order.count({ where: { archived: false } }),
+      prisma.order.count({ where: { archived: false, status: { in: ['Pending Advance', 'Pending Verification'] } } }),
       prisma.product.count(),
       prisma.product.count({ where: { inStock: false } }),
-      prisma.order.aggregate({ _sum: { totalAmount: true } }),
+      prisma.order.aggregate({ where: { archived: false }, _sum: { totalAmount: true } }),
       prisma.coupon.count({ where: { isActive: true } }).catch(() => 0),
-      prisma.order.findMany({ take: 5, orderBy: { createdAt: 'desc' }, include: { product: { include: { brand: true } } } }),
+      prisma.order.findMany({ where: { archived: false }, take: 5, orderBy: { createdAt: 'desc' }, include: { product: { include: { brand: true } } } }),
       prisma.product.findMany({ where: { inStock: false }, take: 10, include: { brand: true } }),
     ]);
 
@@ -244,14 +244,89 @@ app.get('/api/admin/stats', adminAuth, async (req, res) => {
 
 app.get('/api/admin/orders', adminAuth, async (req, res) => {
   try {
-    const orders = await prisma.order.findMany({
-      include: { product: { include: { brand: true } } },
-      orderBy: { createdAt: 'desc' },
-    });
-    res.json(orders);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(200, Math.max(1, parseInt(req.query.limit) || 50));
+    const skip = (page - 1) * limit;
+    const search = (req.query.search || '').toString().trim();
+    const status = (req.query.status || '').toString().trim();
+    const archived = req.query.archived === 'true';
+
+    const where = { archived };
+    if (status && status.toLowerCase() !== 'all') {
+      where.status = { contains: status, mode: 'insensitive' };
+    }
+    if (search) {
+      where.OR = [
+        { orderId: { contains: search, mode: 'insensitive' } },
+        { shippingName: { contains: search, mode: 'insensitive' } },
+        { shippingPhone: { contains: search } },
+        { utrNumber: { contains: search } },
+      ];
+    }
+
+    const [orders, total] = await Promise.all([
+      prisma.order.findMany({
+        where,
+        include: { product: { include: { brand: true } } },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.order.count({ where }),
+    ]);
+    res.json({ orders, total, page, limit });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+});
+
+// Admin: order CSV export — respects same filters, no pagination
+app.get('/api/admin/orders/export', adminAuth, async (req, res) => {
+  try {
+    const search = (req.query.search || '').toString().trim();
+    const status = (req.query.status || '').toString().trim();
+    const archived = req.query.archived === 'true';
+
+    const where = { archived };
+    if (status && status.toLowerCase() !== 'all') {
+      where.status = { contains: status, mode: 'insensitive' };
+    }
+    if (search) {
+      where.OR = [
+        { orderId: { contains: search, mode: 'insensitive' } },
+        { shippingName: { contains: search, mode: 'insensitive' } },
+        { shippingPhone: { contains: search } },
+        { utrNumber: { contains: search } },
+      ];
+    }
+
+    const orders = await prisma.order.findMany({
+      where,
+      include: { product: { select: { name: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const esc = (v) => {
+      const s = v == null ? '' : String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const headers = ['Order ID', 'Date', 'Customer', 'Phone', 'Email', 'Address', 'Product', 'Size', 'Qty', 'Total', 'Paid', 'Status', 'Payment', 'UTR', 'Coupon', 'Discount'];
+    const rows = orders.map(o => [
+      o.orderId, o.createdAt.toISOString(), o.shippingName, o.shippingPhone, o.shippingEmail || '',
+      o.shippingAddress, o.product?.name || '', o.size || '', o.quantity,
+      Number(o.totalAmount), o.amountPaid != null ? Number(o.amountPaid) : '', o.status,
+      o.paymentMethod || '', o.utrNumber || '', o.couponCode || '',
+      o.discountAmount != null ? Number(o.discountAmount) : '',
+    ].map(esc).join(','));
+    const csv = [headers.join(','), ...rows].join('\n');
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="orders-${new Date().toISOString().slice(0, 10)}.csv"`);
+    res.send('\uFEFF' + csv);
+  } catch (error) {
+    console.error('[orders/export]', error);
+    res.status(500).json({ error: 'Failed to export orders' });
   }
 });
 
@@ -286,10 +361,31 @@ app.post('/api/admin/orders/:orderId/notes', adminAuth, async (req, res) => {
 
 app.delete('/api/admin/orders/:orderId', adminAuth, async (req, res) => {
   try {
-    await prisma.order.delete({ where: { orderId: req.params.orderId } });
-    res.json({ success: true });
+    // Hard delete only when explicitly requested; default is soft-delete (archive)
+    if (req.query.hard === 'true') {
+      await prisma.order.delete({ where: { orderId: req.params.orderId } });
+      return res.json({ success: true, hardDeleted: true });
+    }
+    const updated = await prisma.order.update({
+      where: { orderId: req.params.orderId },
+      data: { archived: true },
+    });
+    res.json({ success: true, archived: true, orderId: updated.orderId });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete order' });
+  }
+});
+
+// Admin: restore an archived order
+app.post('/api/admin/orders/:orderId/restore', adminAuth, async (req, res) => {
+  try {
+    const updated = await prisma.order.update({
+      where: { orderId: req.params.orderId },
+      data: { archived: false },
+    });
+    res.json({ success: true, orderId: updated.orderId });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to restore order' });
   }
 });
 
@@ -540,12 +636,45 @@ app.delete('/api/categories/:id', adminAuth, async (req, res) => {
 
 app.get('/api/products', async (req, res) => {
   try {
-    const { brand, category, subcategory, featured } = req.query;
+    const { brand, category, subcategory, featured, search } = req.query;
     const where = {};
     if (category) where.category = category;
     if (subcategory) where.subcategory = subcategory;
     if (featured === 'true') where.isFeatured = true;
     if (brand) where.brand = { slug: brand };
+    if (search && search.toString().trim()) {
+      where.OR = [
+        { name: { contains: search.toString().trim(), mode: 'insensitive' } },
+        { brand: { name: { contains: search.toString().trim(), mode: 'insensitive' } } },
+      ];
+    }
+
+    const serialize = (p) => ({
+      id: p.id, name: p.name, slug: p.slug, description: p.description,
+      price: Number(p.price), originalPrice: p.originalPrice != null ? Number(p.originalPrice) : null,
+      images: p.images, sizes: p.sizes, colors: p.colors, category: p.category,
+      subcategory: p.subcategory, isFeatured: p.isFeatured, inStock: p.inStock,
+      brand: p.brand, brandId: p.brandId, source: p.source, sourceId: p.sourceId, lastSync: p.lastSync,
+    });
+
+    // Opt-in pagination: only when ?page is supplied (keeps storefront array contract intact)
+    if (req.query.page !== undefined) {
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const limit = Math.min(200, Math.max(1, parseInt(req.query.limit) || 50));
+      const skip = (page - 1) * limit;
+      const [products, total] = await Promise.all([
+        prisma.product.findMany({
+          where,
+          include: { brand: true },
+          orderBy: [{ isFeatured: 'desc' }, { id: 'desc' }],
+          skip,
+          take: limit,
+        }),
+        prisma.product.count({ where }),
+      ]);
+      return res.json({ products: products.map(serialize), total, page, limit });
+    }
+
     const products = await prisma.product.findMany({
       where,
       include: { brand: true },
@@ -554,13 +683,7 @@ app.get('/api/products', async (req, res) => {
         { id: 'desc' },
       ],
     });
-    res.json(products.map(p => ({
-      id: p.id, name: p.name, slug: p.slug, description: p.description,
-      price: Number(p.price), originalPrice: p.originalPrice != null ? Number(p.originalPrice) : null,
-      images: p.images, sizes: p.sizes, colors: p.colors, category: p.category,
-      subcategory: p.subcategory, isFeatured: p.isFeatured, inStock: p.inStock,
-      brand: p.brand, brandId: p.brandId,
-    })));
+    res.json(products.map(serialize));
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch products' });
@@ -592,6 +715,116 @@ app.get('/api/products/:slug', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch product' });
   }
+});
+
+// Admin: bulk update products (brand / category / featured / stock) in one request
+app.put('/api/products/bulk', adminAuth, async (req, res) => {
+  try {
+    const { ids, action, value } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: 'ids array is required' });
+    }
+    const intIds = ids.map(Number).filter(Number.isInteger);
+    if (intIds.length === 0) return res.status(400).json({ error: 'No valid ids provided' });
+
+    let data;
+    switch (action) {
+      case 'brand': {
+        const brandId = Number(value);
+        if (!Number.isInteger(brandId) || brandId <= 0) return res.status(400).json({ error: 'value must be a valid brandId' });
+        data = { brandId };
+        break;
+      }
+      case 'category': {
+        const dbCats = await prisma.category.findMany({ where: { active: true }, select: { slug: true } }).catch(() => []);
+        const allowed = dbCats.length > 0 ? dbCats.map(c => c.slug) : ['sneakers', 'watches', 'luxury-watches', 'glasses', 'handbags', 'clothing', 'ua-batch'];
+        if (!allowed.includes(value)) return res.status(400).json({ error: 'Invalid category' });
+        data = { category: value };
+        break;
+      }
+      case 'featured':
+        data = { isFeatured: Boolean(value) };
+        break;
+      case 'stock':
+        data = { inStock: Boolean(value) };
+        break;
+      default:
+        return res.status(400).json({ error: 'action must be one of: brand, category, featured, stock' });
+    }
+
+    const result = await prisma.product.updateMany({ where: { id: { in: intIds } }, data });
+    res.json({ success: true, updated: result.count });
+  } catch (error) {
+    console.error('[products/bulk]', error);
+    res.status(500).json({ error: 'Failed to bulk update products' });
+  }
+});
+
+// Admin: bulk delete products in one request
+app.delete('/api/products/bulk', adminAuth, async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: 'ids array is required' });
+    }
+    const intIds = ids.map(Number).filter(Number.isInteger);
+    if (intIds.length === 0) return res.status(400).json({ error: 'No valid ids provided' });
+
+    await prisma.order.updateMany({ where: { productId: { in: intIds } }, data: { productId: null } });
+    const result = await prisma.product.deleteMany({ where: { id: { in: intIds } } });
+    res.json({ success: true, deleted: result.count });
+  } catch (error) {
+    console.error('[products/bulk delete]', error);
+    res.status(500).json({ error: 'Failed to bulk delete products' });
+  }
+});
+
+// Admin: bulk CSV import — accepts an array of product rows, processed in one request
+app.post('/api/admin/import-csv', adminAuth, async (req, res) => {
+  const { products: incoming } = req.body;
+  if (!Array.isArray(incoming) || incoming.length === 0) {
+    return res.status(400).json({ error: 'products array must not be empty' });
+  }
+
+  const dbCats = await prisma.category.findMany({ where: { active: true }, select: { slug: true } }).catch(() => []);
+  const allowedCats = dbCats.length > 0 ? dbCats.map(c => c.slug) : undefined;
+
+  const results = [];
+  let successCount = 0, failureCount = 0;
+
+  for (const row of incoming) {
+    const name = (row.name || '').toString().trim();
+    try {
+      const data = {
+        name,
+        slug: (row.slug && row.slug.trim()) || slugify(name),
+        category: (row.category || '').toString().trim(),
+        brandId: row.brandId != null ? Number(row.brandId) : (row.brand_id != null ? Number(row.brand_id) : null),
+        description: (row.description || '').toString().trim() || null,
+        price: Number(row.price),
+        originalPrice: row.originalPrice ?? row.original_price ?? null,
+        sizes: row.sizes,
+        colors: row.colors,
+        isFeatured: row.isFeatured === true || row.is_featured === 'true' || row.is_featured === true,
+        inStock: !(row.inStock === false || row.in_stock === 'false' || row.in_stock === false),
+        images: Array.isArray(row.images) ? row.images : [],
+      };
+      const validation = validateProductData(data, allowedCats);
+      if (!validation.valid) {
+        failureCount++;
+        results.push({ name, ok: false, msg: validation.error });
+        continue;
+      }
+      await prisma.product.create({ data: buildProductData(data) });
+      successCount++;
+      results.push({ name, ok: true, msg: 'Imported' });
+    } catch (e) {
+      failureCount++;
+      results.push({ name, ok: false, msg: e.message || 'Failed' });
+    }
+  }
+
+  res.json({ successCount, failureCount, results });
 });
 
 app.post('/api/products', adminAuth, async (req, res) => {
@@ -647,6 +880,25 @@ app.put('/api/products/:id/stock', adminAuth, async (req, res) => {
     res.json(product);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update stock' });
+  }
+});
+
+// Admin: list only products with source tracking (for the Sync tab)
+app.get('/api/admin/synced-products', adminAuth, async (req, res) => {
+  try {
+    const products = await prisma.product.findMany({
+      where: { source: { not: null } },
+      include: { brand: { select: { name: true } } },
+      orderBy: { lastSync: 'asc' },
+    });
+    res.json(products.map(p => ({
+      id: p.id, name: p.name, source: p.source, sourceId: p.sourceId,
+      sourceUrl: p.sourceUrl, lastSync: p.lastSync, inStock: p.inStock,
+      images: p.images, brand: p.brand,
+    })));
+  } catch (error) {
+    console.error('[synced-products]', error);
+    res.status(500).json({ error: 'Failed to fetch synced products' });
   }
 });
 
@@ -1508,17 +1760,25 @@ app.get('/api/reviews/stats', async (req, res) => {
 app.get('/api/admin/reviews', adminAuth, async (req, res) => {
   try {
     const { approved, source, productId } = req.query;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(200, Math.max(1, parseInt(req.query.limit) || 50));
+    const skip = (page - 1) * limit;
     const where = {};
     if (approved === 'true') where.approved = true;
     if (approved === 'false') where.approved = false;
     if (source && VALID_REVIEW_SOURCES.includes(source)) where.source = source;
     if (productId) where.productId = parseInt(productId);
-    const reviews = await prisma.review.findMany({
-      where,
-      include: { product: { select: { id: true, name: true, slug: true, images: true } } },
-      orderBy: { createdAt: 'desc' },
-    });
-    res.json(reviews.map(serializeReview));
+    const [reviews, total] = await Promise.all([
+      prisma.review.findMany({
+        where,
+        include: { product: { select: { id: true, name: true, slug: true, images: true } } },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.review.count({ where }),
+    ]);
+    res.json({ reviews: reviews.map(serializeReview), total, page, limit });
   } catch (error) {
     console.error('[admin/reviews/list]', error);
     res.status(500).json({ error: 'Failed to fetch reviews' });

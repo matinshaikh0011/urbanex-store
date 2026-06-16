@@ -79,12 +79,9 @@ export function buildProductData(data) {
 
   // originalPrice must always be strictly greater than price.
   // If it's missing, equal, or lower — set it to price × 1.4.
-  const incomingOriginalPrice = originalPrice;
   if (!originalPrice || originalPrice <= price) {
     originalPrice = Math.round(price * 1.4);
   }
-
-  console.log(`[PRICE DEBUG] name="${data.name}" sourcePrice=${data.sourcePrice ?? '—'} cartpeMrp=${incomingOriginalPrice ?? '—'} finalPrice=${price} originalPrice=${originalPrice}${incomingOriginalPrice && incomingOriginalPrice > price ? ' (used CartPe MRP)' : ' (fallback ×1.4)'}`);
 
   return {
     name:          String(data.name).trim(),

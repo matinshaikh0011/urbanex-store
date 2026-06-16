@@ -314,25 +314,76 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
   const [noteOrder, setNoteOrder] = useState<string | null>(null);
   const [noteText, setNoteText] = useState('');
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [showArchived, setShowArchived] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const LIMIT = 50;
+
+  const buildQuery = useCallback((extra: Record<string, string> = {}) => {
+    const params = new URLSearchParams({ page: String(page), limit: String(LIMIT), archived: String(showArchived), ...extra });
+    if (search.trim()) params.set('search', search.trim());
+    if (filter !== 'All') params.set('status', filter);
+    return params.toString();
+  }, [page, search, filter, showArchived]);
 
   const load = useCallback(() => {
     setLoading(true);
-    api('/api/admin/orders').then(r => r.json()).then(d => { setOrders(Array.isArray(d) ? d : []); setLoading(false); }).catch(() => { show('Failed to load orders', 'err'); setLoading(false); });
-  }, [show]);
+    api(`/api/admin/orders?${buildQuery()}`).then(r => r.json()).then(d => {
+      setOrders(Array.isArray(d.orders) ? d.orders : []);
+      setTotal(d.total || 0);
+      setLoading(false);
+    }).catch(() => { show('Failed to load orders', 'err'); setLoading(false); });
+  }, [buildQuery, show]);
 
-  useEffect(() => { load(); }, [load]);
+  // Reset to page 1 when filters/search change
+  useEffect(() => { setPage(1); }, [search, filter, showArchived]);
+
+  // Debounced load on any dependency change
+  useEffect(() => {
+    const t = setTimeout(load, 300);
+    return () => clearTimeout(t);
+  }, [load]);
 
   const updateStatus = async (orderId: string, status: string) => {
     setOrders(prev => prev.map(o => o.orderId === orderId ? { ...o, status } : o));
     const res = await api(`/api/admin/orders/${orderId}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
-    if (!res.ok) { show('Failed to update status', 'err'); load(); } else show(`Status â†’ ${status}`);
+    if (!res.ok) { show('Failed to update status', 'err'); load(); } else show(`Status → ${status}`);
   };
 
-  const deleteOrder = async (orderId: string) => {
-    if (!confirm(`Delete order ${orderId}?`)) return;
+  const archiveOrder = async (orderId: string) => {
+    if (!confirm(`Archive order ${orderId}? It will be hidden but kept for records.`)) return;
     const res = await api(`/api/admin/orders/${orderId}`, { method: 'DELETE' });
-    if (res.ok) { setOrders(prev => prev.filter(o => o.orderId !== orderId)); show('Order deleted'); }
+    if (res.ok) { setOrders(prev => prev.filter(o => o.orderId !== orderId)); setTotal(t => t - 1); show('Order archived'); }
+    else show('Failed to archive', 'err');
+  };
+
+  const restoreOrder = async (orderId: string) => {
+    const res = await api(`/api/admin/orders/${orderId}/restore`, { method: 'POST' });
+    if (res.ok) { setOrders(prev => prev.filter(o => o.orderId !== orderId)); setTotal(t => t - 1); show('Order restored'); }
+    else show('Failed to restore', 'err');
+  };
+
+  const deleteForever = async (orderId: string) => {
+    if (!confirm(`Permanently delete order ${orderId}? This cannot be undone.`)) return;
+    const res = await api(`/api/admin/orders/${orderId}?hard=true`, { method: 'DELETE' });
+    if (res.ok) { setOrders(prev => prev.filter(o => o.orderId !== orderId)); setTotal(t => t - 1); show('Order deleted permanently'); }
     else show('Failed to delete', 'err');
+  };
+
+  const exportCsv = async () => {
+    setExporting(true);
+    try {
+      const res = await api(`/api/admin/orders/export?${buildQuery()}`);
+      if (!res.ok) { show('Export failed', 'err'); return; }
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `orders-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      show('Export downloaded');
+    } catch { show('Export failed', 'err'); } finally { setExporting(false); }
   };
 
   const saveNote = async () => {
@@ -343,17 +394,17 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
   };
 
   const STATUSES = ['All', 'Pending', 'Verified', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'];
-  const filtered = orders.filter(o => {
-    if (filter !== 'All' && !o.status.toLowerCase().includes(filter.toLowerCase())) return false;
-    const q = search.toLowerCase();
-    return !q || o.orderId.toLowerCase().includes(q) || (o.shippingName || '').toLowerCase().includes(q) || (o.shippingPhone || '').includes(q);
-  });
+  const totalPages = Math.max(1, Math.ceil(total / LIMIT));
 
   return (
     <div>
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Orders</h2>
-        <input className={styles.searchInput} placeholder="Search ID, name, phone…" value={search} onChange={e => setSearch(e.target.value)} />
+        <h2 className={styles.sectionTitle}>{showArchived ? 'Archived Orders' : 'Orders'} ({total})</h2>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <input className={styles.searchInput} placeholder="Search ID, name, phone, UTR…" value={search} onChange={e => setSearch(e.target.value)} />
+          <button className={styles.btnSecondary} onClick={exportCsv} disabled={exporting}>{exporting ? 'EXPORTING…' : '⬇ EXPORT CSV'}</button>
+          <button className={`${styles.filterBtn} ${showArchived ? styles.filterActive : ''}`} onClick={() => setShowArchived(a => !a)}>{showArchived ? '← Active Orders' : '🗄 Archived'}</button>
+        </div>
       </div>
       <div className={styles.filterRow}>
         {STATUSES.map(s => <button key={s} className={`${styles.filterBtn} ${filter === s ? styles.filterActive : ''}`} onClick={() => setFilter(s)}>{s}</button>)}
@@ -363,25 +414,36 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
           <table className={styles.table}>
             <thead><tr><th>Order ID</th><th>Customer</th><th>Phone</th><th>Product</th><th>Size</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
             <tbody>
-              {filtered.map(o => (
+              {orders.length === 0
+                ? <tr><td colSpan={9} style={{ textAlign: 'center', color: '#888', padding: 20 }}>No orders found</td></tr>
+                : orders.map(o => (
                 <tr key={o.id}>
                   <td className={styles.mono}>{o.orderId}</td>
                   <td>{o.shippingName}</td>
                   <td><a href={`https://wa.me/91${(o.shippingPhone || '').replace(/\D/g, '').slice(-10)}`} target="_blank" rel="noopener" className={styles.phoneLink}>{o.shippingPhone}</a></td>
-                  <td>{o.product?.name || '"”'}</td>
-                  <td>{o.size || '"”'}</td>
+                  <td>{o.product?.name || '—'}</td>
+                  <td>{o.size || '—'}</td>
                   <td>{fmt(Number(o.totalAmount))}</td>
                   <td><span className={styles.badge} style={{ background: statusColor(o.status) }}>{o.status}</span></td>
                   <td>{fmtDate(o.createdAt)}</td>
                   <td>
                     <div className={styles.actionRow}>
-                      <select className={styles.statusSelect} value={o.status} onChange={e => updateStatus(o.orderId, e.target.value)}>
-                        {['Pending Verification', 'Verified', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'].map(s => <option key={s}>{s}</option>)}
-                      </select>
-                      <button className={styles.iconBtn} title="Add note" onClick={() => { setNoteOrder(o.orderId); setNoteText(''); }}>📝</button>
-                      <button className={styles.iconBtn} title="View details" onClick={() => setDetailOrder(o)}>👁</button>
-                      <a className={styles.iconBtn} href={`https://wa.me/91${(o.shippingPhone || '').replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(`Hi, your UrbanEx order ${o.orderId} status: ${o.status}`)}`} target="_blank" rel="noopener">💬</a>
-                      <button className={styles.iconBtnDanger} title="Delete" onClick={() => deleteOrder(o.orderId)}>🗑</button>
+                      {showArchived ? (
+                        <>
+                          <button className={styles.btnSmall} title="Restore" onClick={() => restoreOrder(o.orderId)}>↩ Restore</button>
+                          <button className={styles.iconBtnDanger} title="Delete permanently" onClick={() => deleteForever(o.orderId)}>🗑</button>
+                        </>
+                      ) : (
+                        <>
+                          <select className={styles.statusSelect} value={o.status} onChange={e => updateStatus(o.orderId, e.target.value)}>
+                            {['Pending Verification', 'Verified', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'].map(s => <option key={s}>{s}</option>)}
+                          </select>
+                          <button className={styles.iconBtn} title="Add note" onClick={() => { setNoteOrder(o.orderId); setNoteText(''); }}>📝</button>
+                          <button className={styles.iconBtn} title="View details" onClick={() => setDetailOrder(o)}>👁</button>
+                          <a className={styles.iconBtn} href={`https://wa.me/91${(o.shippingPhone || '').replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(`Hi, your UrbanEx order ${o.orderId} status: ${o.status}`)}`} target="_blank" rel="noopener">💬</a>
+                          <button className={styles.iconBtnDanger} title="Archive" onClick={() => archiveOrder(o.orderId)}>🗄</button>
+                        </>
+                      )}
                     </div>
                     {o.notes && (() => { try { const ns = JSON.parse(o.notes!); return ns.length > 0 ? <div className={styles.notesList}>{ns.map((n: { text: string; createdAt: string }, i: number) => <div key={i} className={styles.noteItem}><span>{n.text}</span><span className={styles.noteTime}>{fmtDate(n.createdAt)}</span></div>)}</div> : null; } catch { return null; } })()}
                   </td>
@@ -392,11 +454,20 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
         </div>
       )}
 
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', marginTop: 16 }}>
+          <button className={styles.btnSmall} disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}>← Prev</button>
+          <span style={{ fontSize: 13, color: '#aaa' }}>Page {page} of {totalPages}</span>
+          <button className={styles.btnSmall} disabled={page >= totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>Next →</button>
+        </div>
+      )}
+
       {/* Note modal */}
       {noteOrder && (
         <div className={styles.modalOverlay} onClick={() => setNoteOrder(null)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
-            <h3 className={styles.modalTitle}>Add Note "” {noteOrder}</h3>
+            <h3 className={styles.modalTitle}>Add Note — {noteOrder}</h3>
             <textarea className={styles.noteInput} rows={4} value={noteText} onChange={e => setNoteText(e.target.value)} placeholder="Internal note (not shown to customer)…" autoFocus />
             <div className={styles.modalActions}>
               <button className={styles.btnPrimary} onClick={saveNote}>SAVE NOTE</button>
@@ -412,8 +483,8 @@ function OrdersSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
             <h3 className={styles.modalTitle}>Order {detailOrder.orderId}</h3>
             <div className={styles.detailGrid}>
-              {[['Customer', detailOrder.shippingName], ['Phone', detailOrder.shippingPhone], ['Email', detailOrder.shippingEmail], ['Address', detailOrder.shippingAddress], ['Product', detailOrder.product?.name], ['Size', detailOrder.size], ['Amount', fmt(Number(detailOrder.totalAmount))], ['Paid', detailOrder.amountPaid ? fmt(Number(detailOrder.amountPaid)) : '"”'], ['UTR', detailOrder.utrNumber || '"”'], ['Payment', detailOrder.paymentMethod || '"”'], ['Coupon', detailOrder.couponCode ? `${detailOrder.couponCode} (-${fmt(Number(detailOrder.discountAmount))})` : '"”'], ['Status', detailOrder.status], ['Date', fmtDate(detailOrder.createdAt)]].map(([k, v]) => (
-                <div key={k as string} className={styles.detailRow}><span className={styles.detailKey}>{k}</span><span>{v || '"”'}</span></div>
+              {[['Customer', detailOrder.shippingName], ['Phone', detailOrder.shippingPhone], ['Email', detailOrder.shippingEmail], ['Address', detailOrder.shippingAddress], ['Product', detailOrder.product?.name], ['Size', detailOrder.size], ['Amount', fmt(Number(detailOrder.totalAmount))], ['Paid', detailOrder.amountPaid ? fmt(Number(detailOrder.amountPaid)) : '—'], ['UTR', detailOrder.utrNumber || '—'], ['Payment', detailOrder.paymentMethod || '—'], ['Coupon', detailOrder.couponCode ? `${detailOrder.couponCode} (-${fmt(Number(detailOrder.discountAmount))})` : '—'], ['Status', detailOrder.status], ['Date', fmtDate(detailOrder.createdAt)]].map(([k, v]) => (
+                <div key={k as string} className={styles.detailRow}><span className={styles.detailKey}>{k}</span><span>{v || '—'}</span></div>
               ))}
             </div>
             <button className={styles.btnSecondary} onClick={() => setDetailOrder(null)}>CLOSE</button>
@@ -439,7 +510,7 @@ function PaymentsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
 
   const load = useCallback(() => {
     setLoading(true);
-    api('/api/admin/orders').then(r => r.json()).then(d => { setOrders(Array.isArray(d) ? d : []); setLoading(false); }).catch(() => { show('Failed to load payments', 'err'); setLoading(false); });
+    api('/api/admin/orders?limit=200').then(r => r.json()).then(d => { setOrders(Array.isArray(d.orders) ? d.orders : []); setLoading(false); }).catch(() => { show('Failed to load payments', 'err'); setLoading(false); });
   }, [show]);
 
   useEffect(() => { load(); }, [load]);
@@ -653,22 +724,39 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
   const [bulkBrandId, setBulkBrandId] = useState('');
   const [bulkCategory, setBulkCategory] = useState('');
   const [bulkSaving, setBulkSaving] = useState(false);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const LIMIT = 50;
+
+  const buildQuery = useCallback(() => {
+    const params = new URLSearchParams({ page: String(page), limit: String(LIMIT) });
+    if (search.trim()) params.set('search', search.trim());
+    if (filterCat) params.set('category', filterCat);
+    return params.toString();
+  }, [page, search, filterCat]);
 
   const load = useCallback(() => {
     setLoading(true);
-    Promise.all([api('/api/products').then(r => r.json()), api('/api/brands').then(r => r.json())])
-      .then(([p, b]) => { setProducts(Array.isArray(p) ? p : []); setBrands(Array.isArray(b) ? b : []); })
+    Promise.all([api(`/api/products?${buildQuery()}`).then(r => r.json()), api('/api/brands').then(r => r.json())])
+      .then(([p, b]) => {
+        setProducts(Array.isArray(p.products) ? p.products : []);
+        setTotal(p.total || 0);
+        setBrands(Array.isArray(b) ? b : []);
+      })
       .catch(() => show('Failed to load', 'err')).finally(() => setLoading(false));
-  }, [show]);
+  }, [buildQuery, show]);
 
-  useEffect(() => { load(); }, [load]);
+  // Reset to page 1 when search/filter changes
+  useEffect(() => { setPage(1); }, [search, filterCat]);
 
-  const filtered = products.filter(p => {
-    const q = search.toLowerCase();
-    const matchSearch = !q || p.name.toLowerCase().includes(q) || (p.brand?.name || '').toLowerCase().includes(q);
-    const matchCat = !filterCat || p.category === filterCat;
-    return matchSearch && matchCat;
-  });
+  // Debounced load
+  useEffect(() => {
+    const t = setTimeout(load, 300);
+    return () => clearTimeout(t);
+  }, [load]);
+
+  const filtered = products; // server-side filtered now
+  const totalPages = Math.max(1, Math.ceil(total / LIMIT));
 
   const allFilteredIds = filtered.map(p => p.id);
   const allSelected = allFilteredIds.length > 0 && allFilteredIds.every(id => selected.has(id));
@@ -697,51 +785,41 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
 
   const bulkDelete = async () => {
     if (!confirm(`Delete ${selected.size} selected products? This cannot be undone.`)) return;
-    let ok = 0, fail = 0;
-    for (const id of Array.from(selected)) { const res = await api(`/api/products/${id}`, { method: 'DELETE' }); res.ok ? ok++ : fail++; }
-    show(fail > 0 ? `Deleted ${ok}, failed ${fail}` : `Deleted ${ok} products`);
+    setBulkSaving(true);
+    const res = await api('/api/products/bulk', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: Array.from(selected) }) });
+    const d = await res.json().catch(() => ({}));
+    setBulkSaving(false);
+    show(res.ok ? `Deleted ${d.deleted ?? 0} products` : (d.error || 'Bulk delete failed'), res.ok ? 'ok' : 'err');
     clearSelection(); load();
   };
 
   const bulkApplyBrand = async () => {
     if (!bulkBrandId) return;
     setBulkSaving(true);
-    let ok = 0, fail = 0;
-    for (const id of Array.from(selected)) {
-      const p = products.find(x => x.id === id); if (!p) continue;
-      const res = await api(`/api/products/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...p, brandId: Number(bulkBrandId) }) });
-      res.ok ? ok++ : fail++;
-    }
+    const res = await api('/api/products/bulk', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: Array.from(selected), action: 'brand', value: Number(bulkBrandId) }) });
+    const d = await res.json().catch(() => ({}));
     setBulkSaving(false); setBulkModal(null); setBulkBrandId('');
-    show(fail > 0 ? `Updated ${ok}, failed ${fail}` : `Brand updated on ${ok} products`);
+    show(res.ok ? `Brand updated on ${d.updated ?? 0} products` : (d.error || 'Failed'), res.ok ? 'ok' : 'err');
     clearSelection(); load();
   };
 
   const bulkApplyCategory = async () => {
     if (!bulkCategory) return;
     setBulkSaving(true);
-    let ok = 0, fail = 0;
-    for (const id of Array.from(selected)) {
-      const p = products.find(x => x.id === id); if (!p) continue;
-      const res = await api(`/api/products/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...p, category: bulkCategory }) });
-      res.ok ? ok++ : fail++;
-    }
+    const res = await api('/api/products/bulk', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: Array.from(selected), action: 'category', value: bulkCategory }) });
+    const d = await res.json().catch(() => ({}));
     setBulkSaving(false); setBulkModal(null); setBulkCategory('');
-    show(fail > 0 ? `Updated ${ok}, failed ${fail}` : `Category updated on ${ok} products`);
+    show(res.ok ? `Category updated on ${d.updated ?? 0} products` : (d.error || 'Failed'), res.ok ? 'ok' : 'err');
     clearSelection(); load();
   };
 
   const bulkSetFeatured = async (isFeatured: boolean) => {
     setBulkSaving(true);
-    let ok = 0, fail = 0;
-    for (const id of Array.from(selected)) {
-      const p = products.find(x => x.id === id); if (!p) continue;
-      const res = await api(`/api/products/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...p, isFeatured }) });
-      res.ok ? ok++ : fail++;
-    }
+    const res = await api('/api/products/bulk', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: Array.from(selected), action: 'featured', value: isFeatured }) });
+    const d = await res.json().catch(() => ({}));
     setBulkSaving(false);
     const label = isFeatured ? 'Featured' : 'Unfeatured';
-    show(fail > 0 ? `${label} ${ok}, failed ${fail}` : `${label} ${ok} products`);
+    show(res.ok ? `${label} ${d.updated ?? 0} products` : (d.error || 'Failed'), res.ok ? 'ok' : 'err');
     clearSelection(); load();
   };
 
@@ -755,12 +833,12 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
     if (res.ok) { setProducts(prev => prev.map(x => x.id === p.id ? { ...x, inStock: !x.inStock } : x)); }
   };
 
-  const uniqueCategories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
+  const uniqueCategories = CATEGORIES;
 
   return (
     <div>
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Products ({products.length})</h2>
+        <h2 className={styles.sectionTitle}>Products ({total})</h2>
         <button className={styles.btnPrimary} onClick={() => setEditing(null)}>+ ADD PRODUCT</button>
       </div>
 
@@ -849,6 +927,15 @@ function ProductsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', marginTop: 16 }}>
+          <button className={styles.btnSmall} disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}>← Prev</button>
+          <span style={{ fontSize: 13, color: '#aaa' }}>Page {page} of {totalPages}</span>
+          <button className={styles.btnSmall} disabled={page >= totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>Next →</button>
         </div>
       )}
 
@@ -1621,21 +1708,41 @@ function CSVSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void }) {
   const importAll = async () => {
     const valid = rows.filter(r => !r._errors?.length);
     setImporting(true); setResults([]); setProgress(0);
-    const res: typeof results = [];
-    for (let i = 0; i < valid.length; i++) {
-      const r = valid[i];
-      try {
-        let images: string[] = [];
-        try { images = r.images ? r.images.split(',').map(s => s.trim()) : []; } catch { images = []; }
-        let sizes = {}; try { sizes = JSON.parse(r.sizes); } catch { sizes = { oneSize: ['One Size'] }; }
-        let colors: { name: string; hex: string }[] = []; try { colors = JSON.parse(r.colors); } catch { colors = []; }
-        const resp = await api('/api/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: r.name.trim(), slug: r.slug.trim() || slugify(r.name), category: r.category.trim(), brandId: Number(r.brand_id), description: r.description?.trim() || '', price: Number(r.price), originalPrice: r.original_price ? Number(r.original_price) : null, sizes, colors, isFeatured: r.is_featured === 'true', inStock: r.in_stock !== 'false', images }) });
-        res.push({ name: r.name, ok: resp.ok, msg: resp.ok ? 'Imported' : (await resp.json()).error || 'Failed' });
-      } catch (e: unknown) { res.push({ name: r.name, ok: false, msg: e instanceof Error ? e.message : 'Error' }); }
-      setProgress(Math.round(((i + 1) / valid.length) * 100));
-      setResults([...res]);
+
+    // Build the payload client-side, then send everything in ONE request.
+    const payload = valid.map(r => {
+      let images: string[] = [];
+      try { images = r.images ? r.images.split(',').map(s => s.trim()).filter(Boolean) : []; } catch { images = []; }
+      let sizes: unknown = {}; try { sizes = JSON.parse(r.sizes); } catch { sizes = { oneSize: ['One Size'] }; }
+      let colors: { name: string; hex: string }[] = []; try { colors = JSON.parse(r.colors); } catch { colors = []; }
+      return {
+        name: r.name.trim(),
+        slug: r.slug.trim() || slugify(r.name),
+        category: r.category.trim(),
+        brandId: Number(r.brand_id),
+        description: r.description?.trim() || '',
+        price: Number(r.price),
+        originalPrice: r.original_price ? Number(r.original_price) : null,
+        sizes, colors,
+        isFeatured: r.is_featured === 'true',
+        inStock: r.in_stock !== 'false',
+        images,
+      };
+    });
+
+    try {
+      setProgress(50);
+      const resp = await api('/api/admin/import-csv', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ products: payload }) });
+      const d = await resp.json();
+      setProgress(100);
+      if (!resp.ok) { show(d.error || 'Import failed', 'err'); setImporting(false); return; }
+      setResults(Array.isArray(d.results) ? d.results : []);
+      show(`${d.successCount ?? 0} imported, ${d.failureCount ?? 0} failed`);
+    } catch {
+      show('Import failed', 'err');
+    } finally {
+      setImporting(false); setStep('done');
     }
-    setImporting(false); setStep('done'); show(`${res.filter(r => r.ok).length} imported`);
   };
 
   const validCount = rows.filter(r => !r._errors?.length).length;
@@ -1892,25 +1999,37 @@ function ReviewsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void 
   const [editing, setEditing] = useState<Review | Partial<Review> | null>(null);
   const [filter, setFilter] = useState<'all' | 'approved' | 'pending'>('all');
   const [sourceFilter, setSourceFilter] = useState<string>('all');
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const LIMIT = 50;
 
   const fetchReviews = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams({ page: String(page), limit: String(LIMIT) });
       if (filter === 'approved') params.set('approved', 'true');
       if (filter === 'pending') params.set('approved', 'false');
       if (sourceFilter !== 'all') params.set('source', sourceFilter);
       const res = await api(`/api/admin/reviews?${params.toString()}`);
-      if (res.ok) setReviews(await res.json());
-      else show('Failed to fetch reviews', 'err');
+      if (res.ok) {
+        const d = await res.json();
+        setReviews(Array.isArray(d.reviews) ? d.reviews : []);
+        setTotal(d.total || 0);
+      } else show('Failed to fetch reviews', 'err');
     } catch { show('Network error', 'err'); }
     setLoading(false);
-  }, [show, filter, sourceFilter]);
+  }, [show, filter, sourceFilter, page]);
+
+  // Reset to page 1 on filter change
+  useEffect(() => { setPage(1); }, [filter, sourceFilter]);
 
   useEffect(() => { fetchReviews(); }, [fetchReviews]);
   useEffect(() => {
-    api('/api/products').then(r => r.json()).then(d => setProducts(Array.isArray(d) ? d : [])).catch(() => {});
+    // Product dropdown for the review form — fetch a large page
+    api('/api/products?page=1&limit=200').then(r => r.json()).then(d => setProducts(Array.isArray(d.products) ? d.products : [])).catch(() => {});
   }, []);
+
+  const totalPages = Math.max(1, Math.ceil(total / LIMIT));
 
   const saveReview = async (r: Partial<Review>) => {
     try {
@@ -1957,7 +2076,7 @@ function ReviewsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void 
   return (
     <div>
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Reviews ({reviews.length})</h2>
+        <h2 className={styles.sectionTitle}>Reviews ({total})</h2>
         <button className={styles.btnPrimary} onClick={() => setEditing({
           customerName: '', rating: 5, text: '', source: 'direct',
           imageUrls: [], videoUrl: '', whatsappScreenshotUrl: '',
@@ -2020,6 +2139,15 @@ function ReviewsSection({ show }: { show: (m: string, t?: 'ok' | 'err') => void 
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', marginTop: 16 }}>
+          <button className={styles.btnSmall} disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}>← Prev</button>
+          <span style={{ fontSize: 13, color: '#aaa' }}>Page {page} of {totalPages}</span>
+          <button className={styles.btnSmall} disabled={page >= totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>Next →</button>
         </div>
       )}
 

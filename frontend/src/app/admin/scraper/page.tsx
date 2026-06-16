@@ -1260,10 +1260,12 @@ function SyncTab({ show, brands }: { show: (m: string, t?: 'ok' | 'err') => void
   const [products, setProducts] = useState<Array<{ id: number; name: string; source: string; sourceId: string; sourceUrl: string | null; lastSync: string | null; inStock: boolean; images: string[]; brand: { name: string } | null }>>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState<number | null>(null);
+  const [syncingAll, setSyncingAll] = useState(false);
+  const [syncAllProgress, setSyncAllProgress] = useState({ done: 0, total: 0 });
 
   const load = useCallback(() => {
     setLoading(true);
-    api('/api/products').then(r => r.json()).then(d => setProducts((Array.isArray(d) ? d : []).filter((p: { source?: string | null }) => p.source))).catch(() => show('Failed to load', 'err')).finally(() => setLoading(false));
+    api('/api/admin/synced-products').then(r => r.json()).then(d => setProducts(Array.isArray(d) ? d : [])).catch(() => show('Failed to load', 'err')).finally(() => setLoading(false));
   }, [show]);
 
   useEffect(() => { load(); }, [load]);
@@ -1279,6 +1281,29 @@ function SyncTab({ show, brands }: { show: (m: string, t?: 'ok' | 'err') => void
     } catch { show('Sync failed', 'err'); } finally { setSyncing(null); }
   };
 
+  const syncAll = async () => {
+    if (!confirm(`Sync all ${products.length} imported products? This may take a while.`)) return;
+    setSyncingAll(true);
+    setSyncAllProgress({ done: 0, total: products.length });
+    let ok = 0, fail = 0;
+    // Limited concurrency to avoid hammering the source / backend
+    const CONCURRENCY = 4;
+    const ids = products.map(p => p.id);
+    for (let i = 0; i < ids.length; i += CONCURRENCY) {
+      const batch = ids.slice(i, i + CONCURRENCY);
+      await Promise.all(batch.map(async id => {
+        try {
+          const r = await api(`/api/admin/scraper/sync/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+          r.ok ? ok++ : fail++;
+        } catch { fail++; }
+        setSyncAllProgress(prev => ({ ...prev, done: prev.done + 1 }));
+      }));
+    }
+    setSyncingAll(false);
+    show(fail > 0 ? `Synced ${ok}, failed ${fail}` : `Synced all ${ok} products`, fail > 0 ? 'err' : 'ok');
+    load();
+  };
+
   const disconnect = async (id: number, name: string) => {
     if (!confirm(`Disconnect source tracking for "${name}"? The product will remain but won't sync.`)) return;
     const r = await api(`/api/products/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source: null, sourceId: null, lastSync: null }) });
@@ -1291,8 +1316,18 @@ function SyncTab({ show, brands }: { show: (m: string, t?: 'ok' | 'err') => void
 
   return (
     <div>
-      <h2 className={adminStyles.sectionTitle}>Sync Imported Products ({products.length})</h2>
-      <div className={adminStyles.tableWrap}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <h2 className={adminStyles.sectionTitle} style={{ margin: 0 }}>Sync Imported Products ({products.length})</h2>
+        <button className={adminStyles.btnPrimary} onClick={syncAll} disabled={syncingAll} style={{ marginLeft: 'auto' }}>
+          {syncingAll ? `SYNCING ${syncAllProgress.done}/${syncAllProgress.total}…` : '🔄 SYNC ALL'}
+        </button>
+      </div>
+      {syncingAll && (
+        <div className={styles.progressWrap} style={{ marginTop: 12, marginBottom: 12 }}>
+          <div className={styles.progressFill} style={{ width: `${syncAllProgress.total ? Math.round((syncAllProgress.done / syncAllProgress.total) * 100) : 0}%`, transition: 'width 0.3s ease' }} />
+        </div>
+      )}
+      <div className={adminStyles.tableWrap} style={{ marginTop: 16 }}>
         <table className={adminStyles.table}>
           <thead><tr><th>Image</th><th>Name</th><th>Source</th><th>Source ID</th><th>Last Sync</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody>
