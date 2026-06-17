@@ -15,7 +15,7 @@ export const FAQ_GROUPS: FAQGroup[] = [
     title: 'Authenticity & Quality',
     icon: '✅',
     items: [
-      { q: 'Are your products 100% original?', a: 'Every product in our main catalogue is verified original and ships with its bill and original packaging. Items in the "UA Batch" section are clearly labelled premium-quality replicas.' },
+      { q: 'Are your products 100% original?', a: 'Every product in our main catalogue is verified original and ships with its bill and original packaging. Items in the "Premium Edition" section are clearly labelled premium-quality alternatives.' },
       { q: 'Do you provide a bill / invoice?', a: 'Yes, a bill is included with every original order. You can also request a live video call before dispatch to inspect the exact item you will receive.' },
       { q: 'What is a "Live Video Call"?', a: 'On any product page tap "Request a Live Video Call" — our team will show you the actual product on WhatsApp video before you pay the balance, so you buy with full confidence.' },
     ],

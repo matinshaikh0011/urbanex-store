@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { TRUST_STATS } from '@/lib/trustConfig';
 import styles from './HeroBanner.module.css';
 
 // ──────────────────────────────────────────────────────────────
@@ -163,12 +164,15 @@ export default function HeroBanner() {
     return () => clearInterval(interval);
   }, [paused, slides.length]);
 
-  // Animated stat counters — pure rAF, no libraries
+  // Animated stat counters — pure rAF, no libraries.
+  // Numbers come from TRUST_STATS (single source of truth) so the hero
+  // never contradicts the other trust sections.
   useEffect(() => {
     const stats = [
-      { end: 5, suffix: 'K+' },
-      { end: 50, suffix: '+' },
-      { end: 12, suffix: 'K+' },
+      // Happy customers + orders count up with comma grouping; rating one decimal.
+      { end: TRUST_STATS.happyCustomers, decimals: 0, suffix: '+', comma: true },
+      { end: TRUST_STATS.ordersDelivered, decimals: 0, suffix: '+', comma: true },
+      { end: TRUST_STATS.rating, decimals: 1, suffix: '', comma: false },
     ];
     const start = performance.now();
     const duration = 1900;
@@ -178,7 +182,12 @@ export default function HeroBanner() {
       const eased = 1 - Math.pow(1 - t, 3);
       stats.forEach((stat, i) => {
         const el = statRefs.current[i];
-        if (el) el.innerText = Math.floor(eased * stat.end) + stat.suffix;
+        if (!el) return;
+        const val = eased * stat.end;
+        const text = stat.comma
+          ? Math.floor(val).toLocaleString('en-IN')
+          : val.toFixed(stat.decimals);
+        el.innerText = text + stat.suffix;
       });
       if (t < 1) raf = requestAnimationFrame(tick);
     };
@@ -334,16 +343,16 @@ export default function HeroBanner() {
 
           <div className={styles.statsRow}>
             <div className={styles.statBlock}>
-              <span ref={(el) => { statRefs.current[0] = el; }} className={styles.statNum}>0K+</span>
-              <span className={styles.statLabel}>ITEMS</span>
+              <span ref={(el) => { statRefs.current[0] = el; }} className={styles.statNum}>0+</span>
+              <span className={styles.statLabel}>HAPPY CUSTOMERS</span>
             </div>
             <div className={styles.statBlock}>
               <span ref={(el) => { statRefs.current[1] = el; }} className={styles.statNum}>0+</span>
-              <span className={styles.statLabel}>BRANDS</span>
+              <span className={styles.statLabel}>ORDERS DELIVERED</span>
             </div>
             <div className={styles.statBlock}>
-              <span ref={(el) => { statRefs.current[2] = el; }} className={styles.statNum}>0K+</span>
-              <span className={styles.statLabel}>MEMBERS</span>
+              <span ref={(el) => { statRefs.current[2] = el; }} className={styles.statNum}>0.0</span>
+              <span className={styles.statLabel}>RATING ★</span>
             </div>
           </div>
         </div>

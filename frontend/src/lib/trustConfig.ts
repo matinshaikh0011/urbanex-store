@@ -2,23 +2,18 @@
 // Edit values here; no rebuild logic required.
 
 export interface TrustStats {
-  ordersDelivered: number;
-  ordersLabel: string;
   rating: number;
   ratingScale: number;
-  reviewCount: number;
-  satisfactionPct: number;
-  satisfactionMessage: string;
+  happyCustomers: number;
+  ordersDelivered: number;
 }
 
+// Single source of truth — keep every trust section in sync.
 export const TRUST_STATS: TrustStats = {
-  ordersDelivered: 12500,
-  ordersLabel: 'Orders Delivered',
   rating: 4.8,
   ratingScale: 5,
-  reviewCount: 1200,
-  satisfactionPct: 98,
-  satisfactionMessage: 'of customers say they would order again',
+  happyCustomers: 2500,
+  ordersDelivered: 3000,
 };
 
 export interface WhyShopItem {

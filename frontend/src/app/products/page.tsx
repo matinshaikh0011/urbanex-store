@@ -8,7 +8,7 @@ const CATEGORY_META: Record<string, { title: string; description: string }> = {
   glasses: { title: 'Designer Glasses & Sunglasses', description: 'Premium designer glasses and sunglasses at UrbanEx — Ray-Ban, Oakley, Gucci, Prada. Fast pan-India shipping.' },
   handbags: { title: 'Designer Handbags & Luxury Bags', description: 'Premium designer handbags at UrbanEx — Louis Vuitton, Gucci, Prada and more. Verified quality, fast shipping.' },
   clothing: { title: 'Premium Streetwear Clothing', description: 'Premium streetwear clothing at UrbanEx — track pants, jeans, shirts, t-shirts and denims. Fast pan-India shipping.' },
-  'ua-batch': { title: 'UA Batch Sneakers — Premium Quality', description: 'Premium UA-batch sneakers at UrbanEx — top-tier quality replicas, clearly labelled. Fast pan-India shipping.' },
+  'ua-batch': { title: 'Premium Edition Sneakers — UrbanEx', description: 'Premium Edition sneakers at UrbanEx — top-tier premium-quality alternatives, clearly labelled. Fast pan-India shipping.' },
 };
 
 export function generateMetadata({ searchParams }: { searchParams: { category?: string; search?: string } }): Metadata {

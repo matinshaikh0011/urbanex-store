@@ -37,20 +37,20 @@ export default function AboutPage() {
 
           <section className={styles.stats}>
             <div className={styles.statCard}>
-              <span className={styles.statNum}>10K+</span>
+              <span className={styles.statNum}>2,500+</span>
               <span className={styles.statLabel}>Happy Customers</span>
             </div>
             <div className={styles.statCard}>
-              <span className={styles.statNum}>500+</span>
-              <span className={styles.statLabel}>Products</span>
+              <span className={styles.statNum}>3,000+</span>
+              <span className={styles.statLabel}>Orders Delivered</span>
             </div>
             <div className={styles.statCard}>
-              <span className={styles.statNum}>15+</span>
-              <span className={styles.statLabel}>Brands</span>
-            </div>
-            <div className={styles.statCard}>
-              <span className={styles.statNum}>4.9</span>
+              <span className={styles.statNum}>4.8</span>
               <span className={styles.statLabel}>Rating</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statNum}>100%</span>
+              <span className={styles.statLabel}>Authentic</span>
             </div>
           </section>
 
@@ -141,8 +141,8 @@ export default function AboutPage() {
                 <p>Premium streetwear apparel</p>
               </div>
               <div className={styles.service}>
-                <h3>👟 UA Batch</h3>
-                <p>Unreleased and exclusive sneakers</p>
+                <h3>👟 Premium Edition</h3>
+                <p>Premium-quality alternatives, clearly labelled</p>
               </div>
             </div>
           </section>

@@ -12,11 +12,6 @@ function Stars({ value, scale = 5 }: { value: number; scale?: number }) {
   );
 }
 
-function formatCount(n: number) {
-  if (n >= 1000) return `${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}k`;
-  return n.toString();
-}
-
 export default function TrustedByCustomers() {
   const s = TRUST_STATS;
   return (
@@ -26,19 +21,19 @@ export default function TrustedByCustomers() {
           <span className={styles.kicker}>Customer Rating</span>
           <span className={styles.ratingNum}>{s.rating.toFixed(1)}<span className={styles.statSuffix}>/{s.ratingScale}</span></span>
           <Stars value={s.rating} scale={s.ratingScale} />
-          <span className={styles.ratingMeta}>Based on {formatCount(s.reviewCount)}+ verified reviews</span>
+          <span className={styles.ratingMeta}>Average across verified buyers</span>
         </div>
 
         <div className={styles.statBlock}>
           <span className={styles.kicker}>Trusted Across India</span>
-          <span className={styles.statNum}>{formatCount(s.ordersDelivered)}<span className={styles.statSuffix}>+</span></span>
-          <span className={styles.statLabel}>{s.ordersLabel}</span>
+          <span className={styles.statNum}>{s.happyCustomers.toLocaleString('en-IN')}<span className={styles.statSuffix}>+</span></span>
+          <span className={styles.statLabel}>Happy Customers</span>
         </div>
 
         <div className={styles.statBlock}>
-          <span className={styles.kicker}>Customer Satisfaction</span>
-          <span className={styles.statNum}>{s.satisfactionPct}<span className={styles.statSuffix}>%</span></span>
-          <p className={styles.satisfaction}><strong>{s.satisfactionPct}%</strong> {s.satisfactionMessage}</p>
+          <span className={styles.kicker}>Delivered Nationwide</span>
+          <span className={styles.statNum}>{s.ordersDelivered.toLocaleString('en-IN')}<span className={styles.statSuffix}>+</span></span>
+          <span className={styles.statLabel}>Orders Delivered</span>
         </div>
       </div>
     </section>

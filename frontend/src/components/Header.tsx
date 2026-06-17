@@ -42,9 +42,9 @@ const FALLBACK_CATEGORIES: Category[] = [
   { id: 62, name: 'Track Pants',    slug: 'track-pants',    parentId: 6,    active: true, featured: false, sortOrder: 2 },
   { id: 63, name: 'Jeans',          slug: 'jeans',          parentId: 6,    active: true, featured: false, sortOrder: 3 },
   { id: 64, name: 'Shirts',         slug: 'shirts',         parentId: 6,    active: true, featured: false, sortOrder: 4 },
-  { id: 7,  name: 'UA Batch',       slug: 'ua-batch',       parentId: null, active: true, featured: false, sortOrder: 7 },
-  { id: 71, name: "Men's UA",       slug: 'mens-ua',        parentId: 7,    active: true, featured: false, sortOrder: 1 },
-  { id: 72, name: "Women's UA",     slug: 'womens-ua',      parentId: 7,    active: true, featured: false, sortOrder: 2 },
+  { id: 7,  name: 'Premium Edition', slug: 'ua-batch',      parentId: null, active: true, featured: false, sortOrder: 7 },
+  { id: 71, name: "Men's Premium",  slug: 'mens-ua',        parentId: 7,    active: true, featured: false, sortOrder: 1 },
+  { id: 72, name: "Women's Premium",slug: 'womens-ua',      parentId: 7,    active: true, featured: false, sortOrder: 2 },
 ];
 
 // ── Scramble text ────────────────────────────────────────────────

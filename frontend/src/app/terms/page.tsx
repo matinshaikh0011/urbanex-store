@@ -58,7 +58,7 @@ export default function TermsPage() {
             <section className={styles.section}>
               <h2>Product Authenticity</h2>
               <p>
-                Products in our main catalogue are verified for quality and ship with original packaging. Items listed under the &quot;UA Batch&quot; section are clearly labelled premium-quality alternatives and are sold as such.
+                Products in our main catalogue are verified for quality and ship with original packaging. Items listed under the &quot;Premium Edition&quot; section are clearly labelled premium-quality alternatives and are sold as such.
               </p>
             </section>
 

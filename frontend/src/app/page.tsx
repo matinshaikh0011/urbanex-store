@@ -59,7 +59,7 @@ const infoSlides = [
   { icon: '💬', stat: '24/7', title: 'WHATSAPP SUPPORT', sub: 'Chat with us anytime for instant help', color: '#25D366' },
   { icon: '↩️', stat: '7 Days', title: 'EASY RETURNS', sub: 'Hassle-free returns & exchange policy', color: '#F5C400' },
   { icon: '🔒', stat: 'Secure', title: 'SAFE PAYMENTS', sub: 'UPI / GPay / PhonePe — 100% secure', color: '#CC0000' },
-  { icon: '🏆', stat: '10K+', title: 'HAPPY CUSTOMERS', sub: 'Join thousands of satisfied streetwear fans', color: '#1a1a1a' },
+  { icon: '🏆', stat: '2,500+', title: 'HAPPY CUSTOMERS', sub: 'Shoppers across India trust UrbanEx', color: '#1a1a1a' },
 ];
 
 function InfoSlider() {
@@ -260,7 +260,7 @@ export default function Home() {
         {/* Marquee — dark asphalt */}
         <div className={styles.marqueeSection}>
           <div className={styles.marqueeTrack}>
-            {['SNEAKERS', 'WATCHES', 'GLASSES', 'HANDBAGS', 'CLOTHING', 'UA BATCH', 'PREMIUM DROPS', 'FRESH KICKS', 'SNEAKERS', 'WATCHES', 'GLASSES', 'HANDBAGS', 'CLOTHING', 'UA BATCH', 'PREMIUM DROPS', 'FRESH KICKS'].map((item, i) => (
+            {['SNEAKERS', 'WATCHES', 'GLASSES', 'HANDBAGS', 'CLOTHING', 'PREMIUM EDITION', 'PREMIUM DROPS', 'FRESH KICKS', 'SNEAKERS', 'WATCHES', 'GLASSES', 'HANDBAGS', 'CLOTHING', 'PREMIUM EDITION', 'PREMIUM DROPS', 'FRESH KICKS'].map((item, i) => (
               <span key={i} className={styles.marqueeItem}>
                 {item}<span>✦</span>
               </span>
@@ -352,10 +352,10 @@ export default function Home() {
                   </Link>
                   <Link href="/products?category=ua-batch" className={styles.catCard} data-cursor="view">
                     <div className={styles.catImgWrap}>
-                      <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800&q=80" alt="UA Batch" loading="lazy" />
+                      <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800&q=80" alt="Premium Edition" loading="lazy" />
                     </div>
                     <div className={styles.catOverlay}>
-                      <h3>UA BATCH</h3>
+                      <h3>PREMIUM EDITION</h3>
                       <span>EXPLORE →</span>
                     </div>
                   </Link>
@@ -573,7 +573,7 @@ export default function Home() {
                 <Link href="/products?category=glasses">Glasses</Link>
                 <Link href="/products?category=handbags">Handbags</Link>
                 <Link href="/products?category=clothing">Clothing</Link>
-                <Link href="/ua-batch">UA Batch</Link>
+                <Link href="/ua-batch">Premium Edition</Link>
               </div>
             </div>
 

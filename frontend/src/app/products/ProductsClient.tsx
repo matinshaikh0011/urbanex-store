@@ -163,7 +163,7 @@ function ProductsPageContent() {
         glasses: 'GLASSES',
         handbags: 'HANDBAGS',
         clothing: 'CLOTHING',
-        'ua-batch': 'UA BATCH SNEAKERS',
+        'ua-batch': 'PREMIUM EDITION',
         'luxury-watches': 'LUXURY WATCHES'
       };
       return titles[category] || 'PRODUCTS';
