@@ -116,10 +116,14 @@ export default function HeroBanner() {
   }, []);
 
   // ── THE SHUTTER — storefront roller-door reveal ────────────────
-  // 'closed' → 'opening' → 'open'. Initialised lazily so the gate
-  // decision (reduced-motion / dev / nav-type) runs once on mount.
-  const [shutterState, setShutterState] = useState<'closed' | 'opening' | 'open'>(() =>
-    shouldPlayShutter() ? 'closed' : 'open'
+  // 'closed' → 'opening' → 'open'. Initial state reads ONLY `playedThisDocument`
+  // — a plain module flag that is `false` on both the server and the client at a
+  // genuine document load (so SSR HTML and the client's first render match: no
+  // hydration mismatch), and `true` after an internal SPA nav (skip the replay).
+  // Because it defaults to 'closed', the shutter is painted from the very first
+  // frame — no flash of open content before it appears.
+  const [shutterState, setShutterState] = useState<'closed' | 'opening' | 'open'>(
+    () => (playedThisDocument ? 'open' : 'closed')
   );
   const shutterTimers = useRef<number[]>([]);
   const touchStartY = useRef<number | null>(null);
@@ -135,10 +139,15 @@ export default function HeroBanner() {
     });
   }, []);
 
-  // On mount: if we're playing, lift the shutter immediately (one closed
-  // paint frame, then it parts) so the reveal plays without blocking entry.
+  // Post-hydration decision (reads browser APIs, so effect-only).
   useEffect(() => {
     if (shutterState !== 'closed') return;
+    if (!shouldPlayShutter()) {
+      // Reduced motion / already played / non-navigation → reveal instantly.
+      playedThisDocument = true;
+      setShutterState('open');
+      return;
+    }
     const auto = window.setTimeout(() => liftShutter(), 60);
     shutterTimers.current.push(auto);
     const timers = shutterTimers.current;

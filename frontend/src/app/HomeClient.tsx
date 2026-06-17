@@ -1,0 +1,456 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import Script from 'next/script';
+import Header from '@/components/Header';
+import GlobalPopup from '@/components/GlobalPopup';
+import BrandCarousel from '@/components/BrandCarousel';
+import ScrollReveal from '@/components/ScrollReveal';
+import HeroBanner from '@/components/HeroBanner';
+import FeaturedRow from '@/components/FeaturedRow';
+import TrustedByCustomers from '@/components/TrustedByCustomers';
+import WhyShopUrbanEx from '@/components/WhyShopUrbanEx';
+import HomeReviewsCarousel from '@/components/HomeReviewsCarousel';
+import CustomerGallery from '@/components/CustomerGallery';
+import styles from './page.module.css';
+
+// ——————————————————————————————————————
+// INSTAGRAM EMBED — only load Elfsight script when section nears viewport
+// ——————————————————————————————————————
+function InstagramEmbed() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    if (show || !ref.current) return;
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setShow(true); io.disconnect(); }
+    }, { rootMargin: '300px' });
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, [show]);
+
+  return (
+    <div ref={ref} style={{ width: '100%', maxWidth: '1200px', margin: '2rem auto', minHeight: '300px' }}>
+      {show && (
+        <>
+          <Script src="https://elfsightcdn.com/platform.js" strategy="lazyOnload" />
+          <div className="elfsight-app-b08ff70a-db49-4175-90c8-14e852eefad1" data-elfsight-app-lazy></div>
+        </>
+      )}
+    </div>
+  );
+}
+
+export interface HomeFeatured {
+  sneakers: Product[];
+  watches: Product[];
+  glasses: Product[];
+  handbags: Product[];
+  clothing: Product[];
+}
+
+interface Product { id: number; category: string; isFeatured?: boolean; [k: string]: unknown }
+interface Category { id: number; name: string; slug: string; active?: boolean; featured?: boolean; image?: string; [k: string]: unknown }
+
+interface HomeClientProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  brands: any[];
+  categories: Category[];
+  featured: HomeFeatured;
+}
+
+export default function HomeClient({ brands, categories, featured }: HomeClientProps) {
+  const featuredCategories = categories.filter((c) => c.active && c.featured);
+  const hasAnyFeatured =
+    featured.sneakers.length > 0 ||
+    featured.watches.length > 0 ||
+    featured.glasses.length > 0 ||
+    featured.handbags.length > 0 ||
+    featured.clothing.length > 0;
+
+  return (
+    <>
+      <GlobalPopup />
+      <Header />
+      <main className={styles.main}>
+        {/* HERO */}
+        <HeroBanner />
+
+        {/* TRUSTED BY CUSTOMERS — quick stat proof below hero */}
+        <TrustedByCustomers />
+
+        {/* Crack divider into marquee */}
+        <div className={styles.crackDivider} aria-hidden />
+
+        {/* Marquee — dark asphalt */}
+        <div className={styles.marqueeSection}>
+          <div className={styles.marqueeTrack}>
+            {['SNEAKERS', 'WATCHES', 'GLASSES', 'HANDBAGS', 'CLOTHING', 'PREMIUM EDITION', 'PREMIUM DROPS', 'FRESH KICKS', 'SNEAKERS', 'WATCHES', 'GLASSES', 'HANDBAGS', 'CLOTHING', 'PREMIUM EDITION', 'PREMIUM DROPS', 'FRESH KICKS'].map((item, i) => (
+              <span key={i} className={styles.marqueeItem}>
+                {item}<span>✦</span>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* SLAB: dark asphalt — categories as wheatpaste posters */}
+        <section className={`${styles.slab} ${styles.slabDark}`}>
+          <div className={styles.slabGrain} aria-hidden />
+          <ScrollReveal animation="slideUp" duration={800}>
+            <div className={styles.categoryShowcase}>
+              <div className={styles.catHeader}>
+                <span className={styles.catEyebrow}>SECTION / 01</span>
+                <h2 className={styles.catTitle}>SHOP BY <span className={styles.accent}>CATEGORY</span></h2>
+                <span className={styles.catSubtag}>— pick your lane —</span>
+              </div>
+              <div className={styles.catGrid}>
+              {featuredCategories.length > 0 ? (
+                featuredCategories.slice(0, 8).map((cat) => (
+                  <Link key={cat.id} href={`/products?category=${cat.slug}`} className={styles.catCard} data-cursor="view">
+                    <div className={styles.catImgWrap}>
+                      <img
+                        src={cat.image || 'https://images.unsplash.com/photo-1552346154-21d32810baa3?w=800&q=80'}
+                        alt={cat.name}
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className={styles.catOverlay}>
+                      <h3>{cat.name.toUpperCase()}</h3>
+                      <span>EXPLORE →</span>
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                /* Fallback static categories if none exist in backend */
+                <>
+                  <Link href="/products?category=sneakers" className={styles.catCard} data-cursor="view">
+                    <div className={styles.catImgWrap}>
+                      <img src="https://images.unsplash.com/photo-1552346154-21d32810baa3?w=800&q=80" alt="Sneakers" loading="lazy" />
+                    </div>
+                    <div className={styles.catOverlay}>
+                      <h3>SNEAKERS</h3>
+                      <span>EXPLORE →</span>
+                    </div>
+                  </Link>
+                  <Link href="/products?category=watches" className={styles.catCard} data-cursor="view">
+                    <div className={styles.catImgWrap}>
+                      <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=800&q=80" alt="Luxury Watches" loading="lazy" />
+                    </div>
+                    <div className={styles.catOverlay}>
+                      <h3>LUXURY WATCHES</h3>
+                      <span>EXPLORE →</span>
+                    </div>
+                  </Link>
+                  <Link href="/products?category=glasses" className={styles.catCard} data-cursor="view">
+                    <div className={styles.catImgWrap}>
+                      <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&q=80" alt="Glasses" loading="lazy" />
+                    </div>
+                    <div className={styles.catOverlay}>
+                      <h3>GLASSES</h3>
+                      <span>EXPLORE →</span>
+                    </div>
+                  </Link>
+                  <Link href="/products?category=handbags" className={styles.catCard} data-cursor="view">
+                    <div className={styles.catImgWrap}>
+                      <img src="https://images.unsplash.com/photo-1584916201218-f4242ceb4809?w=800&q=80" alt="Handbags" loading="lazy" />
+                    </div>
+                    <div className={styles.catOverlay}>
+                      <h3>HANDBAGS</h3>
+                      <span>EXPLORE →</span>
+                    </div>
+                  </Link>
+                  <Link href="/products?category=clothing" className={styles.catCard} data-cursor="view">
+                    <div className={styles.catImgWrap}>
+                      <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800&q=80" alt="Clothing" loading="lazy" />
+                    </div>
+                    <div className={styles.catOverlay}>
+                      <h3>CLOTHING</h3>
+                      <span>EXPLORE →</span>
+                    </div>
+                  </Link>
+                  <Link href="/products?category=ua-batch" className={styles.catCard} data-cursor="view">
+                    <div className={styles.catImgWrap}>
+                      <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800&q=80" alt="Premium Edition" loading="lazy" />
+                    </div>
+                    <div className={styles.catOverlay}>
+                      <h3>PREMIUM EDITION</h3>
+                      <span>EXPLORE →</span>
+                    </div>
+                  </Link>
+                </>
+              )}
+              </div>
+            </div>
+          </ScrollReveal>
+        </section>
+        <div className={styles.crackDivider} aria-hidden />
+
+        {/* SLAB: light cement — brand carousel */}
+        <section className={`${styles.slab} ${styles.slabLight}`}>
+          <div className={styles.slabGrain} aria-hidden />
+          <BrandCarousel brands={brands} />
+        </section>
+        <div className={styles.crackDivider} aria-hidden />
+
+        {/* SLAB: dark asphalt — Featured Drops header */}
+        <section className={`${styles.slab} ${styles.slabDark}`}>
+          <div className={styles.slabGrain} aria-hidden />
+          <ScrollReveal animation="slideUp">
+            <div className={styles.featuredHeader}>
+              <span className={styles.featuredEyebrow}>SECTION / 02</span>
+              <h2 className={styles.sectionTitle}>
+                <span className={styles.titleAccent}>FEATURED</span> DROPS
+              </h2>
+              <p className={styles.sectionSubtitle}>The hottest releases in every category</p>
+            </div>
+          </ScrollReveal>
+        </section>
+
+        {hasAnyFeatured ? (
+          <>
+            {/* Sneakers — light */}
+            <div className={styles.crackDivider} aria-hidden />
+            <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
+              <div className={styles.slabGrain} aria-hidden />
+              <ScrollReveal animation="fadeIn">
+                <FeaturedRow icon="👟" title="SNEAKERS" href="/products?category=sneakers" products={featured.sneakers} />
+              </ScrollReveal>
+            </section>
+
+            {/* Watches — dark */}
+            <div className={styles.crackDivider} aria-hidden />
+            <section className={`${styles.slab} ${styles.slabDark} ${styles.featuredSlab}`}>
+              <div className={styles.slabGrain} aria-hidden />
+              <ScrollReveal animation="fadeIn">
+                <FeaturedRow icon="⌚" title="LUXURY WATCHES" href="/products?category=watches" products={featured.watches} />
+              </ScrollReveal>
+            </section>
+
+            {/* Glasses — light */}
+            <div className={styles.crackDivider} aria-hidden />
+            <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
+              <div className={styles.slabGrain} aria-hidden />
+              <ScrollReveal animation="fadeIn">
+                <FeaturedRow icon="🕶️" title="GLASSES" href="/products?category=glasses" products={featured.glasses} />
+              </ScrollReveal>
+            </section>
+
+            {/* Handbags — dark */}
+            <div className={styles.crackDivider} aria-hidden />
+            <section className={`${styles.slab} ${styles.slabDark} ${styles.featuredSlab}`}>
+              <div className={styles.slabGrain} aria-hidden />
+              <ScrollReveal animation="fadeIn">
+                <FeaturedRow icon="👜" title="HANDBAGS" href="/products?category=handbags" products={featured.handbags} />
+              </ScrollReveal>
+            </section>
+
+            {/* Clothing — light */}
+            <div className={styles.crackDivider} aria-hidden />
+            <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
+              <div className={styles.slabGrain} aria-hidden />
+              <ScrollReveal animation="fadeIn">
+                <FeaturedRow icon="👕" title="CLOTHING" href="/products?category=clothing" products={featured.clothing} />
+              </ScrollReveal>
+              <ScrollReveal animation="fadeIn">
+                <div className={styles.featuredViewAll}>
+                  <Link href="/products" className={styles.featuredViewAllBtn} data-cursor="cop">
+                    VIEW ALL PRODUCTS →
+                  </Link>
+                </div>
+              </ScrollReveal>
+            </section>
+          </>
+        ) : (
+          <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
+            <div className={styles.slabGrain} aria-hidden />
+            <ScrollReveal animation="scaleIn">
+              <div className={styles.comingSoon}>
+                <span className={styles.comingSoonIcon}>🛍️</span>
+                <h3>FRESH DROPS COMING SOON</h3>
+                <p>We&apos;re stocking up on the hottest releases. Check back shortly or browse our full collection.</p>
+                <Link href="/products" className={styles.featuredViewAllBtn} data-cursor="cop">
+                  BROWSE ALL PRODUCTS →
+                </Link>
+              </div>
+            </ScrollReveal>
+          </section>
+        )}
+
+        {/* WHY SHOP URBANEX — single consolidated trust block (6 cards),
+            placed after the product drops so merchandise leads. */}
+        <div className={styles.crackDivider} aria-hidden />
+        <WhyShopUrbanEx />
+
+        {/* HOMEPAGE REVIEWS CAROUSEL */}
+        <div className={styles.crackDivider} aria-hidden />
+        <section className={`${styles.slab} ${styles.slabLight}`}>
+          <div className={styles.slabGrain} aria-hidden />
+          <HomeReviewsCarousel />
+        </section>
+
+        {/* CUSTOMER GALLERY */}
+        <div className={styles.crackDivider} aria-hidden />
+        <section className={`${styles.slab} ${styles.slabLight}`}>
+          <div className={styles.slabGrain} aria-hidden />
+          <CustomerGallery />
+        </section>
+
+        {/* COP CTA — full diptych echo of hero */}
+        <div className={styles.crackDivider} aria-hidden />
+        <section className={styles.cta}>
+          <div className={styles.ctaLight}>
+            <div className={styles.slabGrain} aria-hidden />
+            <ScrollReveal animation="slideUp">
+              <div className={styles.ctaTextWrap}>
+                <span className={styles.ctaEyebrow}>SECTION / 03</span>
+                <h2 className={styles.ctaTitle}>READY TO <span className={styles.highlight}>COP?</span></h2>
+                <p className={styles.ctaText}>Browse our curated collection of the hottest streetwear drops.</p>
+              </div>
+            </ScrollReveal>
+          </div>
+          <div className={styles.ctaDark}>
+            <div className={styles.slabGrain} aria-hidden />
+            <ScrollReveal animation="slideUp">
+              <div className={styles.ctaButtons}>
+                <Link href="/products" className={styles.ctaBtn} data-cursor="cop">EXPLORE COLLECTION</Link>
+                <Link href="/about" className={styles.ctaBtnOutline} data-cursor="explore">ABOUT US</Link>
+              </div>
+            </ScrollReveal>
+          </div>
+          {/* vertical crack between */}
+          <div className={styles.ctaCrack} aria-hidden />
+        </section>
+
+        {/* Instagram — light cement */}
+        <div className={styles.crackDivider} aria-hidden />
+        <section className={`${styles.slab} ${styles.slabLight} ${styles.instagramWrap}`}>
+          <div className={styles.slabGrain} aria-hidden />
+          <div className={styles.instagram}>
+            <ScrollReveal animation="slideUp">
+              <div className={styles.instaHeader}>
+                <span className={styles.featuredEyebrow}>SECTION / 04</span>
+                <h2 className={styles.sectionTitle}>FOLLOW US ON <span className={styles.titleAccent}>INSTAGRAM</span></h2>
+                <a href="https://www.instagram.com/urbanex.store/" target="_blank" rel="noopener noreferrer" className={styles.instaHandle}>@urbanex.store</a>
+              </div>
+            </ScrollReveal>
+            <InstagramEmbed />
+            <div className={styles.instaFollowWrap}>
+              <a href="https://www.instagram.com/urbanex.store/" target="_blank" rel="noopener noreferrer" className={styles.instaFollowBtn}>
+                FOLLOW US
+              </a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className={styles.footer}>
+        <div className={styles.footerWave}>
+          <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" className={styles.footerWavePath}></path>
+          </svg>
+        </div>
+        <div className={styles.footerContent}>
+          <div className={styles.footerGrid}>
+            {/* Shop All Products */}
+            <div className={styles.footerSection}>
+              <h3 className={styles.footerTitle}>SHOP ALL PRODUCTS</h3>
+              <div className={styles.footerLinks}>
+                <Link href="/products">All Products</Link>
+                <Link href="/products?category=sneakers">Sneakers</Link>
+                <Link href="/products?category=watches">Watches</Link>
+                <Link href="/products?category=glasses">Glasses</Link>
+                <Link href="/products?category=handbags">Handbags</Link>
+                <Link href="/products?category=clothing">Clothing</Link>
+                <Link href="/ua-batch">Premium Edition</Link>
+              </div>
+            </div>
+
+            {/* Category */}
+            <div className={styles.footerSection}>
+              <h3 className={styles.footerTitle}>CATEGORY</h3>
+              <div className={styles.footerLinks}>
+                <Link href="/brands">Brands</Link>
+                <Link href="/products?category=watches">Luxury Watches</Link>
+                <Link href="/products?category=sneakers">Sneakers</Link>
+                <Link href="/products?category=glasses">Eyewear</Link>
+                <Link href="/products?category=handbags">Luxury Bags</Link>
+                <Link href="/products?category=clothing">Clothing</Link>
+              </div>
+            </div>
+
+            {/* Support */}
+            <div className={styles.footerSection}>
+              <h3 className={styles.footerTitle}>SUPPORT</h3>
+              <div className={styles.footerLinks}>
+                <Link href="/about">About Us</Link>
+                <Link href="/authenticity">Authenticity Guarantee</Link>
+                <Link href="/track-order">Track Order</Link>
+                <Link href="/faq">FAQ</Link>
+                <Link href="/return-exchange">Return & Exchange</Link>
+                <Link href="/wholesale">Wholesale Enquiry</Link>
+                <a href="https://wa.me/919898285850" target="_blank" rel="noopener">WhatsApp Support</a>
+                <p className={styles.footerPhone}>📱 +91 98982 85850</p>
+              </div>
+            </div>
+
+            {/* Subcategory of Support */}
+            <div className={styles.footerSection}>
+              <h3 className={styles.footerTitle}>QUICK LINKS</h3>
+              <div className={styles.footerLinks}>
+                <Link href="/products?sort=newest">New Arrivals</Link>
+                <Link href="/products?sort=popular">Best Sellers</Link>
+                <Link href="/products?featured=true">Featured</Link>
+                <Link href="/brands">All Brands</Link>
+                <Link href="/privacy-policy">Privacy Policy</Link>
+                <Link href="/terms">Terms &amp; Conditions</Link>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.footerSocials}>
+            <a
+              href="https://www.instagram.com/urbanex.store/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.socialBtn}
+              aria-label="Instagram"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="22" height="22">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+              </svg>
+              <span>@urbanex.store</span>
+            </a>
+            <a
+              href="https://wa.me/919898285850"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${styles.socialBtn} ${styles.socialWhatsapp}`}
+              aria-label="WhatsApp"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              <span>Chat on WhatsApp</span>
+            </a>
+          </div>
+
+          <div className={styles.footerBottom}>
+            <div className={styles.footerCopyright}>
+              <p>© 2026 UrbanEx. All rights reserved.</p>
+              <p className={styles.qualityNote}>All products are 100% premium quality.</p>
+            </div>
+            <div className={styles.footerBadges}>
+              <span className={styles.badge}>PREMIUM</span>
+              <span className={styles.badge}>VERIFIED</span>
+              <span className={styles.badge}>SECURE</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </>
+  );
+}

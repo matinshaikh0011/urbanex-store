@@ -14,7 +14,7 @@
   font-family: 'Bebas Neue', sans-serif;
   font-size: 13px;
   letter-spacing: 4px;
-  color: var(--accent-primary);
+  color: rgba(10, 10, 10, 0.5);
   margin-bottom: 8px;
 }
 
@@ -26,7 +26,7 @@
   margin: 0;
 }
 
-.accent { color: var(--accent-primary); }
+.accent { color: rgba(10, 10, 10, 0.42); }
 
 .sub {
   margin-top: 10px;
@@ -152,7 +152,7 @@
   cursor: pointer;
   border-radius: 50%;
 }
-.lightboxClose:hover { background: var(--accent-primary); }
+.lightboxClose:hover { background: #0a0a0a; }
 
 @media (max-width: 540px) {
   .grid { grid-template-columns: repeat(2, 1fr); }

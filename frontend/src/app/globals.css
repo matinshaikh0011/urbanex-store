@@ -322,3 +322,17 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); }
   h2 { font-size: 28px; }
   h3 { font-size: 20px; }
 }
+
+/* ================================================================
+   REDUCED MOTION — honor user/OS preference. Collapses infinite
+   decorative loops (marquee, glitch, float) and long transitions to
+   near-instant. Shutter still opens (driven by JS timers, not animationend).
+   ================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

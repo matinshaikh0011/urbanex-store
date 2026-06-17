@@ -30,9 +30,9 @@
   font-family: 'Bebas Neue', sans-serif;
   font-size: 13px;
   letter-spacing: 2px;
-  color: var(--accent-primary);
-  background: rgba(204,0,0,0.12);
-  border: 1px solid rgba(204,0,0,0.4);
+  color: #0a0a0a;
+  background: #c8c5be;
+  border: 1px solid #c8c5be;
   padding: 2px 10px;
 }
 .viewAll {
@@ -41,15 +41,15 @@
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 2px;
-  color: #fff;
-  background: var(--accent-primary);
-  border: 2px solid var(--border-color);
-  box-shadow: var(--shadow-icon);
+  color: #0a0a0a;
+  background: #f4f2ed;
+  border: 2px solid #f4f2ed;
+  box-shadow: 2px 2px 0 #c8c5be;
   padding: 7px 14px;
   white-space: nowrap;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-.viewAll:hover { transform: translate(2px,2px); box-shadow: none; color: #fff; }
+.viewAll:hover { transform: translate(2px,2px); box-shadow: none; color: #0a0a0a; }
 
 /* ---- Wrapping product grid ---- */
 .grid {

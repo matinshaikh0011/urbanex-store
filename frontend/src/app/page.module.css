@@ -963,7 +963,7 @@
   flex-wrap: wrap;
   gap: 16px;
 }
-.footerCopyright p { color: rgba(244,242,237,0.4); font-size: 12px; }
+.footerCopyright p { color: rgba(244,242,237,0.62); font-size: 12px; }
 .qualityNote { color: var(--ux-bone) !important; margin-top: 4px !important; font-size: 11px !important; }
 .footerBadges { display: flex; gap: 8px; }
 .badge {
