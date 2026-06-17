@@ -42,7 +42,8 @@
       "autoApprove": [
         "browser_take_screenshot",
         "browser_snapshot",
-        "browser_evaluate"
+        "browser_evaluate",
+        "browser_navigate"
       ]
     }
   }

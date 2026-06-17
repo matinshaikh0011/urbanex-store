@@ -1,0 +1,1517 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - text: FREE SHIPPING OVER ₹999
+        - generic [ref=e6]: ✦
+      - generic [ref=e7]:
+        - text: 7-DAY EASY RETURNS
+        - generic [ref=e8]: ✦
+      - generic [ref=e9]:
+        - text: COD AVAILABLE
+        - generic [ref=e10]: ✦
+      - generic [ref=e11]:
+        - text: 100% AUTHENTIC
+        - generic [ref=e12]: ✦
+      - generic [ref=e13]:
+        - text: INSTANT WHATSAPP SUPPORT
+        - generic [ref=e14]: ✦
+      - generic [ref=e15]:
+        - text: NEW DROP 2026
+        - generic [ref=e16]: ✦
+      - generic [ref=e17]:
+        - text: FREE SHIPPING OVER ₹999
+        - generic [ref=e18]: ✦
+      - generic [ref=e19]:
+        - text: 7-DAY EASY RETURNS
+        - generic [ref=e20]: ✦
+      - generic [ref=e21]:
+        - text: COD AVAILABLE
+        - generic [ref=e22]: ✦
+      - generic [ref=e23]:
+        - text: 100% AUTHENTIC
+        - generic [ref=e24]: ✦
+      - generic [ref=e25]:
+        - text: INSTANT WHATSAPP SUPPORT
+        - generic [ref=e26]: ✦
+      - generic [ref=e27]:
+        - text: NEW DROP 2026
+        - generic [ref=e28]: ✦
+      - generic [ref=e29]:
+        - text: FREE SHIPPING OVER ₹999
+        - generic [ref=e30]: ✦
+      - generic [ref=e31]:
+        - text: 7-DAY EASY RETURNS
+        - generic [ref=e32]: ✦
+      - generic [ref=e33]:
+        - text: COD AVAILABLE
+        - generic [ref=e34]: ✦
+      - generic [ref=e35]:
+        - text: 100% AUTHENTIC
+        - generic [ref=e36]: ✦
+      - generic [ref=e37]:
+        - text: INSTANT WHATSAPP SUPPORT
+        - generic [ref=e38]: ✦
+      - generic [ref=e39]:
+        - text: NEW DROP 2026
+        - generic [ref=e40]: ✦
+    - generic [ref=e41]:
+      - link "UrbanEx" [ref=e42] [cursor=pointer]:
+        - /url: /
+        - img "UrbanEx" [ref=e43]
+      - navigation [ref=e44]:
+        - link "HOME" [ref=e45] [cursor=pointer]:
+          - /url: /
+        - link "Shop Watches" [ref=e46] [cursor=pointer]:
+          - /url: /products
+          - generic [ref=e47]: Shop Watches
+        - button "CATEGORIES ▾" [ref=e49] [cursor=pointer]:
+          - text: CATEGORIES
+          - generic [ref=e50]: ▾
+        - link "ABOUT" [ref=e51] [cursor=pointer]:
+          - /url: /about
+        - link "TRACK" [ref=e52] [cursor=pointer]:
+          - /url: /track-order
+        - link "FAQ" [ref=e53] [cursor=pointer]:
+          - /url: /faq
+        - link "RETURN" [ref=e54] [cursor=pointer]:
+          - /url: /return-exchange
+        - link "CONTACT" [ref=e55] [cursor=pointer]:
+          - /url: /contact
+      - generic [ref=e56]:
+        - button "Search" [ref=e57] [cursor=pointer]:
+          - img [ref=e58]
+        - link "Login" [ref=e61] [cursor=pointer]:
+          - /url: /login
+          - img [ref=e62]
+        - link "Wishlist" [ref=e65] [cursor=pointer]:
+          - /url: /wishlist
+          - img [ref=e66]
+        - link "Cart" [ref=e68] [cursor=pointer]:
+          - /url: /cart
+          - img [ref=e69]
+  - main [ref=e72]:
+    - generic [ref=e73]:
+      - generic:
+        - generic:
+          - generic:
+            - generic: URBANEX
+            - generic: URBANEX
+            - generic: URBANEX
+        - generic: +
+        - generic: ✦
+        - generic: ✕
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - text: NEW DROP 2026
+          - generic [ref=e77]: ✦
+        - generic [ref=e78]:
+          - text: 100% AUTHENTIC
+          - generic [ref=e79]: ✦
+        - generic [ref=e80]:
+          - text: FAST SHIPPING
+          - generic [ref=e81]: ✦
+        - generic [ref=e82]:
+          - text: LIMITED STOCK
+          - generic [ref=e83]: ✦
+        - generic [ref=e84]:
+          - text: STREET CERTIFIED
+          - generic [ref=e85]: ✦
+        - generic [ref=e86]:
+          - text: COP OR DROP
+          - generic [ref=e87]: ✦
+        - generic [ref=e88]:
+          - text: NEW DROP 2026
+          - generic [ref=e89]: ✦
+        - generic [ref=e90]:
+          - text: 100% AUTHENTIC
+          - generic [ref=e91]: ✦
+        - generic [ref=e92]:
+          - text: FAST SHIPPING
+          - generic [ref=e93]: ✦
+        - generic [ref=e94]:
+          - text: LIMITED STOCK
+          - generic [ref=e95]: ✦
+        - generic [ref=e96]:
+          - text: STREET CERTIFIED
+          - generic [ref=e97]: ✦
+        - generic [ref=e98]:
+          - text: COP OR DROP
+          - generic [ref=e99]: ✦
+        - generic [ref=e100]:
+          - text: NEW DROP 2026
+          - generic [ref=e101]: ✦
+        - generic [ref=e102]:
+          - text: 100% AUTHENTIC
+          - generic [ref=e103]: ✦
+        - generic [ref=e104]:
+          - text: FAST SHIPPING
+          - generic [ref=e105]: ✦
+        - generic [ref=e106]:
+          - text: LIMITED STOCK
+          - generic [ref=e107]: ✦
+        - generic [ref=e108]:
+          - text: STREET CERTIFIED
+          - generic [ref=e109]: ✦
+        - generic [ref=e110]:
+          - text: COP OR DROP
+          - generic [ref=e111]: ✦
+      - generic [ref=e112]:
+        - generic [ref=e113]:
+          - generic [ref=e114]: LIVE DROP 2026 — 100% AUTHENTIC
+          - heading "U R B A N E X THE WATCHES DROP" [level=1] [ref=e116]:
+            - generic [ref=e117]:
+              - generic [ref=e118]: U
+              - generic [ref=e119]: R
+              - generic [ref=e120]: B
+              - generic [ref=e121]: A
+              - generic [ref=e122]: "N"
+              - generic [ref=e123]: E
+              - generic [ref=e124]: X
+            - generic [ref=e125]:
+              - text: THE
+              - generic [ref=e126]: WATCHES
+              - text: DROP
+          - paragraph [ref=e128]: Watches · Sneakers · Glasses · Handbags. The street's most wanted — verified original, shipped fast across India.
+          - generic [ref=e129]:
+            - generic [ref=e130]: LUXURY IN EVERY TICK
+            - generic [ref=e131]: PREMIUM CRAFTSMANSHIP • ELEGANT FINISHES • PRECISION MOVEMENT
+          - generic [ref=e132]:
+            - link "SHOP THE DROP →" [ref=e133] [cursor=pointer]:
+              - /url: /products
+              - text: SHOP THE DROP
+              - generic [ref=e135]: →
+            - link "EXPLORE BRANDS" [ref=e136] [cursor=pointer]:
+              - /url: /brands
+          - generic [ref=e137]:
+            - generic [ref=e138]: ⚡ Instant WhatsApp Support
+            - generic [ref=e139]: ↩️ 7-Day Returns
+            - generic [ref=e140]: 🔒 Secure Checkout
+          - generic [ref=e141]:
+            - generic [ref=e142]:
+              - generic [ref=e143]: 2,500+
+              - text: HAPPY CUSTOMERS
+            - generic [ref=e144]:
+              - generic [ref=e145]: 3,000+
+              - text: ORDERS DELIVERED
+            - generic [ref=e146]:
+              - generic [ref=e147]: "4.8"
+              - text: RATING ★
+        - generic [ref=e149]:
+          - generic [ref=e150]: ⌚️ WATCHES
+          - generic [ref=e151]:
+            - text: NEW
+            - text: DROP
+          - link "SNEAKERS WATCHES GLASSES HANDBAGS SHOP WATCHES →" [ref=e153] [cursor=pointer]:
+            - /url: https://www.shopurbanex.com/products?category=watches
+            - img "SNEAKERS"
+            - img "WATCHES"
+            - img "GLASSES"
+            - img "HANDBAGS"
+            - generic [ref=e154]: SHOP WATCHES →
+          - generic [ref=e155]:
+            - generic [ref=e156]: LUXURY IN EVERY TICK
+            - generic [ref=e157]:
+              - button "Show SNEAKERS" [ref=e158] [cursor=pointer]
+              - button "Show WATCHES" [ref=e159] [cursor=pointer]
+              - button "Show GLASSES" [ref=e160] [cursor=pointer]
+              - button "Show HANDBAGS" [ref=e161] [cursor=pointer]
+      - generic [ref=e163]: SCROLL
+    - region "Trusted by customers" [ref=e165]:
+      - generic [ref=e166]:
+        - generic [ref=e167]:
+          - generic [ref=e168]: Customer Rating
+          - generic [ref=e169]:
+            - text: "4.8"
+            - generic [ref=e170]: /5
+          - generic "4.8 out of 5 stars" [ref=e171]:
+            - generic [ref=e172]: ★
+            - generic [ref=e173]: ★
+            - generic [ref=e174]: ★
+            - generic [ref=e175]: ★
+            - generic [ref=e176]: ★
+          - generic [ref=e177]: Average across verified buyers
+        - generic [ref=e178]:
+          - generic [ref=e179]: Trusted Across India
+          - generic [ref=e180]: 2,500+
+          - generic [ref=e181]: Happy Customers
+        - generic [ref=e182]:
+          - generic [ref=e183]: Delivered Nationwide
+          - generic [ref=e184]: 3,000+
+          - generic [ref=e185]: Orders Delivered
+    - generic [ref=e188]:
+      - generic [ref=e189]: SNEAKERS✦
+      - generic [ref=e190]: WATCHES✦
+      - generic [ref=e191]: GLASSES✦
+      - generic [ref=e192]: HANDBAGS✦
+      - generic [ref=e193]: CLOTHING✦
+      - generic [ref=e194]: PREMIUM EDITION✦
+      - generic [ref=e195]: PREMIUM DROPS✦
+      - generic [ref=e196]: FRESH KICKS✦
+      - generic [ref=e197]: SNEAKERS✦
+      - generic [ref=e198]: WATCHES✦
+      - generic [ref=e199]: GLASSES✦
+      - generic [ref=e200]: HANDBAGS✦
+      - generic [ref=e201]: CLOTHING✦
+      - generic [ref=e202]: PREMIUM EDITION✦
+      - generic [ref=e203]: PREMIUM DROPS✦
+      - generic [ref=e204]: FRESH KICKS✦
+    - generic [ref=e207]:
+      - link "Explore all categories" [ref=e208] [cursor=pointer]:
+        - /url: /categories
+        - generic [ref=e209]: EXPLORE ALL CATEGORIES
+        - generic [ref=e210]: →
+      - generic [ref=e211]:
+        - generic [ref=e212]: SECTION / 01
+        - heading "SHOP BY CATEGORY" [level=2] [ref=e213]
+        - generic [ref=e214]: — pick your lane —
+      - generic [ref=e215]:
+        - link "Shoes SHOES EXPLORE →" [ref=e216] [cursor=pointer]:
+          - /url: /products?category=shoes
+          - img "Shoes" [ref=e218]
+          - generic [ref=e219]:
+            - heading "SHOES" [level=3] [ref=e220]
+            - generic [ref=e221]: EXPLORE →
+        - link "Watches WATCHES EXPLORE →" [ref=e222] [cursor=pointer]:
+          - /url: /products?category=watches
+          - img "Watches" [ref=e224]
+          - generic [ref=e225]:
+            - heading "WATCHES" [level=3] [ref=e226]
+            - generic [ref=e227]: EXPLORE →
+        - link "Glasses GLASSES EXPLORE →" [ref=e228] [cursor=pointer]:
+          - /url: /products?category=glasses
+          - img "Glasses" [ref=e230]
+          - generic [ref=e231]:
+            - heading "GLASSES" [level=3] [ref=e232]
+            - generic [ref=e233]: EXPLORE →
+        - link "Loafers/Formals LOAFERS/FORMALS EXPLORE →" [ref=e234] [cursor=pointer]:
+          - /url: /products?category=loafers-formals
+          - img "Loafers/Formals" [ref=e236]
+          - generic [ref=e237]:
+            - heading "LOAFERS/FORMALS" [level=3] [ref=e238]
+            - generic [ref=e239]: EXPLORE →
+        - link "Handbags HANDBAGS EXPLORE →" [ref=e240] [cursor=pointer]:
+          - /url: /products?category=handbags
+          - img "Handbags" [ref=e242]
+          - generic [ref=e243]:
+            - heading "HANDBAGS" [level=3] [ref=e244]
+            - generic [ref=e245]: EXPLORE →
+        - link "Clothing CLOTHING EXPLORE →" [ref=e246] [cursor=pointer]:
+          - /url: /products?category=clothing
+          - img "Clothing" [ref=e248]
+          - generic [ref=e249]:
+            - heading "CLOTHING" [level=3] [ref=e250]
+            - generic [ref=e251]: EXPLORE →
+    - generic [ref=e254]:
+      - generic [ref=e255]:
+        - heading "SHOP BY BRAND" [level=2] [ref=e256]
+        - paragraph [ref=e257]: Find your favorite brands all in one place
+      - generic [ref=e258]:
+        - link "Nike Nike" [ref=e259] [cursor=pointer]:
+          - /url: /products?brand=nike
+          - img "Nike" [ref=e261]
+          - generic [ref=e262]: Nike
+        - link "Adidas Adidas" [ref=e263] [cursor=pointer]:
+          - /url: /products?brand=adidas
+          - img "Adidas" [ref=e265]
+          - generic [ref=e266]: Adidas
+        - link "Jordan Jordan" [ref=e267] [cursor=pointer]:
+          - /url: /products?brand=jordan
+          - img "Jordan" [ref=e269]
+          - generic [ref=e270]: Jordan
+        - link "Puma Puma" [ref=e271] [cursor=pointer]:
+          - /url: /products?brand=puma
+          - img "Puma" [ref=e273]
+          - generic [ref=e274]: Puma
+        - link "New Balance New Balance" [ref=e275] [cursor=pointer]:
+          - /url: /products?brand=new-balance
+          - img "New Balance" [ref=e277]
+          - generic [ref=e278]: New Balance
+        - link "Reebok Reebok" [ref=e279] [cursor=pointer]:
+          - /url: /products?brand=reebok
+          - img "Reebok" [ref=e281]
+          - generic [ref=e282]: Reebok
+        - link "Converse Converse" [ref=e283] [cursor=pointer]:
+          - /url: /products?brand=converse
+          - img "Converse" [ref=e285]
+          - generic [ref=e286]: Converse
+        - link "Vans Vans" [ref=e287] [cursor=pointer]:
+          - /url: /products?brand=vans
+          - img "Vans" [ref=e289]
+          - generic [ref=e290]: Vans
+        - link "Asics Asics" [ref=e291] [cursor=pointer]:
+          - /url: /products?brand=asics
+          - img "Asics" [ref=e293]
+          - generic [ref=e294]: Asics
+        - link "Fila Fila" [ref=e295] [cursor=pointer]:
+          - /url: /products?brand=fila
+          - img "Fila" [ref=e297]
+          - generic [ref=e298]: Fila
+        - link "Under Armour Under Armour" [ref=e299] [cursor=pointer]:
+          - /url: /products?brand=under-armour
+          - img "Under Armour" [ref=e301]
+          - generic [ref=e302]: Under Armour
+        - link "Skechers Skechers" [ref=e303] [cursor=pointer]:
+          - /url: /products?brand=skechers
+          - img "Skechers" [ref=e305]
+          - generic [ref=e306]: Skechers
+        - link "Rolex Rolex" [ref=e307] [cursor=pointer]:
+          - /url: /products?brand=rolex
+          - img "Rolex" [ref=e309]
+          - generic [ref=e310]: Rolex
+        - link "Omega Omega" [ref=e311] [cursor=pointer]:
+          - /url: /products?brand=omega
+          - img "Omega" [ref=e313]
+          - generic [ref=e314]: Omega
+        - link "Hublot Hublot" [ref=e315] [cursor=pointer]:
+          - /url: /products?brand=hublot
+          - img "Hublot" [ref=e317]
+          - generic [ref=e318]: Hublot
+        - link "Ray-Ban Ray-Ban" [ref=e319] [cursor=pointer]:
+          - /url: /products?brand=ray-ban
+          - img "Ray-Ban" [ref=e321]
+          - generic [ref=e322]: Ray-Ban
+        - link "Oakley Oakley" [ref=e323] [cursor=pointer]:
+          - /url: /products?brand=oakley
+          - img "Oakley" [ref=e325]
+          - generic [ref=e326]: Oakley
+        - link "Gucci Gucci" [ref=e327] [cursor=pointer]:
+          - /url: /products?brand=gucci
+          - img "Gucci" [ref=e329]
+          - generic [ref=e330]: Gucci
+        - link "Louis Vuitton Louis Vuitton" [ref=e331] [cursor=pointer]:
+          - /url: /products?brand=louis-vuitton
+          - img "Louis Vuitton" [ref=e333]
+          - generic [ref=e334]: Louis Vuitton
+        - link "Michael Kors Michael Kors" [ref=e335] [cursor=pointer]:
+          - /url: /products?brand=michael-kors
+          - img "Michael Kors" [ref=e337]
+          - generic [ref=e338]: Michael Kors
+        - link "Tag Heuer Tag Heuer" [ref=e339] [cursor=pointer]:
+          - /url: /products?brand=tag-heuer
+          - img "Tag Heuer" [ref=e341]
+          - generic [ref=e342]: Tag Heuer
+        - link "Cartier Cartier" [ref=e343] [cursor=pointer]:
+          - /url: /products?brand=cartier
+          - img "Cartier" [ref=e345]
+          - generic [ref=e346]: Cartier
+        - link "Seiko Seiko" [ref=e347] [cursor=pointer]:
+          - /url: /products?brand=seiko
+          - img "Seiko" [ref=e349]
+          - generic [ref=e350]: Seiko
+        - link "Rado Rado" [ref=e351] [cursor=pointer]:
+          - /url: /products?brand=rado
+          - img "Rado" [ref=e353]
+          - generic [ref=e354]: Rado
+        - link "G-Shock G-Shock" [ref=e355] [cursor=pointer]:
+          - /url: /products?brand=g-shock
+          - img "G-Shock" [ref=e357]
+          - generic [ref=e358]: G-Shock
+        - link "Chanel Chanel" [ref=e359] [cursor=pointer]:
+          - /url: /products?brand=chanel
+          - img "Chanel" [ref=e361]
+          - generic [ref=e362]: Chanel
+    - generic [ref=e366]:
+      - generic [ref=e367]: SECTION / 02
+      - heading "FEATURED DROPS" [level=2] [ref=e368]
+      - paragraph [ref=e369]: The hottest releases in every category
+    - generic [ref=e373]:
+      - generic [ref=e374]:
+        - generic [ref=e375]: 👟
+        - heading "SNEAKERS" [level=3] [ref=e376]
+        - generic [ref=e377]: 12 DROPS
+        - link "VIEW ALL →" [ref=e378] [cursor=pointer]:
+          - /url: /products?category=sneakers
+      - generic [ref=e379]:
+        - link "SKEC.HERS-HYPER-BURST-SLIDE brown SALE Add to wishlist QUICK ADD Skechers SKEC.HERS-HYPER-BURST-SLIDE brown ₹2,399 ₹9,076" [ref=e380] [cursor=pointer]:
+          - /url: /products/skec-hers-hyper-burst-slide-brown-npi498265528
+          - generic [ref=e381]:
+            - img "SKEC.HERS-HYPER-BURST-SLIDE brown" [ref=e382]
+            - generic [ref=e383]: SALE
+            - button "Add to wishlist" [ref=e384]: ♡
+            - button "QUICK ADD" [ref=e386]
+          - generic [ref=e387]:
+            - text: Skechers
+            - heading "SKEC.HERS-HYPER-BURST-SLIDE brown" [level=3] [ref=e388]
+            - generic [ref=e389]:
+              - generic [ref=e390]: ₹2,399
+              - generic [ref=e391]: ₹9,076
+        - link "Skecher Hyperburst Recovery All Black 325 Skecher Hyperburst Recovery All Black 325 alternate view SALE Add to wishlist QUICK ADD Skechers Skecher Hyperburst Recovery All Black 325 ₹2,399 ₹3,359" [ref=e392] [cursor=pointer]:
+          - /url: /products/skecher-hyperburst-recovery-all-black-325-npi552378803
+          - generic [ref=e393]:
+            - img "Skecher Hyperburst Recovery All Black 325" [ref=e394]
+            - img "Skecher Hyperburst Recovery All Black 325 alternate view" [ref=e395]
+            - generic [ref=e396]: SALE
+            - button "Add to wishlist" [ref=e397]: ♡
+            - button "QUICK ADD" [ref=e399]
+          - generic [ref=e400]:
+            - text: Skechers
+            - heading "Skecher Hyperburst Recovery All Black 325" [level=3] [ref=e401]
+            - generic [ref=e402]:
+              - generic [ref=e403]: ₹2,399
+              - generic [ref=e404]: ₹3,359
+        - link "Skecher Hyperburst Recovery Grey 326 Skecher Hyperburst Recovery Grey 326 alternate view SALE Add to wishlist QUICK ADD Skechers Skecher Hyperburst Recovery Grey 326 ₹2,399 ₹3,359" [ref=e405] [cursor=pointer]:
+          - /url: /products/skecher-hyperburst-recovery-grey-326-npi552381083
+          - generic [ref=e406]:
+            - img "Skecher Hyperburst Recovery Grey 326" [ref=e407]
+            - img "Skecher Hyperburst Recovery Grey 326 alternate view" [ref=e408]
+            - generic [ref=e409]: SALE
+            - button "Add to wishlist" [ref=e410]: ♡
+            - button "QUICK ADD" [ref=e412]
+          - generic [ref=e413]:
+            - text: Skechers
+            - heading "Skecher Hyperburst Recovery Grey 326" [level=3] [ref=e414]
+            - generic [ref=e415]:
+              - generic [ref=e416]: ₹2,399
+              - generic [ref=e417]: ₹3,359
+        - link "Skecher Hyperburst Recovery White 327 Skecher Hyperburst Recovery White 327 alternate view SALE Add to wishlist QUICK ADD Skechers Skecher Hyperburst Recovery White 327 ₹2,399 ₹3,359" [ref=e418] [cursor=pointer]:
+          - /url: /products/skecher-hyperburst-recovery-white-327-npi552381881
+          - generic [ref=e419]:
+            - img "Skecher Hyperburst Recovery White 327" [ref=e420]
+            - img "Skecher Hyperburst Recovery White 327 alternate view" [ref=e421]
+            - generic [ref=e422]: SALE
+            - button "Add to wishlist" [ref=e423]: ♡
+            - button "QUICK ADD" [ref=e425]
+          - generic [ref=e426]:
+            - text: Skechers
+            - heading "Skecher Hyperburst Recovery White 327" [level=3] [ref=e427]
+            - generic [ref=e428]:
+              - generic [ref=e429]: ₹2,399
+              - generic [ref=e430]: ₹3,359
+        - link "Skecher Hyperburst Recovery Navy Blue 328 Skecher Hyperburst Recovery Navy Blue 328 alternate view SALE Add to wishlist QUICK ADD Skechers Skecher Hyperburst Recovery Navy Blue 328 ₹2,399 ₹3,359" [ref=e431] [cursor=pointer]:
+          - /url: /products/skecher-hyperburst-recovery-navy-blue-328-npi552385845
+          - generic [ref=e432]:
+            - img "Skecher Hyperburst Recovery Navy Blue 328" [ref=e433]
+            - img "Skecher Hyperburst Recovery Navy Blue 328 alternate view" [ref=e434]
+            - generic [ref=e435]: SALE
+            - button "Add to wishlist" [ref=e436]: ♡
+            - button "QUICK ADD" [ref=e438]
+          - generic [ref=e439]:
+            - text: Skechers
+            - heading "Skecher Hyperburst Recovery Navy Blue 328" [level=3] [ref=e440]
+            - generic [ref=e441]:
+              - generic [ref=e442]: ₹2,399
+              - generic [ref=e443]: ₹3,359
+        - link "Skecher Hyperburst Recovery 2 Cream 329 Skecher Hyperburst Recovery 2 Cream 329 alternate view SALE Add to wishlist QUICK ADD Skechers Skecher Hyperburst Recovery 2 Cream 329 ₹2,399 ₹3,359" [ref=e444] [cursor=pointer]:
+          - /url: /products/skecher-hyperburst-recovery-2-cream-329-npi552431144
+          - generic [ref=e445]:
+            - img "Skecher Hyperburst Recovery 2 Cream 329" [ref=e446]
+            - img "Skecher Hyperburst Recovery 2 Cream 329 alternate view" [ref=e447]
+            - generic [ref=e448]: SALE
+            - button "Add to wishlist" [ref=e449]: ♡
+            - button "QUICK ADD" [ref=e451]
+          - generic [ref=e452]:
+            - text: Skechers
+            - heading "Skecher Hyperburst Recovery 2 Cream 329" [level=3] [ref=e453]
+            - generic [ref=e454]:
+              - generic [ref=e455]: ₹2,399
+              - generic [ref=e456]: ₹3,359
+        - link "Skecher Hyperburst Recovery 2 Blue 330 Skecher Hyperburst Recovery 2 Blue 330 alternate view SALE Add to wishlist QUICK ADD Skechers Skecher Hyperburst Recovery 2 Blue 330 ₹2,399 ₹3,359" [ref=e457] [cursor=pointer]:
+          - /url: /products/skecher-hyperburst-recovery-2-blue-330-npi552431945
+          - generic [ref=e458]:
+            - img "Skecher Hyperburst Recovery 2 Blue 330" [ref=e459]
+            - img "Skecher Hyperburst Recovery 2 Blue 330 alternate view" [ref=e460]
+            - generic [ref=e461]: SALE
+            - button "Add to wishlist" [ref=e462]: ♡
+            - button "QUICK ADD" [ref=e464]
+          - generic [ref=e465]:
+            - text: Skechers
+            - heading "Skecher Hyperburst Recovery 2 Blue 330" [level=3] [ref=e466]
+            - generic [ref=e467]:
+              - generic [ref=e468]: ₹2,399
+              - generic [ref=e469]: ₹3,359
+        - link "Skecher Hyperburst Recovery 2 Grey 331 Skecher Hyperburst Recovery 2 Grey 331 alternate view SALE Add to wishlist QUICK ADD Skechers Skecher Hyperburst Recovery 2 Grey 331 ₹2,399 ₹3,359" [ref=e470] [cursor=pointer]:
+          - /url: /products/skecher-hyperburst-recovery-2-grey-331-npi552437486
+          - generic [ref=e471]:
+            - img "Skecher Hyperburst Recovery 2 Grey 331" [ref=e472]
+            - img "Skecher Hyperburst Recovery 2 Grey 331 alternate view" [ref=e473]
+            - generic [ref=e474]: SALE
+            - button "Add to wishlist" [ref=e475]: ♡
+            - button "QUICK ADD" [ref=e477]
+          - generic [ref=e478]:
+            - text: Skechers
+            - heading "Skecher Hyperburst Recovery 2 Grey 331" [level=3] [ref=e479]
+            - generic [ref=e480]:
+              - generic [ref=e481]: ₹2,399
+              - generic [ref=e482]: ₹3,359
+        - link "Skecher Hyperburst Recovery 2 All Black 332 Skecher Hyperburst Recovery 2 All Black 332 alternate view SALE Add to wishlist QUICK ADD Skechers Skecher Hyperburst Recovery 2 All Black 332 ₹2,399 ₹3,359" [ref=e483] [cursor=pointer]:
+          - /url: /products/skecher-hyperburst-recovery-2-all-black-332-npi552457885
+          - generic [ref=e484]:
+            - img "Skecher Hyperburst Recovery 2 All Black 332" [ref=e485]
+            - img "Skecher Hyperburst Recovery 2 All Black 332 alternate view" [ref=e486]
+            - generic [ref=e487]: SALE
+            - button "Add to wishlist" [ref=e488]: ♡
+            - button "QUICK ADD" [ref=e490]
+          - generic [ref=e491]:
+            - text: Skechers
+            - heading "Skecher Hyperburst Recovery 2 All Black 332" [level=3] [ref=e492]
+            - generic [ref=e493]:
+              - generic [ref=e494]: ₹2,399
+              - generic [ref=e495]: ₹3,359
+        - link "Skecher.s Aero Spark red running Skecher.s Aero Spark red running alternate view SALE Add to wishlist QUICK ADD Skechers Skecher.s Aero Spark red running ₹3,999 ₹4,098" [ref=e496] [cursor=pointer]:
+          - /url: /products/skecher-s-aero-spark-red-running-npi552852385
+          - generic [ref=e497]:
+            - img "Skecher.s Aero Spark red running" [ref=e498]
+            - img "Skecher.s Aero Spark red running alternate view" [ref=e499]
+            - generic [ref=e500]: SALE
+            - button "Add to wishlist" [ref=e501]: ♡
+            - button "QUICK ADD" [ref=e503]
+          - generic [ref=e504]:
+            - text: Skechers
+            - heading "Skecher.s Aero Spark red running" [level=3] [ref=e505]
+            - generic [ref=e506]:
+              - generic [ref=e507]: ₹3,999
+              - generic [ref=e508]: ₹4,098
+        - link "SKECHER_S SLIP IN MAX CUSHIONING ENDEAVOUR HA (1154 SKECHER_S SLIP IN MAX CUSHIONING ENDEAVOUR HA (1154 alternate view SALE Add to wishlist QUICK ADD Skechers SKECHER_S SLIP IN MAX CUSHIONING ENDEAVOUR HA (1154 ₹3,599 ₹5,200" [ref=e509] [cursor=pointer]:
+          - /url: /products/skecher-s-slip-in-max-cushioning-endeavour-ha-1154-npi556020963
+          - generic [ref=e510]:
+            - img "SKECHER_S SLIP IN MAX CUSHIONING ENDEAVOUR HA (1154" [ref=e511]
+            - img "SKECHER_S SLIP IN MAX CUSHIONING ENDEAVOUR HA (1154 alternate view" [ref=e512]
+            - generic [ref=e513]: SALE
+            - button "Add to wishlist" [ref=e514]: ♡
+            - button "QUICK ADD" [ref=e516]
+          - generic [ref=e517]:
+            - text: Skechers
+            - heading "SKECHER_S SLIP IN MAX CUSHIONING ENDEAVOUR HA (1154" [level=3] [ref=e518]
+            - generic [ref=e519]:
+              - generic [ref=e520]: ₹3,599
+              - generic [ref=e521]: ₹5,200
+        - link "SKECHER_S SLIP IN MAX CUSHIONING ENDEAVOUR HA (1156 SKECHER_S SLIP IN MAX CUSHIONING ENDEAVOUR HA (1156 alternate view SALE Add to wishlist QUICK ADD Skechers SKECHER_S SLIP IN MAX CUSHIONING ENDEAVOUR HA (1156 ₹3,599 ₹5,200" [ref=e522] [cursor=pointer]:
+          - /url: /products/skecher-s-slip-in-max-cushioning-endeavour-ha-1156-npi556022368
+          - generic [ref=e523]:
+            - img "SKECHER_S SLIP IN MAX CUSHIONING ENDEAVOUR HA (1156" [ref=e524]
+            - img "SKECHER_S SLIP IN MAX CUSHIONING ENDEAVOUR HA (1156 alternate view" [ref=e525]
+            - generic [ref=e526]: SALE
+            - button "Add to wishlist" [ref=e527]: ♡
+            - button "QUICK ADD" [ref=e529]
+          - generic [ref=e530]:
+            - text: Skechers
+            - heading "SKECHER_S SLIP IN MAX CUSHIONING ENDEAVOUR HA (1156" [level=3] [ref=e531]
+            - generic [ref=e532]:
+              - generic [ref=e533]: ₹3,599
+              - generic [ref=e534]: ₹5,200
+    - generic [ref=e538]:
+      - generic [ref=e539]:
+        - generic [ref=e540]: ⌚
+        - heading "LUXURY WATCHES" [level=3] [ref=e541]
+        - generic [ref=e542]: 12 DROPS
+        - link "VIEW ALL →" [ref=e543] [cursor=pointer]:
+          - /url: /products?category=watches
+      - generic [ref=e544]:
+        - link "Seiko 5 Sports GMT Seiko 5 Sports GMT alternate view SALE Add to wishlist QUICK ADD Seiko Seiko 5 Sports GMT ₹2,099 ₹10,999" [ref=e545] [cursor=pointer]:
+          - /url: /products/seiko-5-sports-gmt-npi544606542
+          - generic [ref=e546]:
+            - img "Seiko 5 Sports GMT" [ref=e547]
+            - img "Seiko 5 Sports GMT alternate view" [ref=e548]
+            - generic [ref=e549]: SALE
+            - button "Add to wishlist" [ref=e550]: ♡
+            - button "QUICK ADD" [ref=e552]
+          - generic [ref=e553]:
+            - text: Seiko
+            - heading "Seiko 5 Sports GMT" [level=3] [ref=e554]
+            - generic [ref=e555]:
+              - generic [ref=e556]: ₹2,099
+              - generic [ref=e557]: ₹10,999
+        - link "Seiko Automatic Watch SALE Add to wishlist QUICK ADD Seiko Seiko Automatic Watch ₹2,849 ₹4,999" [ref=e558] [cursor=pointer]:
+          - /url: /products/seiko-automatic-watch-npi546514276
+          - generic [ref=e559]:
+            - img "Seiko Automatic Watch" [ref=e560]
+            - generic [ref=e561]: SALE
+            - button "Add to wishlist" [ref=e562]: ♡
+            - button "QUICK ADD" [ref=e564]
+          - generic [ref=e565]:
+            - text: Seiko
+            - heading "Seiko Automatic Watch" [level=3] [ref=e566]
+            - generic [ref=e567]:
+              - generic [ref=e568]: ₹2,849
+              - generic [ref=e569]: ₹4,999
+        - link "Seiko Automatic Watch SALE Add to wishlist QUICK ADD Seiko Seiko Automatic Watch ₹2,849 ₹4,999" [ref=e570] [cursor=pointer]:
+          - /url: /products/seiko-automatic-watch-npi546516514
+          - generic [ref=e571]:
+            - img "Seiko Automatic Watch" [ref=e572]
+            - generic [ref=e573]: SALE
+            - button "Add to wishlist" [ref=e574]: ♡
+            - button "QUICK ADD" [ref=e576]
+          - generic [ref=e577]:
+            - text: Seiko
+            - heading "Seiko Automatic Watch" [level=3] [ref=e578]
+            - generic [ref=e579]:
+              - generic [ref=e580]: ₹2,849
+              - generic [ref=e581]: ₹4,999
+        - link "Seiko Automatic Watch SALE Add to wishlist QUICK ADD Seiko Seiko Automatic Watch ₹2,849 ₹4,999" [ref=e582] [cursor=pointer]:
+          - /url: /products/seiko-automatic-watch-npi546521818
+          - generic [ref=e583]:
+            - img "Seiko Automatic Watch" [ref=e584]
+            - generic [ref=e585]: SALE
+            - button "Add to wishlist" [ref=e586]: ♡
+            - button "QUICK ADD" [ref=e588]
+          - generic [ref=e589]:
+            - text: Seiko
+            - heading "Seiko Automatic Watch" [level=3] [ref=e590]
+            - generic [ref=e591]:
+              - generic [ref=e592]: ₹2,849
+              - generic [ref=e593]: ₹4,999
+        - link "Seiko Automatic Watch SALE Add to wishlist QUICK ADD Seiko Seiko Automatic Watch ₹2,849 ₹4,999" [ref=e594] [cursor=pointer]:
+          - /url: /products/seiko-automatic-watch-npi546526016
+          - generic [ref=e595]:
+            - img "Seiko Automatic Watch" [ref=e596]
+            - generic [ref=e597]: SALE
+            - button "Add to wishlist" [ref=e598]: ♡
+            - button "QUICK ADD" [ref=e600]
+          - generic [ref=e601]:
+            - text: Seiko
+            - heading "Seiko Automatic Watch" [level=3] [ref=e602]
+            - generic [ref=e603]:
+              - generic [ref=e604]: ₹2,849
+              - generic [ref=e605]: ₹4,999
+        - link "Seiko Automatic Watch SALE Add to wishlist QUICK ADD Seiko Seiko Automatic Watch ₹2,849 ₹4,999" [ref=e606] [cursor=pointer]:
+          - /url: /products/seiko-automatic-watch-npi546536735
+          - generic [ref=e607]:
+            - img "Seiko Automatic Watch" [ref=e608]
+            - generic [ref=e609]: SALE
+            - button "Add to wishlist" [ref=e610]: ♡
+            - button "QUICK ADD" [ref=e612]
+          - generic [ref=e613]:
+            - text: Seiko
+            - heading "Seiko Automatic Watch" [level=3] [ref=e614]
+            - generic [ref=e615]:
+              - generic [ref=e616]: ₹2,849
+              - generic [ref=e617]: ₹4,999
+        - link "Seiko Automatic Watch SALE Add to wishlist QUICK ADD Seiko Seiko Automatic Watch ₹2,849 ₹4,999" [ref=e618] [cursor=pointer]:
+          - /url: /products/seiko-automatic-watch-npi546541316
+          - generic [ref=e619]:
+            - img "Seiko Automatic Watch" [ref=e620]
+            - generic [ref=e621]: SALE
+            - button "Add to wishlist" [ref=e622]: ♡
+            - button "QUICK ADD" [ref=e624]
+          - generic [ref=e625]:
+            - text: Seiko
+            - heading "Seiko Automatic Watch" [level=3] [ref=e626]
+            - generic [ref=e627]:
+              - generic [ref=e628]: ₹2,849
+              - generic [ref=e629]: ₹4,999
+        - link "Seik o Automatic SALE Add to wishlist QUICK ADD Seiko Seik o Automatic ₹2,800 ₹10,999" [ref=e630] [cursor=pointer]:
+          - /url: /products/seik-o-automatic-npi547843077
+          - generic [ref=e631]:
+            - img "Seik o Automatic" [ref=e632]
+            - generic [ref=e633]: SALE
+            - button "Add to wishlist" [ref=e634]: ♡
+            - button "QUICK ADD" [ref=e636]
+          - generic [ref=e637]:
+            - text: Seiko
+            - heading "Seik o Automatic" [level=3] [ref=e638]
+            - generic [ref=e639]:
+              - generic [ref=e640]: ₹2,800
+              - generic [ref=e641]: ₹10,999
+        - link "Seik o Automatic SALE Add to wishlist QUICK ADD Seiko Seik o Automatic ₹2,800 ₹10,999" [ref=e642] [cursor=pointer]:
+          - /url: /products/seik-o-automatic-npi547847652
+          - generic [ref=e643]:
+            - img "Seik o Automatic" [ref=e644]
+            - generic [ref=e645]: SALE
+            - button "Add to wishlist" [ref=e646]: ♡
+            - button "QUICK ADD" [ref=e648]
+          - generic [ref=e649]:
+            - text: Seiko
+            - heading "Seik o Automatic" [level=3] [ref=e650]
+            - generic [ref=e651]:
+              - generic [ref=e652]: ₹2,800
+              - generic [ref=e653]: ₹10,999
+        - link "Seik o Automatic SALE Add to wishlist QUICK ADD Seiko Seik o Automatic ₹2,800 ₹10,999" [ref=e654] [cursor=pointer]:
+          - /url: /products/seik-o-automatic-npi547853513
+          - generic [ref=e655]:
+            - img "Seik o Automatic" [ref=e656]
+            - generic [ref=e657]: SALE
+            - button "Add to wishlist" [ref=e658]: ♡
+            - button "QUICK ADD" [ref=e660]
+          - generic [ref=e661]:
+            - text: Seiko
+            - heading "Seik o Automatic" [level=3] [ref=e662]
+            - generic [ref=e663]:
+              - generic [ref=e664]: ₹2,800
+              - generic [ref=e665]: ₹10,999
+        - link "Seik o Automatic SALE Add to wishlist QUICK ADD Seiko Seik o Automatic ₹2,800 ₹10,999" [ref=e666] [cursor=pointer]:
+          - /url: /products/seik-o-automatic-npi547858735
+          - generic [ref=e667]:
+            - img "Seik o Automatic" [ref=e668]
+            - generic [ref=e669]: SALE
+            - button "Add to wishlist" [ref=e670]: ♡
+            - button "QUICK ADD" [ref=e672]
+          - generic [ref=e673]:
+            - text: Seiko
+            - heading "Seik o Automatic" [level=3] [ref=e674]
+            - generic [ref=e675]:
+              - generic [ref=e676]: ₹2,800
+              - generic [ref=e677]: ₹10,999
+        - link "Seiko Oyster Perpetual Galaxy Twotone SALE Add to wishlist QUICK ADD Seiko Seiko Oyster Perpetual Galaxy Twotone ₹2,199 ₹2,999" [ref=e678] [cursor=pointer]:
+          - /url: /products/seiko-oyster-perpetual-galaxy-twotone-npi549361742
+          - generic [ref=e679]:
+            - img "Seiko Oyster Perpetual Galaxy Twotone" [ref=e680]
+            - generic [ref=e681]: SALE
+            - button "Add to wishlist" [ref=e682]: ♡
+            - button "QUICK ADD" [ref=e684]
+          - generic [ref=e685]:
+            - text: Seiko
+            - heading "Seiko Oyster Perpetual Galaxy Twotone" [level=3] [ref=e686]
+            - generic [ref=e687]:
+              - generic [ref=e688]: ₹2,199
+              - generic [ref=e689]: ₹2,999
+    - generic [ref=e693]:
+      - generic [ref=e694]:
+        - generic [ref=e695]: 🕶️
+        - heading "GLASSES" [level=3] [ref=e696]
+        - generic [ref=e697]: 12 DROPS
+        - link "VIEW ALL →" [ref=e698] [cursor=pointer]:
+          - /url: /products?category=glasses
+      - generic [ref=e699]:
+        - link "Rayban 0840 tiger blue Rayban 0840 tiger blue alternate view SALE Add to wishlist QUICK ADD Ray-Ban Rayban 0840 tiger blue ₹1,399 ₹1,500" [ref=e700] [cursor=pointer]:
+          - /url: /products/rayban-0840-tiger-blue-lpi552700377
+          - generic [ref=e701]:
+            - img "Rayban 0840 tiger blue" [ref=e702]
+            - img "Rayban 0840 tiger blue alternate view" [ref=e703]
+            - generic [ref=e704]: SALE
+            - button "Add to wishlist" [ref=e705]: ♡
+            - button "QUICK ADD" [ref=e707]
+          - generic [ref=e708]:
+            - text: Ray-Ban
+            - heading "Rayban 0840 tiger blue" [level=3] [ref=e709]
+            - generic [ref=e710]:
+              - generic [ref=e711]: ₹1,399
+              - generic [ref=e712]: ₹1,500
+        - link "Rayban 30165 violet Rayban 30165 violet alternate view SALE Add to wishlist QUICK ADD Ray-Ban Rayban 30165 violet ₹1,399 ₹42,231" [ref=e713] [cursor=pointer]:
+          - /url: /products/rayban-30165-violet-lpi552700382
+          - generic [ref=e714]:
+            - img "Rayban 30165 violet" [ref=e715]
+            - img "Rayban 30165 violet alternate view" [ref=e716]
+            - generic [ref=e717]: SALE
+            - button "Add to wishlist" [ref=e718]: ♡
+            - button "QUICK ADD" [ref=e720]
+          - generic [ref=e721]:
+            - text: Ray-Ban
+            - heading "Rayban 30165 violet" [level=3] [ref=e722]
+            - generic [ref=e723]:
+              - generic [ref=e724]: ₹1,399
+              - generic [ref=e725]: ₹42,231
+        - link "Rayban 2191 brown Rayban 2191 brown alternate view SALE Add to wishlist QUICK ADD Ray-Ban Rayban 2191 brown ₹1,399 ₹3,067" [ref=e726] [cursor=pointer]:
+          - /url: /products/rayban-2191-brown-lpi552700417
+          - generic [ref=e727]:
+            - img "Rayban 2191 brown" [ref=e728]
+            - img "Rayban 2191 brown alternate view" [ref=e729]
+            - generic [ref=e730]: SALE
+            - button "Add to wishlist" [ref=e731]: ♡
+            - button "QUICK ADD" [ref=e733]
+          - generic [ref=e734]:
+            - text: Ray-Ban
+            - heading "Rayban 2191 brown" [level=3] [ref=e735]
+            - generic [ref=e736]:
+              - generic [ref=e737]: ₹1,399
+              - generic [ref=e738]: ₹3,067
+        - link "Rayban 0840 grey black Rayban 0840 grey black alternate view SALE Add to wishlist QUICK ADD Ray-Ban Rayban 0840 grey black ₹1,399 ₹1,500" [ref=e739] [cursor=pointer]:
+          - /url: /products/rayban-0840-grey-black-lpi552700420
+          - generic [ref=e740]:
+            - img "Rayban 0840 grey black" [ref=e741]
+            - img "Rayban 0840 grey black alternate view" [ref=e742]
+            - generic [ref=e743]: SALE
+            - button "Add to wishlist" [ref=e744]: ♡
+            - button "QUICK ADD" [ref=e746]
+          - generic [ref=e747]:
+            - text: Ray-Ban
+            - heading "Rayban 0840 grey black" [level=3] [ref=e748]
+            - generic [ref=e749]:
+              - generic [ref=e750]: ₹1,399
+              - generic [ref=e751]: ₹1,500
+        - link "Rayban 2140 olive tiger brown Rayban 2140 olive tiger brown alternate view SALE Add to wishlist QUICK ADD Ray-Ban Rayban 2140 olive tiger brown ₹1,399 ₹2,996" [ref=e752] [cursor=pointer]:
+          - /url: /products/rayban-2140-olive-tiger-brown-lpi552700424
+          - generic [ref=e753]:
+            - img "Rayban 2140 olive tiger brown" [ref=e754]
+            - img "Rayban 2140 olive tiger brown alternate view" [ref=e755]
+            - generic [ref=e756]: SALE
+            - button "Add to wishlist" [ref=e757]: ♡
+            - button "QUICK ADD" [ref=e759]
+          - generic [ref=e760]:
+            - text: Ray-Ban
+            - heading "Rayban 2140 olive tiger brown" [level=3] [ref=e761]
+            - generic [ref=e762]:
+              - generic [ref=e763]: ₹1,399
+              - generic [ref=e764]: ₹2,996
+        - link "rayban 0840 matt black plano rayban 0840 matt black plano alternate view SALE Add to wishlist QUICK ADD Ray-Ban rayban 0840 matt black plano ₹1,399 ₹1,959" [ref=e765] [cursor=pointer]:
+          - /url: /products/rayban-0840-matt-black-plano-npi553118746
+          - generic [ref=e766]:
+            - img "rayban 0840 matt black plano" [ref=e767]
+            - img "rayban 0840 matt black plano alternate view" [ref=e768]
+            - generic [ref=e769]: SALE
+            - button "Add to wishlist" [ref=e770]: ♡
+            - button "QUICK ADD" [ref=e772]
+          - generic [ref=e773]:
+            - text: Ray-Ban
+            - heading "rayban 0840 matt black plano" [level=3] [ref=e774]
+            - generic [ref=e775]:
+              - generic [ref=e776]: ₹1,399
+              - generic [ref=e777]: ₹1,959
+        - link "Rayban 04 olive tiger brown Rayban 04 olive tiger brown alternate view SALE Add to wishlist QUICK ADD Ray-Ban Rayban 04 olive tiger brown ₹1,399 ₹2,300" [ref=e778] [cursor=pointer]:
+          - /url: /products/rayban-04-olive-tiger-brown-npi553128981
+          - generic [ref=e779]:
+            - img "Rayban 04 olive tiger brown" [ref=e780]
+            - img "Rayban 04 olive tiger brown alternate view" [ref=e781]
+            - generic [ref=e782]: SALE
+            - button "Add to wishlist" [ref=e783]: ♡
+            - button "QUICK ADD" [ref=e785]
+          - generic [ref=e786]:
+            - text: Ray-Ban
+            - heading "Rayban 04 olive tiger brown" [level=3] [ref=e787]
+            - generic [ref=e788]:
+              - generic [ref=e789]: ₹1,399
+              - generic [ref=e790]: ₹2,300
+        - link "rayban 0840 grey tiger plano rayban 0840 grey tiger plano alternate view SALE Add to wishlist QUICK ADD Ray-Ban rayban 0840 grey tiger plano ₹1,399 ₹1,959" [ref=e791] [cursor=pointer]:
+          - /url: /products/rayban-0840-grey-tiger-plano-npi553152728
+          - generic [ref=e792]:
+            - img "rayban 0840 grey tiger plano" [ref=e793]
+            - img "rayban 0840 grey tiger plano alternate view" [ref=e794]
+            - generic [ref=e795]: SALE
+            - button "Add to wishlist" [ref=e796]: ♡
+            - button "QUICK ADD" [ref=e798]
+          - generic [ref=e799]:
+            - text: Ray-Ban
+            - heading "rayban 0840 grey tiger plano" [level=3] [ref=e800]
+            - generic [ref=e801]:
+              - generic [ref=e802]: ₹1,399
+              - generic [ref=e803]: ₹1,959
+        - link "rayban 0840 olive tiger brown rayban 0840 olive tiger brown alternate view SALE Add to wishlist QUICK ADD Ray-Ban rayban 0840 olive tiger brown ₹1,399 ₹1,959" [ref=e804] [cursor=pointer]:
+          - /url: /products/rayban-0840-olive-tiger-brown-npi553210034
+          - generic [ref=e805]:
+            - img "rayban 0840 olive tiger brown" [ref=e806]
+            - img "rayban 0840 olive tiger brown alternate view" [ref=e807]
+            - generic [ref=e808]: SALE
+            - button "Add to wishlist" [ref=e809]: ♡
+            - button "QUICK ADD" [ref=e811]
+          - generic [ref=e812]:
+            - text: Ray-Ban
+            - heading "rayban 0840 olive tiger brown" [level=3] [ref=e813]
+            - generic [ref=e814]:
+              - generic [ref=e815]: ₹1,399
+              - generic [ref=e816]: ₹1,959
+        - link "rayban 02 black plano rayban 02 black plano alternate view SALE Add to wishlist QUICK ADD Ray-Ban rayban 02 black plano ₹1,399 ₹2,300" [ref=e817] [cursor=pointer]:
+          - /url: /products/rayban-02-black-plano-npi553356961
+          - generic [ref=e818]:
+            - img "rayban 02 black plano" [ref=e819]
+            - img "rayban 02 black plano alternate view" [ref=e820]
+            - generic [ref=e821]: SALE
+            - button "Add to wishlist" [ref=e822]: ♡
+            - button "QUICK ADD" [ref=e824]
+          - generic [ref=e825]:
+            - text: Ray-Ban
+            - heading "rayban 02 black plano" [level=3] [ref=e826]
+            - generic [ref=e827]:
+              - generic [ref=e828]: ₹1,399
+              - generic [ref=e829]: ₹2,300
+        - link "rayban 02 grey plano rayban 02 grey plano alternate view SALE Add to wishlist QUICK ADD Ray-Ban rayban 02 grey plano ₹1,399 ₹2,300" [ref=e830] [cursor=pointer]:
+          - /url: /products/rayban-02-grey-plano-npi553375730
+          - generic [ref=e831]:
+            - img "rayban 02 grey plano" [ref=e832]
+            - img "rayban 02 grey plano alternate view" [ref=e833]
+            - generic [ref=e834]: SALE
+            - button "Add to wishlist" [ref=e835]: ♡
+            - button "QUICK ADD" [ref=e837]
+          - generic [ref=e838]:
+            - text: Ray-Ban
+            - heading "rayban 02 grey plano" [level=3] [ref=e839]
+            - generic [ref=e840]:
+              - generic [ref=e841]: ₹1,399
+              - generic [ref=e842]: ₹2,300
+        - link "rayban 06 blue plano rayban 06 blue plano alternate view SALE Add to wishlist QUICK ADD Ray-Ban rayban 06 blue plano ₹1,399 ₹2,300" [ref=e843] [cursor=pointer]:
+          - /url: /products/rayban-06-blue-plano-npi553380566
+          - generic [ref=e844]:
+            - img "rayban 06 blue plano" [ref=e845]
+            - img "rayban 06 blue plano alternate view" [ref=e846]
+            - generic [ref=e847]: SALE
+            - button "Add to wishlist" [ref=e848]: ♡
+            - button "QUICK ADD" [ref=e850]
+          - generic [ref=e851]:
+            - text: Ray-Ban
+            - heading "rayban 06 blue plano" [level=3] [ref=e852]
+            - generic [ref=e853]:
+              - generic [ref=e854]: ₹1,399
+              - generic [ref=e855]: ₹2,300
+    - generic [ref=e859]:
+      - generic [ref=e860]:
+        - generic [ref=e861]: 👜
+        - heading "HANDBAGS" [level=3] [ref=e862]
+        - generic [ref=e863]: 16 DROPS
+        - link "VIEW ALL →" [ref=e864] [cursor=pointer]:
+          - /url: /products?category=handbags
+      - generic [ref=e865]:
+        - link "Chanel_Jumbo_Wine_ShoulderBag_With_OriginalBox_DustCover Chanel_Jumbo_Wine_ShoulderBag_With_OriginalBox_DustCover alternate view SALE Add to wishlist QUICK ADD Chanel Chanel_Jumbo_Wine_ShoulderBag_With_OriginalBox_DustCover ₹3,599 ₹11,197" [ref=e866] [cursor=pointer]:
+          - /url: /products/chanel-jumbo-wine-shoulderbag-with-originalbox-dustcover-lpi551057678
+          - generic [ref=e867]:
+            - img "Chanel_Jumbo_Wine_ShoulderBag_With_OriginalBox_DustCover" [ref=e868]
+            - img "Chanel_Jumbo_Wine_ShoulderBag_With_OriginalBox_DustCover alternate view" [ref=e869]
+            - generic [ref=e870]: SALE
+            - button "Add to wishlist" [ref=e871]: ♡
+            - button "QUICK ADD" [ref=e873]
+          - generic [ref=e874]:
+            - text: Chanel
+            - heading "Chanel_Jumbo_Wine_ShoulderBag_With_OriginalBox_DustCover" [level=3] [ref=e875]
+            - generic [ref=e876]:
+              - generic [ref=e877]: ₹3,599
+              - generic [ref=e878]: ₹11,197
+        - link "chane_l quilted small Top handle vanity case with chain and box 843 chane_l quilted small Top handle vanity case with chain and box 843 alternate view SALE Add to wishlist QUICK ADD Chanel chane_l quilted small Top handle vanity case with chain and box 843 ₹3,699 ₹21,199" [ref=e879] [cursor=pointer]:
+          - /url: /products/chane-l-quilted-small-top-handle-vanity-case-with-chain-and-box-843-npi551314647
+          - generic [ref=e880]:
+            - img "chane_l quilted small Top handle vanity case with chain and box 843" [ref=e881]
+            - img "chane_l quilted small Top handle vanity case with chain and box 843 alternate view" [ref=e882]
+            - generic [ref=e883]: SALE
+            - button "Add to wishlist" [ref=e884]: ♡
+            - button "QUICK ADD" [ref=e886]
+          - generic [ref=e887]:
+            - text: Chanel
+            - heading "chane_l quilted small Top handle vanity case with chain and box 843" [level=3] [ref=e888]
+            - generic [ref=e889]:
+              - generic [ref=e890]: ₹3,699
+              - generic [ref=e891]: ₹21,199
+        - link "chane_l quilted small Top handle vanity case with chain and box 844 SALE Add to wishlist QUICK ADD Chanel chane_l quilted small Top handle vanity case with chain and box 844 ₹3,699 ₹21,199" [ref=e892] [cursor=pointer]:
+          - /url: /products/chane-l-quilted-small-top-handle-vanity-case-with-chain-and-box-844-npi551317289
+          - generic [ref=e893]:
+            - img "chane_l quilted small Top handle vanity case with chain and box 844" [ref=e894]
+            - generic [ref=e895]: SALE
+            - button "Add to wishlist" [ref=e896]: ♡
+            - button "QUICK ADD" [ref=e898]
+          - generic [ref=e899]:
+            - text: Chanel
+            - heading "chane_l quilted small Top handle vanity case with chain and box 844" [level=3] [ref=e900]
+            - generic [ref=e901]:
+              - generic [ref=e902]: ₹3,699
+              - generic [ref=e903]: ₹21,199
+        - link "chane_l quilted small Top handle vanity case with chain and box 844 chane_l quilted small Top handle vanity case with chain and box 844 alternate view SALE Add to wishlist QUICK ADD Chanel chane_l quilted small Top handle vanity case with chain and box 844 ₹3,699 ₹21,199" [ref=e904] [cursor=pointer]:
+          - /url: /products/chane-l-quilted-small-top-handle-vanity-case-with-chain-and-box-844-npi551321476
+          - generic [ref=e905]:
+            - img "chane_l quilted small Top handle vanity case with chain and box 844" [ref=e906]
+            - img "chane_l quilted small Top handle vanity case with chain and box 844 alternate view" [ref=e907]
+            - generic [ref=e908]: SALE
+            - button "Add to wishlist" [ref=e909]: ♡
+            - button "QUICK ADD" [ref=e911]
+          - generic [ref=e912]:
+            - text: Chanel
+            - heading "chane_l quilted small Top handle vanity case with chain and box 844" [level=3] [ref=e913]
+            - generic [ref=e914]:
+              - generic [ref=e915]: ₹3,699
+              - generic [ref=e916]: ₹21,199
+        - link "Chanel_mobile_holder_cum_sling_bag_with_box_6051 Chanel_mobile_holder_cum_sling_bag_with_box_6051 alternate view SALE Add to wishlist QUICK ADD Chanel Chanel_mobile_holder_cum_sling_bag_with_box_6051 ₹2,799 ₹17,199" [ref=e917] [cursor=pointer]:
+          - /url: /products/chanel-mobile-holder-cum-sling-bag-with-box-6051-npi551331160
+          - generic [ref=e918]:
+            - img "Chanel_mobile_holder_cum_sling_bag_with_box_6051" [ref=e919]
+            - img "Chanel_mobile_holder_cum_sling_bag_with_box_6051 alternate view" [ref=e920]
+            - generic [ref=e921]: SALE
+            - button "Add to wishlist" [ref=e922]: ♡
+            - button "QUICK ADD" [ref=e924]
+          - generic [ref=e925]:
+            - text: Chanel
+            - heading "Chanel_mobile_holder_cum_sling_bag_with_box_6051" [level=3] [ref=e926]
+            - generic [ref=e927]:
+              - generic [ref=e928]: ₹2,799
+              - generic [ref=e929]: ₹17,199
+        - link "Chanel_deauville_pearl_canvas_tote_bag_6281 SALE Add to wishlist QUICK ADD Chanel Chanel_deauville_pearl_canvas_tote_bag_6281 ₹3,799 ₹17,199" [ref=e930] [cursor=pointer]:
+          - /url: /products/chanel-deauville-pearl-canvas-tote-bag-6281-npi551362913
+          - generic [ref=e931]:
+            - img "Chanel_deauville_pearl_canvas_tote_bag_6281" [ref=e932]
+            - generic [ref=e933]: SALE
+            - button "Add to wishlist" [ref=e934]: ♡
+            - button "QUICK ADD" [ref=e936]
+          - generic [ref=e937]:
+            - text: Chanel
+            - heading "Chanel_deauville_pearl_canvas_tote_bag_6281" [level=3] [ref=e938]
+            - generic [ref=e939]:
+              - generic [ref=e940]: ₹3,799
+              - generic [ref=e941]: ₹17,199
+        - link "Chanel_deauville_pearl_canvas_tote_bag_6282 SALE Add to wishlist QUICK ADD Chanel Chanel_deauville_pearl_canvas_tote_bag_6282 ₹3,799 ₹17,199" [ref=e942] [cursor=pointer]:
+          - /url: /products/chanel-deauville-pearl-canvas-tote-bag-6282-npi551364458
+          - generic [ref=e943]:
+            - img "Chanel_deauville_pearl_canvas_tote_bag_6282" [ref=e944]
+            - generic [ref=e945]: SALE
+            - button "Add to wishlist" [ref=e946]: ♡
+            - button "QUICK ADD" [ref=e948]
+          - generic [ref=e949]:
+            - text: Chanel
+            - heading "Chanel_deauville_pearl_canvas_tote_bag_6282" [level=3] [ref=e950]
+            - generic [ref=e951]:
+              - generic [ref=e952]: ₹3,799
+              - generic [ref=e953]: ₹17,199
+        - link "Chane_l maxi bow denim with magneg box premium quality 869 Chane_l maxi bow denim with magneg box premium quality 869 alternate view SALE Add to wishlist QUICK ADD Chanel Chane_l maxi bow denim with magneg box premium quality 869 ₹3,699 ₹21,199" [ref=e954] [cursor=pointer]:
+          - /url: /products/chane-l-maxi-bow-denim-with-magneg-box-premium-quality-869-npi552664997
+          - generic [ref=e955]:
+            - img "Chane_l maxi bow denim with magneg box premium quality 869" [ref=e956]
+            - img "Chane_l maxi bow denim with magneg box premium quality 869 alternate view" [ref=e957]
+            - generic [ref=e958]: SALE
+            - button "Add to wishlist" [ref=e959]: ♡
+            - button "QUICK ADD" [ref=e961]
+          - generic [ref=e962]:
+            - text: Chanel
+            - heading "Chane_l maxi bow denim with magneg box premium quality 869" [level=3] [ref=e963]
+            - generic [ref=e964]:
+              - generic [ref=e965]: ₹3,699
+              - generic [ref=e966]: ₹21,199
+        - link "Chane_l lambskin quilted mini bow bag premium quality With box 871 Chane_l lambskin quilted mini bow bag premium quality With box 871 alternate view SALE Add to wishlist QUICK ADD Chanel Chane_l lambskin quilted mini bow bag premium quality With box 871 ₹3,699 ₹21,199" [ref=e967] [cursor=pointer]:
+          - /url: /products/chane-l-lambskin-quilted-mini-bow-bag-premium-quality-with-box-871-npi552667190
+          - generic [ref=e968]:
+            - img "Chane_l lambskin quilted mini bow bag premium quality With box 871" [ref=e969]
+            - img "Chane_l lambskin quilted mini bow bag premium quality With box 871 alternate view" [ref=e970]
+            - generic [ref=e971]: SALE
+            - button "Add to wishlist" [ref=e972]: ♡
+            - button "QUICK ADD" [ref=e974]
+          - generic [ref=e975]:
+            - text: Chanel
+            - heading "Chane_l lambskin quilted mini bow bag premium quality With box 871" [level=3] [ref=e976]
+            - generic [ref=e977]:
+              - generic [ref=e978]: ₹3,699
+              - generic [ref=e979]: ₹21,199
+        - link "Chane_l lambskin quilted mini bow bag premium quality With box 872 Chane_l lambskin quilted mini bow bag premium quality With box 872 alternate view SALE Add to wishlist QUICK ADD Chanel Chane_l lambskin quilted mini bow bag premium quality With box 872 ₹3,699 ₹21,199" [ref=e980] [cursor=pointer]:
+          - /url: /products/chane-l-lambskin-quilted-mini-bow-bag-premium-quality-with-box-872-npi552668286
+          - generic [ref=e981]:
+            - img "Chane_l lambskin quilted mini bow bag premium quality With box 872" [ref=e982]
+            - img "Chane_l lambskin quilted mini bow bag premium quality With box 872 alternate view" [ref=e983]
+            - generic [ref=e984]: SALE
+            - button "Add to wishlist" [ref=e985]: ♡
+            - button "QUICK ADD" [ref=e987]
+          - generic [ref=e988]:
+            - text: Chanel
+            - heading "Chane_l lambskin quilted mini bow bag premium quality With box 872" [level=3] [ref=e989]
+            - generic [ref=e990]:
+              - generic [ref=e991]: ₹3,699
+              - generic [ref=e992]: ₹21,199
+        - link "Chanel_Pearl_Classic_Flap_Shoulder_Bag_With_OG_Box_&_Dust_Bag_(Black-1160) Chanel_Pearl_Classic_Flap_Shoulder_Bag_With_OG_Box_&_Dust_Bag_(Black-1160) alternate view SALE Add to wishlist QUICK ADD Chanel Chanel_Pearl_Classic_Flap_Shoulder_Bag_With_OG_Box_&_Dust_Bag_(Black-1160) ₹4,899 ₹11,195" [ref=e993] [cursor=pointer]:
+          - /url: /products/chanel-pearl-classic-flap-shoulder-bag-with-og-box-dust-bag-black-1160-npi554268098
+          - generic [ref=e994]:
+            - img "Chanel_Pearl_Classic_Flap_Shoulder_Bag_With_OG_Box_&_Dust_Bag_(Black-1160)" [ref=e995]
+            - img "Chanel_Pearl_Classic_Flap_Shoulder_Bag_With_OG_Box_&_Dust_Bag_(Black-1160) alternate view" [ref=e996]
+            - generic [ref=e997]: SALE
+            - button "Add to wishlist" [ref=e998]: ♡
+            - button "QUICK ADD" [ref=e1000]
+          - generic [ref=e1001]:
+            - text: Chanel
+            - heading "Chanel_Pearl_Classic_Flap_Shoulder_Bag_With_OG_Box_&_Dust_Bag_(Black-1160)" [level=3] [ref=e1002]
+            - generic [ref=e1003]:
+              - generic [ref=e1004]: ₹4,899
+              - generic [ref=e1005]: ₹11,195
+        - link "Chanel_Pearl_Classic_Flap_Shoulder_Bag_With_OG_Box_&_Dust_Bag_(White-1161) Chanel_Pearl_Classic_Flap_Shoulder_Bag_With_OG_Box_&_Dust_Bag_(White-1161) alternate view SALE Add to wishlist QUICK ADD Chanel Chanel_Pearl_Classic_Flap_Shoulder_Bag_With_OG_Box_&_Dust_Bag_(White-1161) ₹4,899 ₹11,195" [ref=e1006] [cursor=pointer]:
+          - /url: /products/chanel-pearl-classic-flap-shoulder-bag-with-og-box-dust-bag-white-1161-npi554518719
+          - generic [ref=e1007]:
+            - img "Chanel_Pearl_Classic_Flap_Shoulder_Bag_With_OG_Box_&_Dust_Bag_(White-1161)" [ref=e1008]
+            - img "Chanel_Pearl_Classic_Flap_Shoulder_Bag_With_OG_Box_&_Dust_Bag_(White-1161) alternate view" [ref=e1009]
+            - generic [ref=e1010]: SALE
+            - button "Add to wishlist" [ref=e1011]: ♡
+            - button "QUICK ADD" [ref=e1013]
+          - generic [ref=e1014]:
+            - text: Chanel
+            - heading "Chanel_Pearl_Classic_Flap_Shoulder_Bag_With_OG_Box_&_Dust_Bag_(White-1161)" [level=3] [ref=e1015]
+            - generic [ref=e1016]:
+              - generic [ref=e1017]: ₹4,899
+              - generic [ref=e1018]: ₹11,195
+        - link "Chanel_flap_handbag_with_og_box_and_dust_bag_big_size_6028 Chanel_flap_handbag_with_og_box_and_dust_bag_big_size_6028 alternate view SALE Add to wishlist QUICK ADD Chanel Chanel_flap_handbag_with_og_box_and_dust_bag_big_size_6028 ₹3,299 ₹17,199" [ref=e1019] [cursor=pointer]:
+          - /url: /products/chanel-flap-handbag-with-og-box-and-dust-bag-big-size-6028-npi556046288
+          - generic [ref=e1020]:
+            - img "Chanel_flap_handbag_with_og_box_and_dust_bag_big_size_6028" [ref=e1021]
+            - img "Chanel_flap_handbag_with_og_box_and_dust_bag_big_size_6028 alternate view" [ref=e1022]
+            - generic [ref=e1023]: SALE
+            - button "Add to wishlist" [ref=e1024]: ♡
+            - button "QUICK ADD" [ref=e1026]
+          - generic [ref=e1027]:
+            - text: Chanel
+            - heading "Chanel_flap_handbag_with_og_box_and_dust_bag_big_size_6028" [level=3] [ref=e1028]
+            - generic [ref=e1029]:
+              - generic [ref=e1030]: ₹3,299
+              - generic [ref=e1031]: ₹17,199
+        - link "Chanel_Woven_Metal_Lambskin_Quilted_Small_Flap_Black_Gold_with_box_5523 Chanel_Woven_Metal_Lambskin_Quilted_Small_Flap_Black_Gold_with_box_5523 alternate view SALE Add to wishlist QUICK ADD Chanel Chanel_Woven_Metal_Lambskin_Quilted_Small_Flap_Black_Gold_with_box_5523 ₹3,299 ₹17,199" [ref=e1032] [cursor=pointer]:
+          - /url: /products/chanel-woven-metal-lambskin-quilted-small-flap-black-gold-with-box-5523-npi556067262
+          - generic [ref=e1033]:
+            - img "Chanel_Woven_Metal_Lambskin_Quilted_Small_Flap_Black_Gold_with_box_5523" [ref=e1034]
+            - img "Chanel_Woven_Metal_Lambskin_Quilted_Small_Flap_Black_Gold_with_box_5523 alternate view" [ref=e1035]
+            - generic [ref=e1036]: SALE
+            - button "Add to wishlist" [ref=e1037]: ♡
+            - button "QUICK ADD" [ref=e1039]
+          - generic [ref=e1040]:
+            - text: Chanel
+            - heading "Chanel_Woven_Metal_Lambskin_Quilted_Small_Flap_Black_Gold_with_box_5523" [level=3] [ref=e1041]
+            - generic [ref=e1042]:
+              - generic [ref=e1043]: ₹3,299
+              - generic [ref=e1044]: ₹17,199
+        - link "CHANE_L PARIS DUE TOTE BAG DIOMOND LOGO WITH DUST BAG PREMIUM QUALITY (BLUE) CHANE_L PARIS DUE TOTE BAG DIOMOND LOGO WITH DUST BAG PREMIUM QUALITY (BLUE) alternate view SALE Add to wishlist QUICK ADD Chanel CHANE_L PARIS DUE TOTE BAG DIOMOND LOGO WITH DUST BAG PREMIUM QUALITY (BLUE) ₹3,699 ₹4,200" [ref=e1045] [cursor=pointer]:
+          - /url: /products/chane-l-paris-due-tote-bag-diomond-logo-with-dust-bag-premium-quality-blue-npi556956479
+          - generic [ref=e1046]:
+            - img "CHANE_L PARIS DUE TOTE BAG DIOMOND LOGO WITH DUST BAG PREMIUM QUALITY (BLUE)" [ref=e1047]
+            - img "CHANE_L PARIS DUE TOTE BAG DIOMOND LOGO WITH DUST BAG PREMIUM QUALITY (BLUE) alternate view" [ref=e1048]
+            - generic [ref=e1049]: SALE
+            - button "Add to wishlist" [ref=e1050]: ♡
+            - button "QUICK ADD" [ref=e1052]
+          - generic [ref=e1053]:
+            - text: Chanel
+            - heading "CHANE_L PARIS DUE TOTE BAG DIOMOND LOGO WITH DUST BAG PREMIUM QUALITY (BLUE)" [level=3] [ref=e1054]
+            - generic [ref=e1055]:
+              - generic [ref=e1056]: ₹3,699
+              - generic [ref=e1057]: ₹4,200
+        - link "CHANE_L PARIS DUE TOTE BAG DIOMOND LOGO WITH DUST BAG PREMIUM QUALITY (BIEGE) CHANE_L PARIS DUE TOTE BAG DIOMOND LOGO WITH DUST BAG PREMIUM QUALITY (BIEGE) alternate view SALE Add to wishlist QUICK ADD Chanel CHANE_L PARIS DUE TOTE BAG DIOMOND LOGO WITH DUST BAG PREMIUM QUALITY (BIEGE) ₹3,699 ₹4,200" [ref=e1058] [cursor=pointer]:
+          - /url: /products/chane-l-paris-due-tote-bag-diomond-logo-with-dust-bag-premium-quality-biege-npi556969206
+          - generic [ref=e1059]:
+            - img "CHANE_L PARIS DUE TOTE BAG DIOMOND LOGO WITH DUST BAG PREMIUM QUALITY (BIEGE)" [ref=e1060]
+            - img "CHANE_L PARIS DUE TOTE BAG DIOMOND LOGO WITH DUST BAG PREMIUM QUALITY (BIEGE) alternate view" [ref=e1061]
+            - generic [ref=e1062]: SALE
+            - button "Add to wishlist" [ref=e1063]: ♡
+            - button "QUICK ADD" [ref=e1065]
+          - generic [ref=e1066]:
+            - text: Chanel
+            - heading "CHANE_L PARIS DUE TOTE BAG DIOMOND LOGO WITH DUST BAG PREMIUM QUALITY (BIEGE)" [level=3] [ref=e1067]
+            - generic [ref=e1068]:
+              - generic [ref=e1069]: ₹3,699
+              - generic [ref=e1070]: ₹4,200
+    - generic [ref=e1072]:
+      - generic [ref=e1074]:
+        - generic [ref=e1075]:
+          - generic [ref=e1076]: 👕
+          - heading "CLOTHING" [level=3] [ref=e1077]
+          - generic [ref=e1078]: 16 DROPS
+          - link "VIEW ALL →" [ref=e1079] [cursor=pointer]:
+            - /url: /products?category=clothing
+        - generic [ref=e1080]:
+          - link "sale..Air.Jordan.Flight.Imported.All.Over.Printed.Premium.Joggers sale..Air.Jordan.Flight.Imported.All.Over.Printed.Premium.Joggers alternate view SALE Add to wishlist QUICK ADD sale..Air.Jordan.Flight.Imported.All.Over.Printed.Premium.Joggers ₹2,299 ₹1,01,199" [ref=e1081] [cursor=pointer]:
+            - /url: /products/sale-air-jordan-flight-imported-all-over-printed-premium-joggers-277900784
+            - generic [ref=e1082]:
+              - img "sale..Air.Jordan.Flight.Imported.All.Over.Printed.Premium.Joggers" [ref=e1083]
+              - img "sale..Air.Jordan.Flight.Imported.All.Over.Printed.Premium.Joggers alternate view" [ref=e1084]
+              - generic [ref=e1085]: SALE
+              - button "Add to wishlist" [ref=e1086]: ♡
+              - button "QUICK ADD" [ref=e1088]
+            - generic [ref=e1089]:
+              - heading "sale..Air.Jordan.Flight.Imported.All.Over.Printed.Premium.Joggers" [level=3] [ref=e1090]
+              - generic [ref=e1091]:
+                - generic [ref=e1092]: ₹2,299
+                - generic [ref=e1093]: ₹1,01,199
+          - link ".Air.Jordan.Flight.Imported.All.Over.Printed.Premium.Joggers .Air.Jordan.Flight.Imported.All.Over.Printed.Premium.Joggers alternate view SALE Add to wishlist QUICK ADD .Air.Jordan.Flight.Imported.All.Over.Printed.Premium.Joggers ₹2,799 ₹1,01,199" [ref=e1094] [cursor=pointer]:
+            - /url: /products/air-jordan-flight-imported-all-over-printed-premium-joggers-277901903
+            - generic [ref=e1095]:
+              - img ".Air.Jordan.Flight.Imported.All.Over.Printed.Premium.Joggers" [ref=e1096]
+              - img ".Air.Jordan.Flight.Imported.All.Over.Printed.Premium.Joggers alternate view" [ref=e1097]
+              - generic [ref=e1098]: SALE
+              - button "Add to wishlist" [ref=e1099]: ♡
+              - button "QUICK ADD" [ref=e1101]
+            - generic [ref=e1102]:
+              - heading ".Air.Jordan.Flight.Imported.All.Over.Printed.Premium.Joggers" [level=3] [ref=e1103]
+              - generic [ref=e1104]:
+                - generic [ref=e1105]: ₹2,799
+                - generic [ref=e1106]: ₹1,01,199
+          - link "JORDAN GREY 100% IMPORTED FABRIC CURRENT STORE ARTICLE VERY PREMIUM SHORTS 256 JORDAN GREY 100% IMPORTED FABRIC CURRENT STORE ARTICLE VERY PREMIUM SHORTS 256 alternate view SALE Add to wishlist QUICK ADD JORDAN GREY 100% IMPORTED FABRIC CURRENT STORE ARTICLE VERY PREMIUM SHORTS 256 ₹2,399 ₹11,199" [ref=e1107] [cursor=pointer]:
+            - /url: /products/jordan-grey-100-imported-fabric-current-store-article-very-premium-shorts-256-279467667
+            - generic [ref=e1108]:
+              - img "JORDAN GREY 100% IMPORTED FABRIC CURRENT STORE ARTICLE VERY PREMIUM SHORTS 256" [ref=e1109]
+              - img "JORDAN GREY 100% IMPORTED FABRIC CURRENT STORE ARTICLE VERY PREMIUM SHORTS 256 alternate view" [ref=e1110]
+              - generic [ref=e1111]: SALE
+              - button "Add to wishlist" [ref=e1112]: ♡
+              - button "QUICK ADD" [ref=e1114]
+            - generic [ref=e1115]:
+              - heading "JORDAN GREY 100% IMPORTED FABRIC CURRENT STORE ARTICLE VERY PREMIUM SHORTS 256" [level=3] [ref=e1116]
+              - generic [ref=e1117]:
+                - generic [ref=e1118]: ₹2,399
+                - generic [ref=e1119]: ₹11,199
+          - link "Nik e cargo track pant slim fit premium fabric black 1197 Nik e cargo track pant slim fit premium fabric black 1197 alternate view SALE Add to wishlist QUICK ADD Nik e cargo track pant slim fit premium fabric black 1197 ₹2,299 ₹10,899" [ref=e1120] [cursor=pointer]:
+            - /url: /products/nik-e-cargo-track-pant-slim-fit-premium-fabric-black-1197-282059788
+            - generic [ref=e1121]:
+              - img "Nik e cargo track pant slim fit premium fabric black 1197" [ref=e1122]
+              - img "Nik e cargo track pant slim fit premium fabric black 1197 alternate view" [ref=e1123]
+              - generic [ref=e1124]: SALE
+              - button "Add to wishlist" [ref=e1125]: ♡
+              - button "QUICK ADD" [ref=e1127]
+            - generic [ref=e1128]:
+              - heading "Nik e cargo track pant slim fit premium fabric black 1197" [level=3] [ref=e1129]
+              - generic [ref=e1130]:
+                - generic [ref=e1131]: ₹2,299
+                - generic [ref=e1132]: ₹10,899
+          - link "Nik e cargo track pant slim fit premium fabric brown 1198 Nik e cargo track pant slim fit premium fabric brown 1198 alternate view SALE Add to wishlist QUICK ADD Nik e cargo track pant slim fit premium fabric brown 1198 ₹2,299 ₹10,899" [ref=e1133] [cursor=pointer]:
+            - /url: /products/nik-e-cargo-track-pant-slim-fit-premium-fabric-brown-1198-282062359
+            - generic [ref=e1134]:
+              - img "Nik e cargo track pant slim fit premium fabric brown 1198" [ref=e1135]
+              - img "Nik e cargo track pant slim fit premium fabric brown 1198 alternate view" [ref=e1136]
+              - generic [ref=e1137]: SALE
+              - button "Add to wishlist" [ref=e1138]: ♡
+              - button "QUICK ADD" [ref=e1140]
+            - generic [ref=e1141]:
+              - heading "Nik e cargo track pant slim fit premium fabric brown 1198" [level=3] [ref=e1142]
+              - generic [ref=e1143]:
+                - generic [ref=e1144]: ₹2,299
+                - generic [ref=e1145]: ₹10,899
+          - link "sale..LOUIS.VUITTON.IMPORTED.JOGGERS sale..LOUIS.VUITTON.IMPORTED.JOGGERS alternate view SALE Add to wishlist QUICK ADD sale..LOUIS.VUITTON.IMPORTED.JOGGERS ₹2,499 ₹1,01,199" [ref=e1146] [cursor=pointer]:
+            - /url: /products/sale-louis-vuitton-imported-joggers-283149476
+            - generic [ref=e1147]:
+              - img "sale..LOUIS.VUITTON.IMPORTED.JOGGERS" [ref=e1148]
+              - img "sale..LOUIS.VUITTON.IMPORTED.JOGGERS alternate view" [ref=e1149]
+              - generic [ref=e1150]: SALE
+              - button "Add to wishlist" [ref=e1151]: ♡
+              - button "QUICK ADD" [ref=e1153]
+            - generic [ref=e1154]:
+              - heading "sale..LOUIS.VUITTON.IMPORTED.JOGGERS" [level=3] [ref=e1155]
+              - generic [ref=e1156]:
+                - generic [ref=e1157]: ₹2,499
+                - generic [ref=e1158]: ₹1,01,199
+          - link "sale.VERSACE IMPORTED BLACK FRONT LOGO PRINTED VERY PREMIUM FULL SLEEVES TRACKSUIT MR108 sale.VERSACE IMPORTED BLACK FRONT LOGO PRINTED VERY PREMIUM FULL SLEEVES TRACKSUIT MR108 alternate view SALE Add to wishlist QUICK ADD sale.VERSACE IMPORTED BLACK FRONT LOGO PRINTED VERY PREMIUM FULL SLEEVES TRACKSUIT MR108 ₹2,399 ₹11,199" [ref=e1159] [cursor=pointer]:
+            - /url: /products/sale-versace-imported-black-front-logo-printed-very-premium-full-sleeves-tracksuit-mr108-295511469
+            - generic [ref=e1160]:
+              - img "sale.VERSACE IMPORTED BLACK FRONT LOGO PRINTED VERY PREMIUM FULL SLEEVES TRACKSUIT MR108" [ref=e1161]
+              - img "sale.VERSACE IMPORTED BLACK FRONT LOGO PRINTED VERY PREMIUM FULL SLEEVES TRACKSUIT MR108 alternate view" [ref=e1162]
+              - generic [ref=e1163]: SALE
+              - button "Add to wishlist" [ref=e1164]: ♡
+              - button "QUICK ADD" [ref=e1166]
+            - generic [ref=e1167]:
+              - heading "sale.VERSACE IMPORTED BLACK FRONT LOGO PRINTED VERY PREMIUM FULL SLEEVES TRACKSUIT MR108" [level=3] [ref=e1168]
+              - generic [ref=e1169]:
+                - generic [ref=e1170]: ₹2,399
+                - generic [ref=e1171]: ₹11,199
+          - link "NIK_E ROYAL BLUE PREMIUM IMPORTED TRACKPANT NIK_E ROYAL BLUE PREMIUM IMPORTED TRACKPANT alternate view SALE Add to wishlist QUICK ADD NIK_E ROYAL BLUE PREMIUM IMPORTED TRACKPANT ₹2,099 ₹74,536" [ref=e1172] [cursor=pointer]:
+            - /url: /products/nik-e-royal-blue-premium-imported-trackpant-305794736
+            - generic [ref=e1173]:
+              - img "NIK_E ROYAL BLUE PREMIUM IMPORTED TRACKPANT" [ref=e1174]
+              - img "NIK_E ROYAL BLUE PREMIUM IMPORTED TRACKPANT alternate view" [ref=e1175]
+              - generic [ref=e1176]: SALE
+              - button "Add to wishlist" [ref=e1177]: ♡
+              - button "QUICK ADD" [ref=e1179]
+            - generic [ref=e1180]:
+              - heading "NIK_E ROYAL BLUE PREMIUM IMPORTED TRACKPANT" [level=3] [ref=e1181]
+              - generic [ref=e1182]:
+                - generic [ref=e1183]: ₹2,099
+                - generic [ref=e1184]: ₹74,536
+          - link "NIK_E RED PREMIUM IMPORTED TRACKPANT SALE Add to wishlist QUICK ADD NIK_E RED PREMIUM IMPORTED TRACKPANT ₹2,099 ₹74,536" [ref=e1185] [cursor=pointer]:
+            - /url: /products/nik-e-red-premium-imported-trackpant-305795659
+            - generic [ref=e1186]:
+              - img "NIK_E RED PREMIUM IMPORTED TRACKPANT" [ref=e1187]
+              - generic [ref=e1188]: SALE
+              - button "Add to wishlist" [ref=e1189]: ♡
+              - button "QUICK ADD" [ref=e1191]
+            - generic [ref=e1192]:
+              - heading "NIK_E RED PREMIUM IMPORTED TRACKPANT" [level=3] [ref=e1193]
+              - generic [ref=e1194]:
+                - generic [ref=e1195]: ₹2,099
+                - generic [ref=e1196]: ₹74,536
+          - link "NIK_E NAVY BLUE PREMIUM IMPORTED TRACKPANT SALE Add to wishlist QUICK ADD NIK_E NAVY BLUE PREMIUM IMPORTED TRACKPANT ₹1,999 ₹74,536" [ref=e1197] [cursor=pointer]:
+            - /url: /products/nik-e-navy-blue-premium-imported-trackpant-305797505
+            - generic [ref=e1198]:
+              - img "NIK_E NAVY BLUE PREMIUM IMPORTED TRACKPANT" [ref=e1199]
+              - generic [ref=e1200]: SALE
+              - button "Add to wishlist" [ref=e1201]: ♡
+              - button "QUICK ADD" [ref=e1203]
+            - generic [ref=e1204]:
+              - heading "NIK_E NAVY BLUE PREMIUM IMPORTED TRACKPANT" [level=3] [ref=e1205]
+              - generic [ref=e1206]:
+                - generic [ref=e1207]: ₹1,999
+                - generic [ref=e1208]: ₹74,536
+          - link "Gucc i GG Monogram Imported Premium Trackpant White ( No Return No Exchange On This Product ) Gucc i GG Monogram Imported Premium Trackpant White ( No Return No Exchange On This Product ) alternate view SALE Add to wishlist QUICK ADD Gucc i GG Monogram Imported Premium Trackpant White ( No Return No Exchange On This Product ) ₹1,899 ₹8,399" [ref=e1209] [cursor=pointer]:
+            - /url: /products/gucc-i-gg-monogram-imported-premium-trackpant-white-no-return-no-exchange-on-this-product-306252742
+            - generic [ref=e1210]:
+              - img "Gucc i GG Monogram Imported Premium Trackpant White ( No Return No Exchange On This Product )" [ref=e1211]
+              - img "Gucc i GG Monogram Imported Premium Trackpant White ( No Return No Exchange On This Product ) alternate view" [ref=e1212]
+              - generic [ref=e1213]: SALE
+              - button "Add to wishlist" [ref=e1214]: ♡
+              - button "QUICK ADD" [ref=e1216]
+            - generic [ref=e1217]:
+              - heading "Gucc i GG Monogram Imported Premium Trackpant White ( No Return No Exchange On This Product )" [level=3] [ref=e1218]
+              - generic [ref=e1219]:
+                - generic [ref=e1220]: ₹1,899
+                - generic [ref=e1221]: ₹8,399
+          - link "Emporio Arman i Premium Trackpant Regular Fit ( 3 Pockets & Zips ) ( No Return No Exchange On This Product Emporio Arman i Premium Trackpant Regular Fit ( 3 Pockets & Zips ) ( No Return No Exchange On This Product alternate view SALE Add to wishlist QUICK ADD Emporio Arman i Premium Trackpant Regular Fit ( 3 Pockets & Zips ) ( No Return No Exchange On This Product ₹1,899 ₹8,399" [ref=e1222] [cursor=pointer]:
+            - /url: /products/emporio-arman-i-premium-trackpant-regular-fit-3-pockets-zips-no-return-no-exchange-on-this-product-306289139
+            - generic [ref=e1223]:
+              - img "Emporio Arman i Premium Trackpant Regular Fit ( 3 Pockets & Zips ) ( No Return No Exchange On This Product" [ref=e1224]
+              - img "Emporio Arman i Premium Trackpant Regular Fit ( 3 Pockets & Zips ) ( No Return No Exchange On This Product alternate view" [ref=e1225]
+              - generic [ref=e1226]: SALE
+              - button "Add to wishlist" [ref=e1227]: ♡
+              - button "QUICK ADD" [ref=e1229]
+            - generic [ref=e1230]:
+              - heading "Emporio Arman i Premium Trackpant Regular Fit ( 3 Pockets & Zips ) ( No Return No Exchange On This Product" [level=3] [ref=e1231]
+              - generic [ref=e1232]:
+                - generic [ref=e1233]: ₹1,899
+                - generic [ref=e1234]: ₹8,399
+          - link "Christian Dio_r Monogram Premium Trackpant ( No Return No Exchange On This Product Christian Dio_r Monogram Premium Trackpant ( No Return No Exchange On This Product alternate view SALE Add to wishlist QUICK ADD Christian Dio_r Monogram Premium Trackpant ( No Return No Exchange On This Product ₹1,899 ₹2,239" [ref=e1235] [cursor=pointer]:
+            - /url: /products/christian-dio-r-monogram-premium-trackpant-no-return-no-exchange-on-this-product-306301052
+            - generic [ref=e1236]:
+              - img "Christian Dio_r Monogram Premium Trackpant ( No Return No Exchange On This Product" [ref=e1237]
+              - img "Christian Dio_r Monogram Premium Trackpant ( No Return No Exchange On This Product alternate view" [ref=e1238]
+              - generic [ref=e1239]: SALE
+              - button "Add to wishlist" [ref=e1240]: ♡
+              - button "QUICK ADD" [ref=e1242]
+            - generic [ref=e1243]:
+              - heading "Christian Dio_r Monogram Premium Trackpant ( No Return No Exchange On This Product" [level=3] [ref=e1244]
+              - generic [ref=e1245]:
+                - generic [ref=e1246]: ₹1,899
+                - generic [ref=e1247]: ₹2,239
+          - link "Christian Dio_r Monogram Premium Trackpant Black ( No Return No Exchange On This Product Christian Dio_r Monogram Premium Trackpant Black ( No Return No Exchange On This Product alternate view SALE Add to wishlist QUICK ADD Christian Dio_r Monogram Premium Trackpant Black ( No Return No Exchange On This Product ₹1,899 ₹2,239" [ref=e1248] [cursor=pointer]:
+            - /url: /products/christian-dio-r-monogram-premium-trackpant-black-no-return-no-exchange-on-this-product-306301535
+            - generic [ref=e1249]:
+              - img "Christian Dio_r Monogram Premium Trackpant Black ( No Return No Exchange On This Product" [ref=e1250]
+              - img "Christian Dio_r Monogram Premium Trackpant Black ( No Return No Exchange On This Product alternate view" [ref=e1251]
+              - generic [ref=e1252]: SALE
+              - button "Add to wishlist" [ref=e1253]: ♡
+              - button "QUICK ADD" [ref=e1255]
+            - generic [ref=e1256]:
+              - heading "Christian Dio_r Monogram Premium Trackpant Black ( No Return No Exchange On This Product" [level=3] [ref=e1257]
+              - generic [ref=e1258]:
+                - generic [ref=e1259]: ₹1,899
+                - generic [ref=e1260]: ₹2,239
+          - link "ARMAN_I EXCHANGE GREY AX PREMIUM TRACKPANT ARMAN_I EXCHANGE GREY AX PREMIUM TRACKPANT alternate view SALE Add to wishlist QUICK ADD ARMAN_I EXCHANGE GREY AX PREMIUM TRACKPANT ₹2,199 ₹74,563" [ref=e1261] [cursor=pointer]:
+            - /url: /products/arman-i-exchange-grey-ax-premium-trackpant-310505959
+            - generic [ref=e1262]:
+              - img "ARMAN_I EXCHANGE GREY AX PREMIUM TRACKPANT" [ref=e1263]
+              - img "ARMAN_I EXCHANGE GREY AX PREMIUM TRACKPANT alternate view" [ref=e1264]
+              - generic [ref=e1265]: SALE
+              - button "Add to wishlist" [ref=e1266]: ♡
+              - button "QUICK ADD" [ref=e1268]
+            - generic [ref=e1269]:
+              - heading "ARMAN_I EXCHANGE GREY AX PREMIUM TRACKPANT" [level=3] [ref=e1270]
+              - generic [ref=e1271]:
+                - generic [ref=e1272]: ₹2,199
+                - generic [ref=e1273]: ₹74,563
+          - link "ADIDA_S ORIGINALS WHITE RED 3 STRIPES PREMIUM TRACKPANT ADIDA_S ORIGINALS WHITE RED 3 STRIPES PREMIUM TRACKPANT alternate view SALE Add to wishlist QUICK ADD ADIDA_S ORIGINALS WHITE RED 3 STRIPES PREMIUM TRACKPANT ₹2,199 ₹74,536" [ref=e1274] [cursor=pointer]:
+            - /url: /products/adida-s-originals-white-red-3-stripes-premium-trackpant-320710455
+            - generic [ref=e1275]:
+              - img "ADIDA_S ORIGINALS WHITE RED 3 STRIPES PREMIUM TRACKPANT" [ref=e1276]
+              - img "ADIDA_S ORIGINALS WHITE RED 3 STRIPES PREMIUM TRACKPANT alternate view" [ref=e1277]
+              - generic [ref=e1278]: SALE
+              - button "Add to wishlist" [ref=e1279]: ♡
+              - button "QUICK ADD" [ref=e1281]
+            - generic [ref=e1282]:
+              - heading "ADIDA_S ORIGINALS WHITE RED 3 STRIPES PREMIUM TRACKPANT" [level=3] [ref=e1283]
+              - generic [ref=e1284]:
+                - generic [ref=e1285]: ₹2,199
+                - generic [ref=e1286]: ₹74,536
+      - link "VIEW ALL PRODUCTS →" [ref=e1289] [cursor=pointer]:
+        - /url: /products
+    - region "WHY SHOP URBANEX?" [ref=e1291]:
+      - generic [ref=e1292]:
+        - generic [ref=e1293]: Why UrbanEx
+        - heading "WHY SHOP URBANEX?" [level=2] [ref=e1294]
+        - paragraph [ref=e1295]: Every order ships with care, every product is verified, and every customer gets real human support.
+      - generic [ref=e1296]:
+        - article [ref=e1297]:
+          - generic [ref=e1298]: 📦
+          - heading "Original Packaging" [level=3] [ref=e1299]
+          - paragraph [ref=e1300]: Every product ships in its original box with all included accessories.
+        - article [ref=e1301]:
+          - generic [ref=e1302]: 🧾
+          - heading "Invoice Included" [level=3] [ref=e1303]
+          - paragraph [ref=e1304]: Authentic GST invoice with every order for full peace of mind.
+        - article [ref=e1305]:
+          - generic [ref=e1306]: ↩️
+          - heading "7-Day Returns" [level=3] [ref=e1307]
+          - paragraph [ref=e1308]: Not happy? Hassle-free return or exchange within 7 days.
+        - article [ref=e1309]:
+          - generic [ref=e1310]: 💵
+          - heading "COD Available" [level=3] [ref=e1311]
+          - paragraph [ref=e1312]: Cash on delivery available on most pin codes across India.
+        - article [ref=e1313]:
+          - generic [ref=e1314]: 🔒
+          - heading "Secure Payments" [level=3] [ref=e1315]
+          - paragraph [ref=e1316]: UPI, cards, and net banking — every transaction is fully encrypted.
+        - article [ref=e1317]:
+          - generic [ref=e1318]: 💬
+          - heading "WhatsApp Support" [level=3] [ref=e1319]
+          - paragraph [ref=e1320]: Real humans on chat 9 AM – 10 PM, 7 days a week.
+    - generic [ref=e1324]:
+      - generic [ref=e1327]:
+        - generic [ref=e1328]: SECTION / 03
+        - heading "READY TO COP?" [level=2] [ref=e1329]
+        - paragraph [ref=e1330]: Browse our curated collection of the hottest streetwear drops.
+      - generic [ref=e1333]:
+        - link "EXPLORE COLLECTION" [ref=e1334] [cursor=pointer]:
+          - /url: /products
+        - link "ABOUT US" [ref=e1335] [cursor=pointer]:
+          - /url: /about
+    - generic [ref=e1338]:
+      - generic [ref=e1340]:
+        - generic [ref=e1341]: SECTION / 04
+        - heading "FOLLOW US ON INSTAGRAM" [level=2] [ref=e1342]
+        - link "@urbanex.store" [ref=e1343] [cursor=pointer]:
+          - /url: https://www.instagram.com/urbanex.store/
+      - link "FOLLOW US" [ref=e1346] [cursor=pointer]:
+        - /url: https://www.instagram.com/urbanex.store/
+  - contentinfo [ref=e1347]:
+    - generic [ref=e1348]:
+      - generic [ref=e1349]:
+        - generic [ref=e1350]:
+          - heading "SHOP ALL PRODUCTS" [level=3] [ref=e1351]
+          - generic [ref=e1352]:
+            - link "All Products" [ref=e1353] [cursor=pointer]:
+              - /url: /products
+            - link "Sneakers" [ref=e1354] [cursor=pointer]:
+              - /url: /products?category=sneakers
+            - link "Watches" [ref=e1355] [cursor=pointer]:
+              - /url: /products?category=watches
+            - link "Glasses" [ref=e1356] [cursor=pointer]:
+              - /url: /products?category=glasses
+            - link "Handbags" [ref=e1357] [cursor=pointer]:
+              - /url: /products?category=handbags
+            - link "Clothing" [ref=e1358] [cursor=pointer]:
+              - /url: /products?category=clothing
+            - link "Premium Edition" [ref=e1359] [cursor=pointer]:
+              - /url: /ua-batch
+        - generic [ref=e1360]:
+          - heading "CATEGORY" [level=3] [ref=e1361]
+          - generic [ref=e1362]:
+            - link "Brands" [ref=e1363] [cursor=pointer]:
+              - /url: /brands
+            - link "Luxury Watches" [ref=e1364] [cursor=pointer]:
+              - /url: /products?category=watches
+            - link "Sneakers" [ref=e1365] [cursor=pointer]:
+              - /url: /products?category=sneakers
+            - link "Eyewear" [ref=e1366] [cursor=pointer]:
+              - /url: /products?category=glasses
+            - link "Luxury Bags" [ref=e1367] [cursor=pointer]:
+              - /url: /products?category=handbags
+            - link "Clothing" [ref=e1368] [cursor=pointer]:
+              - /url: /products?category=clothing
+        - generic [ref=e1369]:
+          - heading "SUPPORT" [level=3] [ref=e1370]
+          - generic [ref=e1371]:
+            - link "About Us" [ref=e1372] [cursor=pointer]:
+              - /url: /about
+            - link "Authenticity Guarantee" [ref=e1373] [cursor=pointer]:
+              - /url: /authenticity
+            - link "Track Order" [ref=e1374] [cursor=pointer]:
+              - /url: /track-order
+            - link "FAQ" [ref=e1375] [cursor=pointer]:
+              - /url: /faq
+            - link "Return & Exchange" [ref=e1376] [cursor=pointer]:
+              - /url: /return-exchange
+            - link "Wholesale Enquiry" [ref=e1377] [cursor=pointer]:
+              - /url: /wholesale
+            - link "WhatsApp Support" [ref=e1378] [cursor=pointer]:
+              - /url: https://wa.me/919898285850
+            - paragraph [ref=e1379]: 📱 +91 98982 85850
+        - generic [ref=e1380]:
+          - heading "QUICK LINKS" [level=3] [ref=e1381]
+          - generic [ref=e1382]:
+            - link "New Arrivals" [ref=e1383] [cursor=pointer]:
+              - /url: /products?sort=newest
+            - link "Best Sellers" [ref=e1384] [cursor=pointer]:
+              - /url: /products?sort=popular
+            - link "Featured" [ref=e1385] [cursor=pointer]:
+              - /url: /products?featured=true
+            - link "All Brands" [ref=e1386] [cursor=pointer]:
+              - /url: /brands
+            - link "Privacy Policy" [ref=e1387] [cursor=pointer]:
+              - /url: /privacy-policy
+            - link "Terms & Conditions" [ref=e1388] [cursor=pointer]:
+              - /url: /terms
+      - generic [ref=e1389]:
+        - link "Instagram" [ref=e1390] [cursor=pointer]:
+          - /url: https://www.instagram.com/urbanex.store/
+          - img [ref=e1391]
+          - generic [ref=e1394]: "@urbanex.store"
+        - link "WhatsApp" [ref=e1395] [cursor=pointer]:
+          - /url: https://wa.me/919898285850
+          - img [ref=e1396]
+          - generic [ref=e1398]: Chat on WhatsApp
+      - generic [ref=e1399]:
+        - generic [ref=e1400]:
+          - paragraph [ref=e1401]: © 2026 UrbanEx. All rights reserved.
+          - paragraph [ref=e1402]: All products are 100% premium quality.
+        - generic [ref=e1403]:
+          - generic [ref=e1404]: PREMIUM
+          - generic [ref=e1405]: VERIFIED
+          - generic [ref=e1406]: SECURE
+  - link "Chat with us on WhatsApp" [ref=e1407] [cursor=pointer]:
+    - /url: https://wa.me/919898285850
+    - generic: Chat with us
+    - img [ref=e1409]
+  - alert [ref=e1411]

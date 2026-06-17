@@ -102,6 +102,10 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
           <div className={styles.slabGrain} aria-hidden />
           <ScrollReveal animation="slideUp" duration={800}>
             <div className={styles.categoryShowcase}>
+              <Link href="/categories" className={styles.exploreAllBtn} data-cursor="view" aria-label="Explore all categories">
+                <span>EXPLORE ALL CATEGORIES</span>
+                <span className={styles.exploreAllArrow} aria-hidden>→</span>
+              </Link>
               <div className={styles.catHeader}>
                 <span className={styles.catEyebrow}>SECTION / 01</span>
                 <h2 className={styles.catTitle}>SHOP BY <span className={styles.accent}>CATEGORY</span></h2>

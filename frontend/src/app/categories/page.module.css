@@ -1,0 +1,442 @@
+/* ================================================================
+   ALL CATEGORIES PAGE — UrbanEx "Concrete Diptych"
+   Asphalt + bone + ink, wheatpaste-poster cards. Matches homepage.
+   ================================================================ */
+
+.main {
+  --ux-cement:      #ebe9e6;
+  --ux-cement-deep: #d6d4cf;
+  --ux-asphalt:     #1c1c1e;
+  --ux-asphalt-mid: #2a2a2e;
+  --ux-bone:        #f4f2ed;
+  --ux-ink:         #0a0a0a;
+  --ux-chalk:       #c8c5be;
+
+  background: var(--ux-asphalt);
+  color: var(--ux-bone);
+  min-height: 100vh;
+}
+
+.accent { color: var(--ux-chalk); }
+
+/* Shared procedural concrete grain */
+.slabGrain,
+.heroGrain {
+  position: absolute;
+  inset: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='500' height='500' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 360px 360px;
+  mix-blend-mode: screen;
+  opacity: 0.16;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Crack divider between slabs */
+.crackDivider {
+  position: relative;
+  height: 18px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 18' preserveAspectRatio='none'><path d='M0 9 L80 7 L160 11 L260 6 L360 12 L450 8 L560 11 L660 7 L780 12 L880 8 L990 11 L1100 7 L1220 12 L1330 8 L1440 11 L1600 9' stroke='%230a0a0a' stroke-width='2' fill='none' opacity='0.85'/><path d='M0 10 L80 8 L160 12 L260 7 L360 13 L450 9 L560 12 L660 8 L780 13 L880 9 L990 12 L1100 8 L1220 13 L1330 9 L1440 12 L1600 10' stroke='%23f4f2ed' stroke-width='0.8' fill='none' opacity='0.5'/></svg>");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  z-index: 5;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.4));
+}
+
+/* ================================================================
+   HERO HEADER
+   ================================================================ */
+.hero {
+  position: relative;
+  background: var(--ux-asphalt);
+  padding: 64px 24px 56px;
+  overflow: hidden;
+  isolation: isolate;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: -10%;
+  background:
+    radial-gradient(ellipse 40% 32% at 20% 28%, rgba(255,255,255,0.05), transparent 60%),
+    radial-gradient(ellipse 34% 26% at 80% 72%, rgba(0,0,0,0.32), transparent 60%);
+  z-index: 0;
+}
+.heroInner {
+  position: relative;
+  z-index: 2;
+  max-width: 1400px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.breadcrumb {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--ux-chalk);
+  margin-bottom: 28px;
+}
+.breadcrumb a {
+  color: var(--ux-chalk);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.breadcrumb a:hover { color: var(--ux-bone); }
+.crumbCurrent { color: var(--ux-bone); }
+
+.heroEyebrow {
+  display: block;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  letter-spacing: 7px;
+  color: var(--ux-chalk);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.heroTitle {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(44px, 8vw, 92px);
+  font-weight: 700;
+  letter-spacing: 6px;
+  line-height: 0.95;
+  margin: 0;
+  text-transform: uppercase;
+  color: var(--ux-bone);
+  text-shadow: 5px 6px 0 var(--ux-ink);
+}
+.heroSub {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 16px;
+  color: var(--ux-chalk);
+  margin: 18px 0 0;
+}
+
+.heroMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 30px;
+  padding: 12px 26px;
+  border: 2px solid var(--ux-bone);
+  background: rgba(244,242,237,0.04);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 15px;
+  letter-spacing: 2px;
+  color: var(--ux-chalk);
+  transform: rotate(-0.6deg);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.heroMeta strong { color: var(--ux-bone); font-size: 18px; }
+.metaDivider {
+  width: 1px;
+  height: 18px;
+  background: rgba(244,242,237,0.3);
+}
+
+/* ================================================================
+   CATEGORY GRID SLAB
+   ================================================================ */
+.gridSlab {
+  position: relative;
+  background: var(--ux-asphalt);
+  padding: 70px 24px 80px;
+  overflow: hidden;
+  isolation: isolate;
+}
+.gridWrap {
+  position: relative;
+  z-index: 2;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.catGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 28px;
+}
+
+/* Wheatpaste poster card */
+.catCard {
+  position: relative;
+  display: block;
+  height: 420px;
+  border: 3px solid var(--ux-bone);
+  box-shadow: 6px 6px 0 var(--ux-bone), 0 6px 18px rgba(0,0,0,0.45);
+  overflow: hidden;
+  background: var(--ux-asphalt-mid);
+  text-decoration: none;
+  transform: rotate(-0.6deg);
+  transition: transform 0.32s cubic-bezier(0.16,1,0.3,1), box-shadow 0.32s ease;
+  animation: cardIn 0.6s cubic-bezier(0.16,1,0.3,1) backwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+.catCard:nth-child(2n) { transform: rotate(0.7deg); }
+.catCard:nth-child(3n) { transform: rotate(-1.1deg); }
+.catCard:hover {
+  transform: rotate(0deg) translateY(-8px);
+  box-shadow: 9px 9px 0 var(--ux-bone), 0 16px 34px rgba(0,0,0,0.55);
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(28px) rotate(-2deg); }
+  to   { opacity: 1; }
+}
+
+/* Tape corners */
+.catCard::before,
+.catCard::after {
+  content: '';
+  position: absolute;
+  width: 66px;
+  height: 18px;
+  background: rgba(244,242,237,0.7);
+  border: 1px solid rgba(0,0,0,0.18);
+  z-index: 6;
+  pointer-events: none;
+}
+.catCard::before { top: -8px; left: 14%; transform: rotate(-6deg); }
+.catCard::after  { top: -8px; right: 14%; transform: rotate(7deg); }
+
+.cardIndex {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  z-index: 5;
+  font-family: 'Oswald', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--ux-bone);
+  text-shadow: 2px 2px 0 var(--ux-ink);
+  opacity: 0.85;
+}
+
+.catImgWrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.catImgWrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.1) brightness(0.8);
+  transition: filter 0.45s ease, transform 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+.catCard:hover .catImgWrap img {
+  filter: grayscale(0) contrast(1) brightness(1);
+  transform: scale(1.07);
+}
+
+.catOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 26px;
+  background: linear-gradient(to top, rgba(10,10,10,0.94) 0%, rgba(10,10,10,0.4) 48%, rgba(10,10,10,0.15) 100%);
+  transition: background 0.3s ease;
+}
+.catCard:hover .catOverlay {
+  background: linear-gradient(to top, rgba(10,10,10,0.86) 0%, rgba(10,10,10,0.2) 60%, transparent 100%);
+}
+
+.catTop { display: flex; justify-content: flex-end; }
+.countPill {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--ux-ink);
+  background: var(--ux-bone);
+  padding: 4px 10px;
+  border: 1px solid var(--ux-ink);
+}
+
+.catBottom { display: flex; flex-direction: column; }
+.catName {
+  font-family: 'Oswald', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--ux-bone);
+  margin: 0 0 6px;
+  text-shadow: 2px 2px 0 var(--ux-ink);
+  transform: translateY(8px);
+  transition: transform 0.32s cubic-bezier(0.16,1,0.3,1);
+}
+.catCard:hover .catName { transform: translateY(0); }
+
+.catDesc {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ux-chalk);
+  margin: 0 0 10px;
+  max-width: 90%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.subChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, opacity 0.35s ease, margin 0.35s ease;
+}
+.catCard:hover .subChips { max-height: 60px; opacity: 1; }
+.subChip {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--ux-bone);
+  border: 1px solid rgba(244,242,237,0.45);
+  padding: 3px 9px;
+}
+
+.exploreLine {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 15px;
+  letter-spacing: 4px;
+  color: var(--ux-bone);
+}
+.exploreArrow {
+  font-family: 'Oswald', sans-serif;
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.catCard:hover .exploreArrow { transform: translateX(8px); }
+
+/* ================================================================
+   CTA STRIP
+   ================================================================ */
+.ctaSlab {
+  position: relative;
+  background: var(--ux-cement);
+  color: var(--ux-ink);
+  padding: 64px 24px;
+  overflow: hidden;
+  isolation: isolate;
+}
+.ctaSlab .slabGrain { mix-blend-mode: multiply; opacity: 0.32; }
+.ctaInner {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+.ctaTitle {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(34px, 5vw, 54px);
+  font-weight: 700;
+  letter-spacing: 5px;
+  margin: 0;
+  text-transform: uppercase;
+  color: var(--ux-ink);
+  text-shadow: 3px 3px 0 var(--ux-cement-deep);
+}
+.ctaSub {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  color: #555;
+  margin: 12px 0 26px;
+}
+.ctaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 32px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 17px;
+  letter-spacing: 3px;
+  color: var(--ux-bone);
+  background: var(--ux-ink);
+  border: 2px solid var(--ux-ink);
+  text-decoration: none;
+  box-shadow: 5px 5px 0 var(--ux-cement-deep);
+  transition: transform 0.28s cubic-bezier(0.16,1,0.3,1), box-shadow 0.28s ease;
+}
+.ctaBtn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 var(--ux-cement-deep);
+}
+.ctaBtn span { transition: transform 0.28s ease; }
+.ctaBtn:hover span { transform: translateX(6px); }
+
+/* ================================================================
+   FOOTER
+   ================================================================ */
+.footer {
+  background: var(--ux-ink);
+  color: var(--ux-chalk);
+  padding: 48px 24px;
+  text-align: center;
+}
+.footerInner { max-width: 900px; margin: 0 auto; }
+.footerLogo {
+  font-family: 'Oswald', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--ux-bone);
+}
+.footerTag {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 2px;
+  font-size: 13px;
+  margin: 10px 0 24px;
+  color: var(--ux-chalk);
+}
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 22px;
+  margin-bottom: 24px;
+}
+.footerLinks a {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--ux-chalk);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.footerLinks a:hover { color: var(--ux-bone); }
+.footerCopy {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 768px) {
+  .hero { padding: 44px 16px 40px; }
+  .gridSlab { padding: 48px 16px 56px; }
+  .catGrid { grid-template-columns: 1fr; gap: 22px; }
+  .catCard { height: 340px; }
+  .catName { font-size: 28px; }
+  /* On touch devices, reveal subchips by default since there's no hover */
+  .subChips { max-height: 60px; opacity: 1; }
+}
