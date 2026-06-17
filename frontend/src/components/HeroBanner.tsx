@@ -97,14 +97,20 @@ function shouldPlayShutter(): boolean {
   return navType === 'navigate' || navType === 'reload' || navType === undefined;
 }
 
-export default function HeroBanner() {
-  const [slides, setSlides] = useState<any[]>(DEFAULT_PRODUCTS);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function HeroBanner({ initialSlides }: { initialSlides?: any[] }) {
+  // Prefer server-provided slides so the first paint already shows the real
+  // featured products — no flash of the DEFAULT_PRODUCTS placeholder.
+  const hasInitial = Array.isArray(initialSlides) && initialSlides.length > 0;
+  const [slides, setSlides] = useState<any[]>(hasInitial ? initialSlides! : DEFAULT_PRODUCTS);
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const statRefs = useRef<(HTMLSpanElement | null)[]>([null, null, null]);
 
   useEffect(() => {
+    // Server already supplied real slides — skip the client fetch (and the swap).
+    if (hasInitial) return;
     fetch('/api/hero-slides')
       .then(res => res.json())
       .then(data => {
@@ -113,6 +119,7 @@ export default function HeroBanner() {
         }
       })
       .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── THE SHUTTER — storefront roller-door reveal ────────────────

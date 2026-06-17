@@ -59,9 +59,11 @@ interface HomeClientProps {
   brands: any[];
   categories: Category[];
   featured: HomeFeatured;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  heroSlides?: any[];
 }
 
-export default function HomeClient({ brands, categories, featured }: HomeClientProps) {
+export default function HomeClient({ brands, categories, featured, heroSlides }: HomeClientProps) {
   const featuredCategories = categories.filter((c) => c.active && c.featured);
   const hasAnyFeatured =
     featured.sneakers.length > 0 ||
@@ -76,7 +78,7 @@ export default function HomeClient({ brands, categories, featured }: HomeClientP
       <Header />
       <main className={styles.main}>
         {/* HERO */}
-        <HeroBanner />
+        <HeroBanner initialSlides={heroSlides} />
 
         {/* TRUSTED BY CUSTOMERS — quick stat proof below hero */}
         <TrustedByCustomers />

@@ -32,15 +32,17 @@ function featuredFor(products: Product[], category: string): Product[] {
 }
 
 export default async function Home() {
-  const [brandsData, productsData, categoriesData] = await Promise.all([
+  const [brandsData, productsData, categoriesData, heroData] = await Promise.all([
     getJson<unknown[]>('/api/brands?featured=true'),
     getJson<unknown[]>('/api/products'),
     getJson<unknown[]>('/api/categories'),
+    getJson<unknown[]>('/api/hero-slides'),
   ]);
 
   const products = Array.isArray(productsData) ? (productsData as Product[]) : [];
   const brands = Array.isArray(brandsData) ? brandsData : [];
   const categories = Array.isArray(categoriesData) ? categoriesData : [];
+  const heroSlides = Array.isArray(heroData) ? heroData : [];
 
   const featured: HomeFeatured = {
     sneakers: featuredFor(products, 'sneakers'),
@@ -51,5 +53,5 @@ export default async function Home() {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <HomeClient brands={brands as any} categories={categories as any} featured={featured} />;
+  return <HomeClient brands={brands as any} categories={categories as any} featured={featured} heroSlides={heroSlides} />;
 }

@@ -25,7 +25,12 @@
       "Bash(grep *)",
       "mcp__ide__getDiagnostics",
       "Bash(ls -la globals.css)",
-      "Bash(ls layout.tsx page.tsx page.module.css)"
+      "Bash(ls layout.tsx page.tsx page.module.css)",
+      "Bash(wc -l TrustedByCustomers.tsx WhyShopUrbanEx.tsx HomeReviewsCarousel.tsx CustomerGallery.tsx FeaturedRow.tsx BrandCarousel.tsx)",
+      "Read(//c/Users/Matin/lib/**)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
