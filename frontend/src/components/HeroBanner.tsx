@@ -190,6 +190,18 @@ export default function HeroBanner({ initialSlides }: { initialSlides?: any[] })
       { end: TRUST_STATS.ordersDelivered, decimals: 0, suffix: '+', comma: true },
       { end: TRUST_STATS.rating, decimals: 1, suffix: '', comma: false },
     ];
+    const setFinal = () => {
+      stats.forEach((stat, i) => {
+        const el = statRefs.current[i];
+        if (!el) return;
+        el.innerText = (stat.comma ? stat.end.toLocaleString('en-IN') : stat.end.toFixed(stat.decimals)) + stat.suffix;
+      });
+    };
+    // Respect reduced motion: show the real numbers immediately, no count-up.
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setFinal();
+      return;
+    }
     const start = performance.now();
     const duration = 1900;
     let raf = 0;
@@ -359,15 +371,15 @@ export default function HeroBanner({ initialSlides }: { initialSlides?: any[] })
 
           <div className={styles.statsRow}>
             <div className={styles.statBlock}>
-              <span ref={(el) => { statRefs.current[0] = el; }} className={styles.statNum}>0+</span>
+              <span ref={(el) => { statRefs.current[0] = el; }} className={styles.statNum}>{TRUST_STATS.happyCustomers.toLocaleString('en-IN')}+</span>
               <span className={styles.statLabel}>HAPPY CUSTOMERS</span>
             </div>
             <div className={styles.statBlock}>
-              <span ref={(el) => { statRefs.current[1] = el; }} className={styles.statNum}>0+</span>
+              <span ref={(el) => { statRefs.current[1] = el; }} className={styles.statNum}>{TRUST_STATS.ordersDelivered.toLocaleString('en-IN')}+</span>
               <span className={styles.statLabel}>ORDERS DELIVERED</span>
             </div>
             <div className={styles.statBlock}>
-              <span ref={(el) => { statRefs.current[2] = el; }} className={styles.statNum}>0.0</span>
+              <span ref={(el) => { statRefs.current[2] = el; }} className={styles.statNum}>{TRUST_STATS.rating.toFixed(1)}</span>
               <span className={styles.statLabel}>RATING ★</span>
             </div>
           </div>

@@ -3,3 +3,5 @@ frontend/.next
 backend/node_modules
 .env
 ADMIN_SECRETS.txt
+.vercel
+.env*

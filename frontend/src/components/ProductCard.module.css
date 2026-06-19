@@ -281,12 +281,65 @@
 }
 
 /* ================================================================
+   TOUCH DEVICES — no hover, so the hover overlay never appears.
+   Instead of a full-width button (which made cards too tall), we use a
+   compact icon add-button docked at the end of the price row. The image
+   stays fully visible and the card gains no extra height.
+   ================================================================ */
+.touchAdd { display: none; }
+
+@media (hover: none) {
+  /* Kill the hover overlay quick-add on touch — it would only ever
+     sit over the image. */
+  .overlay { display: none; }
+
+  /* 44px tap target for the wishlist heart on touch */
+  .wishlistBtn {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+  }
+
+  /* second image swap is hover-only; keep the primary image visible */
+  .card:hover .secondImage { opacity: 0; }
+
+  /* Compact icon add-button, inline at the end of the price row */
+  .touchAdd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: auto;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: var(--ux-ink);
+    color: var(--ux-bone);
+    border: 2px solid var(--ux-ink);
+    box-shadow: 2px 2px 0 var(--ux-chalk);
+    cursor: pointer;
+    transition: transform 0.12s var(--ease-spring), box-shadow 0.12s ease, background 0.15s ease;
+  }
+  .touchAdd svg { display: block; }
+  .touchAdd:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 var(--ux-chalk);
+  }
+  .touchAdded {
+    background: var(--success, #009960);
+    border-color: var(--success, #009960);
+    box-shadow: 2px 2px 0 var(--ux-ink);
+    animation: heartPop 0.35s var(--ease-spring);
+  }
+}
+
+/* ================================================================
    RESPONSIVE
    ================================================================ */
 @media (max-width: 600px) {
   .quickAdd {
-    padding: 12px 20px;
-    font-size: 13px;
+    padding: 11px 16px;
+    font-size: 12px;
   }
 
   .price { font-size: 17px; }

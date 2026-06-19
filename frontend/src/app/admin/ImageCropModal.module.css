@@ -1,0 +1,151 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal {
+  background: #161616;
+  border: 1px solid #333;
+  width: min(720px, 96vw);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  color: #eee;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid #2a2a2a;
+}
+.title { font-family: 'Oswald', sans-serif; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; font-size: 15px; }
+.close { background: none; border: none; color: #aaa; font-size: 18px; cursor: pointer; }
+.close:hover { color: #fff; }
+
+.controls { display: flex; gap: 28px; flex-wrap: wrap; padding: 14px 18px 6px; }
+.ctrlGroup { display: flex; flex-direction: column; gap: 6px; }
+.ctrlLabel { font-family: 'Bebas Neue', sans-serif; font-size: 12px; letter-spacing: 2px; color: #888; text-transform: uppercase; }
+.btnRow { display: flex; gap: 6px; }
+.chip {
+  padding: 6px 14px;
+  background: #111;
+  border: 1px solid #333;
+  color: #ccc;
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.chip:hover { border-color: #CC0000; }
+.chipActive { background: #CC0000; border-color: #CC0000; color: #fff; }
+
+.sliderRow { display: flex; align-items: center; gap: 12px; padding: 8px 18px 14px; }
+.slider { flex: 1; accent-color: #CC0000; }
+.sliderVal { font-family: 'Oswald', sans-serif; font-size: 13px; color: #ccc; min-width: 42px; text-align: right; }
+.resetBtn { padding: 5px 12px; background: #111; border: 1px solid #333; color: #ccc; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 1px; cursor: pointer; }
+.resetBtn:hover { border-color: #CC0000; }
+
+.dragHint {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Oswald', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  background: rgba(0,0,0,0.4);
+  padding: 2px 8px;
+  pointer-events: none;
+}
+
+/* Vertical Y position slider, right of the frame */
+.ySliderWrap { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+.ySlider {
+  writing-mode: vertical-lr;
+  direction: rtl; /* top = 0% */
+  width: 6px;
+  flex: 1;
+  accent-color: #CC0000;
+  cursor: pointer;
+}
+.ySliderVal { font-family: 'Oswald', sans-serif; font-size: 12px; color: #ccc; min-width: 36px; text-align: center; }
+
+/* Horizontal X position slider, under the frame */
+.posRow { display: flex; align-items: center; gap: 12px; padding: 12px 18px 0; }
+
+.stage {
+  flex: 1;
+  min-height: 320px;
+  max-height: 56vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  overflow: hidden;
+  background: #0d0d0d;
+}
+
+.stageInner { display: flex; align-items: center; gap: 14px; }
+
+/* The output frame — checkerboard for transparent, solid otherwise */
+.frame {
+  position: relative;
+  overflow: hidden;
+  border: 1px dashed #555;
+  touch-action: none;
+}
+.frame[data-bg='transparent'] {
+  background: repeating-conic-gradient(#1c1c1c 0% 25%, #262626 0% 50%) 50% / 20px 20px;
+}
+.frame[data-bg='white'] { background: #ffffff; }
+.frame[data-bg='bone'] { background: #f4f2ed; }
+
+.product {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  cursor: grab;
+  touch-action: none;
+}
+.product:active { cursor: grabbing; }
+
+.error { color: #f4a; font-size: 14px; text-align: center; line-height: 1.6; padding: 40px; }
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 18px;
+  border-top: 1px solid #2a2a2a;
+}
+.btnGhost {
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid #444;
+  color: #ccc;
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+.btnGhost:hover { border-color: #888; }
+.btnPrimary {
+  padding: 10px 24px;
+  background: #CC0000;
+  border: 1px solid #CC0000;
+  color: #fff;
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+.btnPrimary:disabled { opacity: 0.5; cursor: not-allowed; }

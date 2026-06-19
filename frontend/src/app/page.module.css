@@ -327,31 +327,32 @@
   margin: 0 auto;
 }
 
-/* ---- Explore-all categories button (top-right of the section) ---- */
+/* ---- Explore-all categories button (centered below the grid) ---- */
+.exploreAllWrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 48px;
+}
 .exploreAllBtn {
-  position: absolute;
-  top: 80px;
-  right: 24px;
-  z-index: 6;
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 13px 22px;
+  padding: 15px 30px;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 15px;
+  font-size: 17px;
   letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--ux-ink);
   background: var(--ux-bone);
   border: 2px solid var(--ux-bone);
   text-decoration: none;
-  box-shadow: 4px 4px 0 var(--ux-ink);
+  box-shadow: 5px 5px 0 var(--ux-ink);
   transform: rotate(-1.2deg);
   transition: transform 0.28s cubic-bezier(0.16,1,0.3,1), box-shadow 0.28s ease, background 0.28s ease, color 0.28s ease;
 }
 .exploreAllBtn:hover {
   transform: rotate(0deg) translate(-2px, -2px);
-  box-shadow: 7px 7px 0 var(--ux-ink);
+  box-shadow: 8px 8px 0 var(--ux-ink);
   background: var(--ux-ink);
   color: var(--ux-bone);
   border-color: var(--ux-bone);
@@ -359,20 +360,10 @@
 .exploreAllArrow {
   display: inline-flex;
   font-family: 'Oswald', sans-serif;
-  font-size: 18px;
+  font-size: 20px;
   transition: transform 0.28s cubic-bezier(0.16,1,0.3,1);
 }
 .exploreAllBtn:hover .exploreAllArrow { transform: translateX(6px); }
-
-@media (max-width: 860px) {
-  .exploreAllBtn {
-    position: static;
-    transform: rotate(-1deg);
-    margin: 0 auto 28px;
-    display: flex;
-    width: max-content;
-  }
-}
 
 .catHeader {
   text-align: center;
@@ -515,8 +506,20 @@
 
 @media (max-width: 768px) {
   .categoryShowcase { padding: 48px 16px; }
-  .catCard { height: 260px; }
-  .catOverlay h3 { font-size: 24px; }
+  .catGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .catCard { height: 220px; }
+  .catOverlay { padding: 16px; }
+  .catOverlay h3 { font-size: 18px; letter-spacing: 2px; }
+  .catOverlay span { font-size: 12px; letter-spacing: 2px; }
+  .exploreAllWrap { margin-top: 32px; }
+  .exploreAllBtn { font-size: 15px; padding: 13px 22px; }
+}
+
+@media (max-width: 380px) {
+  .catOverlay h3 { font-size: 16px; }
 }
 
 /* ================================================================
@@ -573,57 +576,9 @@
   margin: 0 auto;
 }
 
-/* ── Override FeaturedRow children inside light slabs ── */
-.featuredSlab.slabLight :global(.header),
-.featuredSlab.slabLight [class*="header"] {
-  background: var(--ux-ink) !important;
-  border-color: var(--ux-ink) !important;
-  box-shadow: 5px 5px 0 var(--ux-chalk) !important;
-}
-
-/* ── Override FeaturedRow children inside dark slabs ── */
-.featuredSlab.slabDark [class*="header"] {
-  background: var(--ux-bone) !important;
-  border-color: var(--ux-bone) !important;
-  box-shadow: 5px 5px 0 var(--ux-ink) !important;
-}
-.featuredSlab.slabDark [class*="header"] h3,
-.featuredSlab.slabDark [class*="title"] {
-  color: var(--ux-ink) !important;
-}
-.featuredSlab.slabDark [class*="count"] {
-  color: var(--ux-ink) !important;
-  background: var(--ux-chalk) !important;
-  border-color: var(--ux-ink) !important;
-}
-.featuredSlab.slabDark [class*="viewAll"] {
-  background: var(--ux-ink) !important;
-  color: var(--ux-bone) !important;
-  border-color: var(--ux-ink) !important;
-}
-
-/* Product cards inside any featured slab — kill red */
-.featuredSlab [class*="saleTag"] {
-  background: var(--ux-ink) !important;
-  color: var(--ux-bone) !important;
-  border-color: var(--ux-ink) !important;
-  box-shadow: 3px 3px 0 var(--ux-chalk) !important;
-}
-.featuredSlab [class*="wishlistBtn"] {
-  color: var(--ux-ink) !important;
-  background: var(--ux-bone) !important;
-  border-color: var(--ux-ink) !important;
-}
-.featuredSlab [class*="card"]:hover {
-  border-color: var(--ux-ink) !important;
-}
-.featuredSlab [class*="card"]::before {
-  border-top-color: var(--ux-ink) !important;
-}
-.featuredSlab [class*="quickAdd"] {
-  background: var(--ux-ink) !important;
-  color: var(--ux-bone) !important;
-}
+/* FeaturedRow + ShowcaseCard handle their own tone-aware styling now
+   (see FeaturedRow.module.css / ShowcaseCard.module.css). No slab-level
+   overrides needed — they were for the old boxed header design. */
 
 /* Featured "view all" CTA */
 .featuredViewAll {

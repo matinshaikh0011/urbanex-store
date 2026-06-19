@@ -1,0 +1,50 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]: URBANEX
+    - navigation [ref=e5]:
+      - button "📊 Overview" [ref=e6] [cursor=pointer]:
+        - generic [ref=e7]: 📊
+        - text: Overview
+      - button "📦 Orders" [ref=e8] [cursor=pointer]:
+        - generic [ref=e9]: 📦
+        - text: Orders
+      - button "💳 Manage Payments" [ref=e10] [cursor=pointer]:
+        - generic [ref=e11]: 💳
+        - text: Manage Payments
+      - button "👟 Products" [ref=e12] [cursor=pointer]:
+        - generic [ref=e13]: 👟
+        - text: Products
+      - button "🏷️ Brands" [ref=e14] [cursor=pointer]:
+        - generic [ref=e15]: 🏷️
+        - text: Brands
+      - button "🗂️ Categories" [ref=e16] [cursor=pointer]:
+        - generic [ref=e17]: 🗂️
+        - text: Categories
+      - button "🖼️ Hero Banners" [ref=e18] [cursor=pointer]:
+        - generic [ref=e19]: 🖼️
+        - text: Hero Banners
+      - button "🎟️ Coupons" [ref=e20] [cursor=pointer]:
+        - generic [ref=e21]: 🎟️
+        - text: Coupons
+      - button "📈 Inventory" [ref=e22] [cursor=pointer]:
+        - generic [ref=e23]: 📈
+        - text: Inventory
+      - button "⭐ Reviews" [ref=e24] [cursor=pointer]:
+        - generic [ref=e25]: ⭐
+        - text: Reviews
+      - button "📥 Import CSV" [ref=e26] [cursor=pointer]:
+        - generic [ref=e27]: 📥
+        - text: Import CSV
+      - button "📜 Audit Log" [ref=e28] [cursor=pointer]:
+        - generic [ref=e29]: 📜
+        - text: Audit Log
+      - link "✦ Product Scraper" [ref=e30] [cursor=pointer]:
+        - /url: /admin/scraper
+        - generic [ref=e31]: ✦
+        - text: Product Scraper
+    - button "⏻ LOGOUT" [ref=e32] [cursor=pointer]
+  - generic [ref=e33]:
+    - banner [ref=e34]:
+      - heading "UrbanEx Admin" [level=1] [ref=e35]
+      - button "LOGOUT" [ref=e36] [cursor=pointer]
+    - generic [ref=e38]: Loading stats…

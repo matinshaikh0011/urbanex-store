@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { notFound, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -17,6 +17,7 @@ import ProductFaqAccordion from '@/components/ProductFaqAccordion';
 import NeedHelpWhatsApp from '@/components/NeedHelpWhatsApp';
 import UrbanExVerified from '@/components/UrbanExVerified';
 import { addRecentlyViewed } from '@/lib/recentlyViewed';
+import { trackViewItem, toItem } from '@/lib/analytics';
 import styles from './page.module.css';
 
 interface Product {
@@ -46,6 +47,9 @@ export default function ProductDetailClient({ params }: { params: { slug: string
   const [zoom, setZoom] = useState({ active: false, x: 50, y: 50 });
   const router = useRouter();
   const { addToCart } = useCart();
+  // Guards GA4 view_item so it fires exactly once per product id, even if
+  // the data effect re-runs or StrictMode double-invokes in dev.
+  const viewedItemId = useRef<number | null>(null);
 
   // Scroll to top on every product navigation
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [params.slug]);
@@ -106,6 +110,22 @@ export default function ProductDetailClient({ params }: { params: { slug: string
         setLoading(false);
       });
   }, [params.slug]);
+
+  // GA4 view_item — fires once per product, after the product resolves.
+  useEffect(() => {
+    if (!product || !product.id) return;
+    if (viewedItemId.current === product.id) return;
+    viewedItemId.current = product.id;
+    trackViewItem(
+      toItem({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        brand: product.brand,
+        category: product.category,
+      })
+    );
+  }, [product]);
 
   if (loading) {
     return (

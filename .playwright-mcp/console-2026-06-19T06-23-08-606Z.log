@@ -1,0 +1,13 @@
+[    5738ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js:32365
+[    5869ms] [LOG] %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit @ https://va.vercel-scripts.com/v1/script.debug.js:0
+[    5870ms] [LOG] %c[Vercel Web Analytics]%c [view] http://localhost:3001/admin color: rgb(120, 120, 120) color: inherit {o: http://localhost:3001/admin, sv: 0.1.3, sdkn: @vercel/analytics/react, sdkv: 1.3.1, ts: 1781850194475} /_vercel/insights/view @ https://va.vercel-scripts.com/v1/script.debug.js:0
+[    6254ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3001/api/admin/verify:0
+[    6390ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/hot-reloader-client.js:180
+[    6680ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3001/api/admin/verify:0
+[    6682ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3001/api/admin/stats:0
+[    7051ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3001/api/admin/stats:0
+[    7585ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js:32365
+[    7659ms] [LOG] %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit @ https://va.vercel-scripts.com/v1/script.debug.js:0
+[    7659ms] [LOG] %c[Vercel Web Analytics]%c [view] http://localhost:3001/admin/login color: rgb(120, 120, 120) color: inherit {o: http://localhost:3001/admin/login, sv: 0.1.3, sdkn: @vercel/analytics/react, sdkv: 1.3.1, ts: 1781850196265} /_vercel/insights/view @ https://va.vercel-scripts.com/v1/script.debug.js:0
+[    8507ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3001/api/admin/verify:0
+[    8914ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3001/api/admin/verify:0

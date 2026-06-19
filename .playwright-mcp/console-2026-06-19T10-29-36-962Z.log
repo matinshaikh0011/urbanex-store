@@ -1,0 +1,1749 @@
+[    4202ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js:32365
+[    4892ms] [LOG] %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit @ https://va.vercel-scripts.com/v1/script.debug.js:0
+[    4893ms] [LOG] %c[Vercel Web Analytics]%c [view] http://localhost:3001/ color: rgb(120, 120, 120) color: inherit {o: http://localhost:3001/, sv: 0.1.3, sdkn: @vercel/analytics/react, sdkv: 1.3.1, ts: 1781864981854} /_vercel/insights/view @ https://va.vercel-scripts.com/v1/script.debug.js:0
+[  132188ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/hot-reloader-client.js:180
+[  147193ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/hot-reloader-client.js:180
+[  345142ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/hot-reloader-client.js:180
+[  362404ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/hot-reloader-client.js:180
+[  375948ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/hot-reloader-client.js:180
+[  389941ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/hot-reloader-client.js:180
+[  389946ms] [ERROR] ./src/components/Header.tsx
+Error: 
+  × Return statement is not allowed here
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:395:1]
+ 395 │         return () => document.removeEventListener('mousedown', onClick);
+ 396 │       }, [megaOpen, helpOpen]);
+ 397 │     
+ 398 │ ╭─▶   return (
+ 399 │ │       <header className={`${styles.header} ${menuOpen ? styles.mobileOpen : ''}`}>
+ 400 │ │         {/* Utility tape — dark marquee strip above the main bar */}
+ 401 │ │         <div className={styles.utilityTape} aria-hidden>
+ 402 │ │           <div className={styles.utilityTrack}>
+ 403 │ │             {[...UTILITY_NOTES, ...UTILITY_NOTES, ...UTILITY_NOTES].map((note, i) => (
+ 404 │ │               <span key={i} className={styles.utilityItem}>
+ 405 │ │                 {note}<i>✦</i>
+ 406 │ │               </span>
+ 407 │ │             ))}
+ 408 │ │           </div>
+ 409 │ │         </div>
+ 410 │ │   
+ 411 │ │         <div className={styles.container}>
+ 412 │ │           {/* ── LEFT zone: search + primary nav ── */}
+ 413 │ │           <div className={styles.zoneLeft}>
+ 414 │ │             <button className={styles.iconBtn} onClick={() => setSearchOpen(true)} title="Search" aria-label="Search">
+ 415 │ │               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 416 │ │                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+ 417 │ │               </svg>
+ 418 │ │             </button>
+ 419 │ │             <nav className={styles.navLeft} aria-label="Primary">
+ 420 │ │               <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 421 │ │               <Link href="/products" className={styles.navLink} onClick={closeAll}><ScrambleText /></Link>
+ 422 │ │               <div
+ 423 │ │                 ref={megaRef}
+ 424 │ │                 className={`${styles.catTrigger} ${megaOpen ? styles.catTriggerActive : ''}`}
+ 425 │ │                 onMouseEnter={() => { if (!isMobile) setMegaOpen(true); }}
+ 426 │ │                 onMouseLeave={() => { if (!isMobile) setMegaOpen(false); }}
+ 427 │ │               >
+ 428 │ │                 <button
+ 429 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 430 │ │                   aria-haspopup="true"
+ 431 │ │                   aria-expanded={megaOpen}
+ 432 │ │                   onClick={() => { if (isMobile) { setMegaOpen(o => !o); setHelpOpen(false); } }}
+ 433 │ │                 >
+ 434 │ │                   CATEGORIES <span className={styles.chevron}>{megaOpen ? '▴' : '▾'}</span>
+ 435 │ │                 </button>
+ 436 │ │               </div>
+ 437 │ │             </nav>
+ 438 │ │           </div>
+ 439 │ │   
+ 440 │ │           {/* ── CENTER zone: logo ── */}
+ 441 │ │           <Link href="/" className={styles.logo} onClick={closeAll}>
+ 442 │ │             <img src="/urbanex-logo.png" alt="UrbanEx" className={styles.logoImage} />
+ 443 │ │           </Link>
+ 444 │ │   
+ 445 │ │           {/* ── RIGHT zone: secondary nav + account icons ── */}
+ 446 │ │           <div className={styles.zoneRight}>
+ 447 │ │             <nav className={styles.navRight} aria-label="Secondary">
+ 448 │ │               <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 449 │ │               <div
+ 450 │ │                 ref={helpRef}
+ 451 │ │                 className={`${styles.helpTrigger} ${helpOpen ? styles.catTriggerActive : ''}`}
+ 452 │ │                 onMouseEnter={() => { if (!isMobile) setHelpOpen(true); }}
+ 453 │ │                 onMouseLeave={() => { if (!isMobile) setHelpOpen(false); }}
+ 454 │ │               >
+ 455 │ │                 <button
+ 456 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 457 │ │                   aria-haspopup="true"
+ 458 │ │                   aria-expanded={helpOpen}
+ 459 │ │                   onClick={() => { if (isMobile) { setHelpOpen(o => !o); setMegaOpen(false); } }}
+ 460 │ │                 >
+ 461 │ │                   HELP <span className={styles.chevron}>{helpOpen ? '▴' : '▾'}</span>
+ 462 │ │                 </button>
+ 463 │ │                 {helpOpen && (
+ 464 │ │                   <div className={styles.helpMenu}>
+ 465 │ │                     {HELP_LINKS.map(l => (
+ 466 │ │                       <Link key={l.href} href={l.href} className={styles.helpItem} onClick={closeAll}>{l.label}</Link>
+ 467 │ │                     ))}
+ 468 │ │                   </div>
+ 469 │ │                 )}
+ 470 │ │               </div>
+ 471 │ │             </nav>
+ 472 │ │   
+ 473 │ │             <div className={styles.actions}>
+ 474 │ │               <Link href="/login" className={styles.iconBtn} title="Login" aria-label="Login">
+ 475 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 476 │ │                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+ 477 │ │                 </svg>
+ 478 │ │               </Link>
+ 479 │ │               <Link href="/wishlist" className={styles.iconBtn} title="Wishlist" aria-label="Wishlist">
+ 480 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 481 │ │                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+ 482 │ │                 </svg>
+ 483 │ │                 {mounted && wishlistCount > 0 && <span className={styles.cartCount}>{wishlistCount}</span>}
+ 484 │ │               </Link>
+ 485 │ │               <Link href="/cart" className={styles.cartLink} title="Cart" aria-label="Cart">
+ 486 │ │                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 487 │ │                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+ 488 │ │                   <line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
+ 489 │ │                 </svg>
+ 490 │ │                 {mounted && itemCount > 0 && <span className={styles.cartCount}>{itemCount}</span>}
+ 491 │ │               </Link>
+ 492 │ │               <button className={`${styles.menuToggle} ${menuOpen ? styles.open : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+ 493 │ │                 <span></span><span></span><span></span>
+ 494 │ │               </button>
+ 495 │ │             </div>
+ 496 │ │           </div>
+ 497 │ │         </div>
+ 498 │ │   
+ 499 │ │         {/* Desktop mega menu — full-width panel under the bar */}
+ 500 │ │         {!isMobile && megaOpen && (
+ 501 │ │           <div
+ 502 │ │             className={styles.megaWrapper}
+ 503 │ │             onMouseEnter={() => setMegaOpen(true)}
+ 504 │ │             onMouseLeave={() => setMegaOpen(false)}
+ 505 │ │           >
+ 506 │ │             <MegaMenu categories={categories} onClose={closeAll} />
+ 507 │ │           </div>
+ 508 │ │         )}
+ 509 │ │   
+ 510 │ │         {/* Mobile drawer */}
+ 511 │ │         <nav className={`${styles.mobileNav} ${menuOpen ? styles.open : ''}`} aria-label="Mobile">
+ 512 │ │           <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 513 │ │           <Link href="/products" className={styles.navLink} onClick={closeAll}>SHOP</Link>
+ 514 │ │           <div className={styles.mobileCatWrapper}>
+ 515 │ │             <button
+ 516 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 517 │ │               onClick={() => setMobileAccordionOpen(o => !o)}
+ 518 │ │               aria-expanded={mobileAccordionOpen}
+ 519 │ │             >
+ 520 │ │               CATEGORIES <span className={styles.chevron}>{mobileAccordionOpen ? '▴' : '▾'}</span>
+ 521 │ │             </button>
+ 522 │ │             {mobileAccordionOpen && <MobileAccordion categories={categories} onClose={closeAll} />}
+ 523 │ │           </div>
+ 524 │ │           <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 525 │ │           <div className={styles.mobileCatWrapper}>
+ 526 │ │             <button
+ 527 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 528 │ │               onClick={() => setMobileHelpOpen(o => !o)}
+ 529 │ │               aria-expanded={mobileHelpOpen}
+ 530 │ │             >
+ 531 │ │               HELP <span className={styles.chevron}>{mobileHelpOpen ? '▴' : '▾'}</span>
+ 532 │ │             </button>
+ 533 │ │             {mobileHelpOpen && (
+ 534 │ │               <div className={styles.mobileAccordion}>
+ 535 │ │                 {HELP_LINKS.map(l => (
+ 536 │ │                   <Link key={l.href} href={l.href} className={styles.accordionChild} onClick={closeAll}>{l.label}</Link>
+ 537 │ │                 ))}
+ 538 │ │               </div>
+ 539 │ │             )}
+ 540 │ │           </div>
+ 541 │ │         </nav>
+ 542 │ │   
+ 543 │ │         {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │ │       </header>
+ 545 │ ╰─▶   );
+ 546 │     }
+     ╰────
+
+  × Expression expected
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:543:1]
+ 543 │       {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │     </header>
+ 545 │   );
+ 546 │ }
+     · ─
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/Header.tsx
+./src/app/HomeClient.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:34
+[  389948ms] [ERROR] ./src/components/Header.tsx
+Error: 
+  × Return statement is not allowed here
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:395:1]
+ 395 │         return () => document.removeEventListener('mousedown', onClick);
+ 396 │       }, [megaOpen, helpOpen]);
+ 397 │     
+ 398 │ ╭─▶   return (
+ 399 │ │       <header className={`${styles.header} ${menuOpen ? styles.mobileOpen : ''}`}>
+ 400 │ │         {/* Utility tape — dark marquee strip above the main bar */}
+ 401 │ │         <div className={styles.utilityTape} aria-hidden>
+ 402 │ │           <div className={styles.utilityTrack}>
+ 403 │ │             {[...UTILITY_NOTES, ...UTILITY_NOTES, ...UTILITY_NOTES].map((note, i) => (
+ 404 │ │               <span key={i} className={styles.utilityItem}>
+ 405 │ │                 {note}<i>✦</i>
+ 406 │ │               </span>
+ 407 │ │             ))}
+ 408 │ │           </div>
+ 409 │ │         </div>
+ 410 │ │   
+ 411 │ │         <div className={styles.container}>
+ 412 │ │           {/* ── LEFT zone: search + primary nav ── */}
+ 413 │ │           <div className={styles.zoneLeft}>
+ 414 │ │             <button className={styles.iconBtn} onClick={() => setSearchOpen(true)} title="Search" aria-label="Search">
+ 415 │ │               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 416 │ │                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+ 417 │ │               </svg>
+ 418 │ │             </button>
+ 419 │ │             <nav className={styles.navLeft} aria-label="Primary">
+ 420 │ │               <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 421 │ │               <Link href="/products" className={styles.navLink} onClick={closeAll}><ScrambleText /></Link>
+ 422 │ │               <div
+ 423 │ │                 ref={megaRef}
+ 424 │ │                 className={`${styles.catTrigger} ${megaOpen ? styles.catTriggerActive : ''}`}
+ 425 │ │                 onMouseEnter={() => { if (!isMobile) setMegaOpen(true); }}
+ 426 │ │                 onMouseLeave={() => { if (!isMobile) setMegaOpen(false); }}
+ 427 │ │               >
+ 428 │ │                 <button
+ 429 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 430 │ │                   aria-haspopup="true"
+ 431 │ │                   aria-expanded={megaOpen}
+ 432 │ │                   onClick={() => { if (isMobile) { setMegaOpen(o => !o); setHelpOpen(false); } }}
+ 433 │ │                 >
+ 434 │ │                   CATEGORIES <span className={styles.chevron}>{megaOpen ? '▴' : '▾'}</span>
+ 435 │ │                 </button>
+ 436 │ │               </div>
+ 437 │ │             </nav>
+ 438 │ │           </div>
+ 439 │ │   
+ 440 │ │           {/* ── CENTER zone: logo ── */}
+ 441 │ │           <Link href="/" className={styles.logo} onClick={closeAll}>
+ 442 │ │             <img src="/urbanex-logo.png" alt="UrbanEx" className={styles.logoImage} />
+ 443 │ │           </Link>
+ 444 │ │   
+ 445 │ │           {/* ── RIGHT zone: secondary nav + account icons ── */}
+ 446 │ │           <div className={styles.zoneRight}>
+ 447 │ │             <nav className={styles.navRight} aria-label="Secondary">
+ 448 │ │               <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 449 │ │               <div
+ 450 │ │                 ref={helpRef}
+ 451 │ │                 className={`${styles.helpTrigger} ${helpOpen ? styles.catTriggerActive : ''}`}
+ 452 │ │                 onMouseEnter={() => { if (!isMobile) setHelpOpen(true); }}
+ 453 │ │                 onMouseLeave={() => { if (!isMobile) setHelpOpen(false); }}
+ 454 │ │               >
+ 455 │ │                 <button
+ 456 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 457 │ │                   aria-haspopup="true"
+ 458 │ │                   aria-expanded={helpOpen}
+ 459 │ │                   onClick={() => { if (isMobile) { setHelpOpen(o => !o); setMegaOpen(false); } }}
+ 460 │ │                 >
+ 461 │ │                   HELP <span className={styles.chevron}>{helpOpen ? '▴' : '▾'}</span>
+ 462 │ │                 </button>
+ 463 │ │                 {helpOpen && (
+ 464 │ │                   <div className={styles.helpMenu}>
+ 465 │ │                     {HELP_LINKS.map(l => (
+ 466 │ │                       <Link key={l.href} href={l.href} className={styles.helpItem} onClick={closeAll}>{l.label}</Link>
+ 467 │ │                     ))}
+ 468 │ │                   </div>
+ 469 │ │                 )}
+ 470 │ │               </div>
+ 471 │ │             </nav>
+ 472 │ │   
+ 473 │ │             <div className={styles.actions}>
+ 474 │ │               <Link href="/login" className={styles.iconBtn} title="Login" aria-label="Login">
+ 475 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 476 │ │                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+ 477 │ │                 </svg>
+ 478 │ │               </Link>
+ 479 │ │               <Link href="/wishlist" className={styles.iconBtn} title="Wishlist" aria-label="Wishlist">
+ 480 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 481 │ │                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+ 482 │ │                 </svg>
+ 483 │ │                 {mounted && wishlistCount > 0 && <span className={styles.cartCount}>{wishlistCount}</span>}
+ 484 │ │               </Link>
+ 485 │ │               <Link href="/cart" className={styles.cartLink} title="Cart" aria-label="Cart">
+ 486 │ │                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 487 │ │                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+ 488 │ │                   <line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
+ 489 │ │                 </svg>
+ 490 │ │                 {mounted && itemCount > 0 && <span className={styles.cartCount}>{itemCount}</span>}
+ 491 │ │               </Link>
+ 492 │ │               <button className={`${styles.menuToggle} ${menuOpen ? styles.open : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+ 493 │ │                 <span></span><span></span><span></span>
+ 494 │ │               </button>
+ 495 │ │             </div>
+ 496 │ │           </div>
+ 497 │ │         </div>
+ 498 │ │   
+ 499 │ │         {/* Desktop mega menu — full-width panel under the bar */}
+ 500 │ │         {!isMobile && megaOpen && (
+ 501 │ │           <div
+ 502 │ │             className={styles.megaWrapper}
+ 503 │ │             onMouseEnter={() => setMegaOpen(true)}
+ 504 │ │             onMouseLeave={() => setMegaOpen(false)}
+ 505 │ │           >
+ 506 │ │             <MegaMenu categories={categories} onClose={closeAll} />
+ 507 │ │           </div>
+ 508 │ │         )}
+ 509 │ │   
+ 510 │ │         {/* Mobile drawer */}
+ 511 │ │         <nav className={`${styles.mobileNav} ${menuOpen ? styles.open : ''}`} aria-label="Mobile">
+ 512 │ │           <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 513 │ │           <Link href="/products" className={styles.navLink} onClick={closeAll}>SHOP</Link>
+ 514 │ │           <div className={styles.mobileCatWrapper}>
+ 515 │ │             <button
+ 516 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 517 │ │               onClick={() => setMobileAccordionOpen(o => !o)}
+ 518 │ │               aria-expanded={mobileAccordionOpen}
+ 519 │ │             >
+ 520 │ │               CATEGORIES <span className={styles.chevron}>{mobileAccordionOpen ? '▴' : '▾'}</span>
+ 521 │ │             </button>
+ 522 │ │             {mobileAccordionOpen && <MobileAccordion categories={categories} onClose={closeAll} />}
+ 523 │ │           </div>
+ 524 │ │           <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 525 │ │           <div className={styles.mobileCatWrapper}>
+ 526 │ │             <button
+ 527 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 528 │ │               onClick={() => setMobileHelpOpen(o => !o)}
+ 529 │ │               aria-expanded={mobileHelpOpen}
+ 530 │ │             >
+ 531 │ │               HELP <span className={styles.chevron}>{mobileHelpOpen ? '▴' : '▾'}</span>
+ 532 │ │             </button>
+ 533 │ │             {mobileHelpOpen && (
+ 534 │ │               <div className={styles.mobileAccordion}>
+ 535 │ │                 {HELP_LINKS.map(l => (
+ 536 │ │                   <Link key={l.href} href={l.href} className={styles.accordionChild} onClick={closeAll}>{l.label}</Link>
+ 537 │ │                 ))}
+ 538 │ │               </div>
+ 539 │ │             )}
+ 540 │ │           </div>
+ 541 │ │         </nav>
+ 542 │ │   
+ 543 │ │         {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │ │       </header>
+ 545 │ ╰─▶   );
+ 546 │     }
+     ╰────
+
+  × Expression expected
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:543:1]
+ 543 │       {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │     </header>
+ 545 │   );
+ 546 │ }
+     · ─
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/Header.tsx
+./src/app/HomeClient.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:34
+[  455647ms] [ERROR] ./src/components/Header.tsx
+Error: 
+  × Return statement is not allowed here
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:395:1]
+ 395 │         return () => document.removeEventListener('mousedown', onClick);
+ 396 │       }, [megaOpen, helpOpen]);
+ 397 │     
+ 398 │ ╭─▶   return (
+ 399 │ │       <header className={`${styles.header} ${menuOpen ? styles.mobileOpen : ''}`}>
+ 400 │ │         {/* Utility tape — dark marquee strip above the main bar */}
+ 401 │ │         <div className={styles.utilityTape} aria-hidden>
+ 402 │ │           <div className={styles.utilityTrack}>
+ 403 │ │             {[...UTILITY_NOTES, ...UTILITY_NOTES, ...UTILITY_NOTES].map((note, i) => (
+ 404 │ │               <span key={i} className={styles.utilityItem}>
+ 405 │ │                 {note}<i>✦</i>
+ 406 │ │               </span>
+ 407 │ │             ))}
+ 408 │ │           </div>
+ 409 │ │         </div>
+ 410 │ │   
+ 411 │ │         <div className={styles.container}>
+ 412 │ │           {/* ── LEFT zone: search + primary nav ── */}
+ 413 │ │           <div className={styles.zoneLeft}>
+ 414 │ │             <button className={styles.iconBtn} onClick={() => setSearchOpen(true)} title="Search" aria-label="Search">
+ 415 │ │               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 416 │ │                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+ 417 │ │               </svg>
+ 418 │ │             </button>
+ 419 │ │             <nav className={styles.navLeft} aria-label="Primary">
+ 420 │ │               <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 421 │ │               <Link href="/products" className={styles.navLink} onClick={closeAll}><ScrambleText /></Link>
+ 422 │ │               <div
+ 423 │ │                 ref={megaRef}
+ 424 │ │                 className={`${styles.catTrigger} ${megaOpen ? styles.catTriggerActive : ''}`}
+ 425 │ │                 onMouseEnter={() => { if (!isMobile) setMegaOpen(true); }}
+ 426 │ │                 onMouseLeave={() => { if (!isMobile) setMegaOpen(false); }}
+ 427 │ │               >
+ 428 │ │                 <button
+ 429 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 430 │ │                   aria-haspopup="true"
+ 431 │ │                   aria-expanded={megaOpen}
+ 432 │ │                   onClick={() => { if (isMobile) { setMegaOpen(o => !o); setHelpOpen(false); } }}
+ 433 │ │                 >
+ 434 │ │                   CATEGORIES <span className={styles.chevron}>{megaOpen ? '▴' : '▾'}</span>
+ 435 │ │                 </button>
+ 436 │ │               </div>
+ 437 │ │             </nav>
+ 438 │ │           </div>
+ 439 │ │   
+ 440 │ │           {/* ── CENTER zone: logo ── */}
+ 441 │ │           <Link href="/" className={styles.logo} onClick={closeAll}>
+ 442 │ │             <img src="/urbanex-logo.png" alt="UrbanEx" className={styles.logoImage} />
+ 443 │ │           </Link>
+ 444 │ │   
+ 445 │ │           {/* ── RIGHT zone: secondary nav + account icons ── */}
+ 446 │ │           <div className={styles.zoneRight}>
+ 447 │ │             <nav className={styles.navRight} aria-label="Secondary">
+ 448 │ │               <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 449 │ │               <div
+ 450 │ │                 ref={helpRef}
+ 451 │ │                 className={`${styles.helpTrigger} ${helpOpen ? styles.catTriggerActive : ''}`}
+ 452 │ │                 onMouseEnter={() => { if (!isMobile) setHelpOpen(true); }}
+ 453 │ │                 onMouseLeave={() => { if (!isMobile) setHelpOpen(false); }}
+ 454 │ │               >
+ 455 │ │                 <button
+ 456 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 457 │ │                   aria-haspopup="true"
+ 458 │ │                   aria-expanded={helpOpen}
+ 459 │ │                   onClick={() => { if (isMobile) { setHelpOpen(o => !o); setMegaOpen(false); } }}
+ 460 │ │                 >
+ 461 │ │                   HELP <span className={styles.chevron}>{helpOpen ? '▴' : '▾'}</span>
+ 462 │ │                 </button>
+ 463 │ │                 {helpOpen && (
+ 464 │ │                   <div className={styles.helpMenu}>
+ 465 │ │                     {HELP_LINKS.map(l => (
+ 466 │ │                       <Link key={l.href} href={l.href} className={styles.helpItem} onClick={closeAll}>{l.label}</Link>
+ 467 │ │                     ))}
+ 468 │ │                   </div>
+ 469 │ │                 )}
+ 470 │ │               </div>
+ 471 │ │             </nav>
+ 472 │ │   
+ 473 │ │             <div className={styles.actions}>
+ 474 │ │               <Link href="/login" className={styles.iconBtn} title="Login" aria-label="Login">
+ 475 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 476 │ │                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+ 477 │ │                 </svg>
+ 478 │ │               </Link>
+ 479 │ │               <Link href="/wishlist" className={styles.iconBtn} title="Wishlist" aria-label="Wishlist">
+ 480 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 481 │ │                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+ 482 │ │                 </svg>
+ 483 │ │                 {mounted && wishlistCount > 0 && <span className={styles.cartCount}>{wishlistCount}</span>}
+ 484 │ │               </Link>
+ 485 │ │               <Link href="/cart" className={styles.cartLink} title="Cart" aria-label="Cart">
+ 486 │ │                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 487 │ │                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+ 488 │ │                   <line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
+ 489 │ │                 </svg>
+ 490 │ │                 {mounted && itemCount > 0 && <span className={styles.cartCount}>{itemCount}</span>}
+ 491 │ │               </Link>
+ 492 │ │               <button className={`${styles.menuToggle} ${menuOpen ? styles.open : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+ 493 │ │                 <span></span><span></span><span></span>
+ 494 │ │               </button>
+ 495 │ │             </div>
+ 496 │ │           </div>
+ 497 │ │         </div>
+ 498 │ │   
+ 499 │ │         {/* Desktop mega menu — full-width panel under the bar */}
+ 500 │ │         {!isMobile && megaOpen && (
+ 501 │ │           <div
+ 502 │ │             className={styles.megaWrapper}
+ 503 │ │             onMouseEnter={() => setMegaOpen(true)}
+ 504 │ │             onMouseLeave={() => setMegaOpen(false)}
+ 505 │ │           >
+ 506 │ │             <MegaMenu categories={categories} onClose={closeAll} />
+ 507 │ │           </div>
+ 508 │ │         )}
+ 509 │ │   
+ 510 │ │         {/* Mobile drawer */}
+ 511 │ │         <nav className={`${styles.mobileNav} ${menuOpen ? styles.open : ''}`} aria-label="Mobile">
+ 512 │ │           <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 513 │ │           <Link href="/products" className={styles.navLink} onClick={closeAll}>SHOP</Link>
+ 514 │ │           <div className={styles.mobileCatWrapper}>
+ 515 │ │             <button
+ 516 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 517 │ │               onClick={() => setMobileAccordionOpen(o => !o)}
+ 518 │ │               aria-expanded={mobileAccordionOpen}
+ 519 │ │             >
+ 520 │ │               CATEGORIES <span className={styles.chevron}>{mobileAccordionOpen ? '▴' : '▾'}</span>
+ 521 │ │             </button>
+ 522 │ │             {mobileAccordionOpen && <MobileAccordion categories={categories} onClose={closeAll} />}
+ 523 │ │           </div>
+ 524 │ │           <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 525 │ │           <div className={styles.mobileCatWrapper}>
+ 526 │ │             <button
+ 527 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 528 │ │               onClick={() => setMobileHelpOpen(o => !o)}
+ 529 │ │               aria-expanded={mobileHelpOpen}
+ 530 │ │             >
+ 531 │ │               HELP <span className={styles.chevron}>{mobileHelpOpen ? '▴' : '▾'}</span>
+ 532 │ │             </button>
+ 533 │ │             {mobileHelpOpen && (
+ 534 │ │               <div className={styles.mobileAccordion}>
+ 535 │ │                 {HELP_LINKS.map(l => (
+ 536 │ │                   <Link key={l.href} href={l.href} className={styles.accordionChild} onClick={closeAll}>{l.label}</Link>
+ 537 │ │                 ))}
+ 538 │ │               </div>
+ 539 │ │             )}
+ 540 │ │           </div>
+ 541 │ │         </nav>
+ 542 │ │   
+ 543 │ │         {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │ │       </header>
+ 545 │ ╰─▶   );
+ 546 │     }
+     ╰────
+
+  × Expression expected
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:543:1]
+ 543 │       {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │     </header>
+ 545 │   );
+ 546 │ }
+     · ─
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/Header.tsx
+./src/app/HomeClient.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:34
+[  458454ms] [ERROR] ./src/components/Header.tsx
+Error: 
+  × Return statement is not allowed here
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:395:1]
+ 395 │         return () => document.removeEventListener('mousedown', onClick);
+ 396 │       }, [megaOpen, helpOpen]);
+ 397 │     
+ 398 │ ╭─▶   return (
+ 399 │ │       <header className={`${styles.header} ${menuOpen ? styles.mobileOpen : ''}`}>
+ 400 │ │         {/* Utility tape — dark marquee strip above the main bar */}
+ 401 │ │         <div className={styles.utilityTape} aria-hidden>
+ 402 │ │           <div className={styles.utilityTrack}>
+ 403 │ │             {[...UTILITY_NOTES, ...UTILITY_NOTES, ...UTILITY_NOTES].map((note, i) => (
+ 404 │ │               <span key={i} className={styles.utilityItem}>
+ 405 │ │                 {note}<i>✦</i>
+ 406 │ │               </span>
+ 407 │ │             ))}
+ 408 │ │           </div>
+ 409 │ │         </div>
+ 410 │ │   
+ 411 │ │         <div className={styles.container}>
+ 412 │ │           {/* ── LEFT zone: search + primary nav ── */}
+ 413 │ │           <div className={styles.zoneLeft}>
+ 414 │ │             <button className={styles.iconBtn} onClick={() => setSearchOpen(true)} title="Search" aria-label="Search">
+ 415 │ │               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 416 │ │                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+ 417 │ │               </svg>
+ 418 │ │             </button>
+ 419 │ │             <nav className={styles.navLeft} aria-label="Primary">
+ 420 │ │               <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 421 │ │               <Link href="/products" className={styles.navLink} onClick={closeAll}><ScrambleText /></Link>
+ 422 │ │               <div
+ 423 │ │                 ref={megaRef}
+ 424 │ │                 className={`${styles.catTrigger} ${megaOpen ? styles.catTriggerActive : ''}`}
+ 425 │ │                 onMouseEnter={() => { if (!isMobile) setMegaOpen(true); }}
+ 426 │ │                 onMouseLeave={() => { if (!isMobile) setMegaOpen(false); }}
+ 427 │ │               >
+ 428 │ │                 <button
+ 429 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 430 │ │                   aria-haspopup="true"
+ 431 │ │                   aria-expanded={megaOpen}
+ 432 │ │                   onClick={() => { if (isMobile) { setMegaOpen(o => !o); setHelpOpen(false); } }}
+ 433 │ │                 >
+ 434 │ │                   CATEGORIES <span className={styles.chevron}>{megaOpen ? '▴' : '▾'}</span>
+ 435 │ │                 </button>
+ 436 │ │               </div>
+ 437 │ │             </nav>
+ 438 │ │           </div>
+ 439 │ │   
+ 440 │ │           {/* ── CENTER zone: logo ── */}
+ 441 │ │           <Link href="/" className={styles.logo} onClick={closeAll}>
+ 442 │ │             <img src="/urbanex-logo.png" alt="UrbanEx" className={styles.logoImage} />
+ 443 │ │           </Link>
+ 444 │ │   
+ 445 │ │           {/* ── RIGHT zone: secondary nav + account icons ── */}
+ 446 │ │           <div className={styles.zoneRight}>
+ 447 │ │             <nav className={styles.navRight} aria-label="Secondary">
+ 448 │ │               <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 449 │ │               <div
+ 450 │ │                 ref={helpRef}
+ 451 │ │                 className={`${styles.helpTrigger} ${helpOpen ? styles.catTriggerActive : ''}`}
+ 452 │ │                 onMouseEnter={() => { if (!isMobile) setHelpOpen(true); }}
+ 453 │ │                 onMouseLeave={() => { if (!isMobile) setHelpOpen(false); }}
+ 454 │ │               >
+ 455 │ │                 <button
+ 456 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 457 │ │                   aria-haspopup="true"
+ 458 │ │                   aria-expanded={helpOpen}
+ 459 │ │                   onClick={() => { if (isMobile) { setHelpOpen(o => !o); setMegaOpen(false); } }}
+ 460 │ │                 >
+ 461 │ │                   HELP <span className={styles.chevron}>{helpOpen ? '▴' : '▾'}</span>
+ 462 │ │                 </button>
+ 463 │ │                 {helpOpen && (
+ 464 │ │                   <div className={styles.helpMenu}>
+ 465 │ │                     {HELP_LINKS.map(l => (
+ 466 │ │                       <Link key={l.href} href={l.href} className={styles.helpItem} onClick={closeAll}>{l.label}</Link>
+ 467 │ │                     ))}
+ 468 │ │                   </div>
+ 469 │ │                 )}
+ 470 │ │               </div>
+ 471 │ │             </nav>
+ 472 │ │   
+ 473 │ │             <div className={styles.actions}>
+ 474 │ │               <Link href="/login" className={styles.iconBtn} title="Login" aria-label="Login">
+ 475 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 476 │ │                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+ 477 │ │                 </svg>
+ 478 │ │               </Link>
+ 479 │ │               <Link href="/wishlist" className={styles.iconBtn} title="Wishlist" aria-label="Wishlist">
+ 480 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 481 │ │                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+ 482 │ │                 </svg>
+ 483 │ │                 {mounted && wishlistCount > 0 && <span className={styles.cartCount}>{wishlistCount}</span>}
+ 484 │ │               </Link>
+ 485 │ │               <Link href="/cart" className={styles.cartLink} title="Cart" aria-label="Cart">
+ 486 │ │                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 487 │ │                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+ 488 │ │                   <line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
+ 489 │ │                 </svg>
+ 490 │ │                 {mounted && itemCount > 0 && <span className={styles.cartCount}>{itemCount}</span>}
+ 491 │ │               </Link>
+ 492 │ │               <button className={`${styles.menuToggle} ${menuOpen ? styles.open : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+ 493 │ │                 <span></span><span></span><span></span>
+ 494 │ │               </button>
+ 495 │ │             </div>
+ 496 │ │           </div>
+ 497 │ │         </div>
+ 498 │ │   
+ 499 │ │         {/* Desktop mega menu — full-width panel under the bar */}
+ 500 │ │         {!isMobile && megaOpen && (
+ 501 │ │           <div
+ 502 │ │             className={styles.megaWrapper}
+ 503 │ │             onMouseEnter={() => setMegaOpen(true)}
+ 504 │ │             onMouseLeave={() => setMegaOpen(false)}
+ 505 │ │           >
+ 506 │ │             <MegaMenu categories={categories} onClose={closeAll} />
+ 507 │ │           </div>
+ 508 │ │         )}
+ 509 │ │   
+ 510 │ │         {/* Mobile drawer */}
+ 511 │ │         <nav className={`${styles.mobileNav} ${menuOpen ? styles.open : ''}`} aria-label="Mobile">
+ 512 │ │           <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 513 │ │           <Link href="/products" className={styles.navLink} onClick={closeAll}>SHOP</Link>
+ 514 │ │           <div className={styles.mobileCatWrapper}>
+ 515 │ │             <button
+ 516 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 517 │ │               onClick={() => setMobileAccordionOpen(o => !o)}
+ 518 │ │               aria-expanded={mobileAccordionOpen}
+ 519 │ │             >
+ 520 │ │               CATEGORIES <span className={styles.chevron}>{mobileAccordionOpen ? '▴' : '▾'}</span>
+ 521 │ │             </button>
+ 522 │ │             {mobileAccordionOpen && <MobileAccordion categories={categories} onClose={closeAll} />}
+ 523 │ │           </div>
+ 524 │ │           <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 525 │ │           <div className={styles.mobileCatWrapper}>
+ 526 │ │             <button
+ 527 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 528 │ │               onClick={() => setMobileHelpOpen(o => !o)}
+ 529 │ │               aria-expanded={mobileHelpOpen}
+ 530 │ │             >
+ 531 │ │               HELP <span className={styles.chevron}>{mobileHelpOpen ? '▴' : '▾'}</span>
+ 532 │ │             </button>
+ 533 │ │             {mobileHelpOpen && (
+ 534 │ │               <div className={styles.mobileAccordion}>
+ 535 │ │                 {HELP_LINKS.map(l => (
+ 536 │ │                   <Link key={l.href} href={l.href} className={styles.accordionChild} onClick={closeAll}>{l.label}</Link>
+ 537 │ │                 ))}
+ 538 │ │               </div>
+ 539 │ │             )}
+ 540 │ │           </div>
+ 541 │ │         </nav>
+ 542 │ │   
+ 543 │ │         {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │ │       </header>
+ 545 │ ╰─▶   );
+ 546 │     }
+     ╰────
+
+  × Expression expected
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:543:1]
+ 543 │       {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │     </header>
+ 545 │   );
+ 546 │ }
+     · ─
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/Header.tsx
+./src/app/HomeClient.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:34
+[  459272ms] [ERROR] ./src/components/Header.tsx
+Error: 
+  × Return statement is not allowed here
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:395:1]
+ 395 │         return () => document.removeEventListener('mousedown', onClick);
+ 396 │       }, [megaOpen, helpOpen]);
+ 397 │     
+ 398 │ ╭─▶   return (
+ 399 │ │       <header className={`${styles.header} ${menuOpen ? styles.mobileOpen : ''}`}>
+ 400 │ │         {/* Utility tape — dark marquee strip above the main bar */}
+ 401 │ │         <div className={styles.utilityTape} aria-hidden>
+ 402 │ │           <div className={styles.utilityTrack}>
+ 403 │ │             {[...UTILITY_NOTES, ...UTILITY_NOTES, ...UTILITY_NOTES].map((note, i) => (
+ 404 │ │               <span key={i} className={styles.utilityItem}>
+ 405 │ │                 {note}<i>✦</i>
+ 406 │ │               </span>
+ 407 │ │             ))}
+ 408 │ │           </div>
+ 409 │ │         </div>
+ 410 │ │   
+ 411 │ │         <div className={styles.container}>
+ 412 │ │           {/* ── LEFT zone: search + primary nav ── */}
+ 413 │ │           <div className={styles.zoneLeft}>
+ 414 │ │             <button className={styles.iconBtn} onClick={() => setSearchOpen(true)} title="Search" aria-label="Search">
+ 415 │ │               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 416 │ │                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+ 417 │ │               </svg>
+ 418 │ │             </button>
+ 419 │ │             <nav className={styles.navLeft} aria-label="Primary">
+ 420 │ │               <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 421 │ │               <Link href="/products" className={styles.navLink} onClick={closeAll}><ScrambleText /></Link>
+ 422 │ │               <div
+ 423 │ │                 ref={megaRef}
+ 424 │ │                 className={`${styles.catTrigger} ${megaOpen ? styles.catTriggerActive : ''}`}
+ 425 │ │                 onMouseEnter={() => { if (!isMobile) setMegaOpen(true); }}
+ 426 │ │                 onMouseLeave={() => { if (!isMobile) setMegaOpen(false); }}
+ 427 │ │               >
+ 428 │ │                 <button
+ 429 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 430 │ │                   aria-haspopup="true"
+ 431 │ │                   aria-expanded={megaOpen}
+ 432 │ │                   onClick={() => { if (isMobile) { setMegaOpen(o => !o); setHelpOpen(false); } }}
+ 433 │ │                 >
+ 434 │ │                   CATEGORIES <span className={styles.chevron}>{megaOpen ? '▴' : '▾'}</span>
+ 435 │ │                 </button>
+ 436 │ │               </div>
+ 437 │ │             </nav>
+ 438 │ │           </div>
+ 439 │ │   
+ 440 │ │           {/* ── CENTER zone: logo ── */}
+ 441 │ │           <Link href="/" className={styles.logo} onClick={closeAll}>
+ 442 │ │             <img src="/urbanex-logo.png" alt="UrbanEx" className={styles.logoImage} />
+ 443 │ │           </Link>
+ 444 │ │   
+ 445 │ │           {/* ── RIGHT zone: secondary nav + account icons ── */}
+ 446 │ │           <div className={styles.zoneRight}>
+ 447 │ │             <nav className={styles.navRight} aria-label="Secondary">
+ 448 │ │               <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 449 │ │               <div
+ 450 │ │                 ref={helpRef}
+ 451 │ │                 className={`${styles.helpTrigger} ${helpOpen ? styles.catTriggerActive : ''}`}
+ 452 │ │                 onMouseEnter={() => { if (!isMobile) setHelpOpen(true); }}
+ 453 │ │                 onMouseLeave={() => { if (!isMobile) setHelpOpen(false); }}
+ 454 │ │               >
+ 455 │ │                 <button
+ 456 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 457 │ │                   aria-haspopup="true"
+ 458 │ │                   aria-expanded={helpOpen}
+ 459 │ │                   onClick={() => { if (isMobile) { setHelpOpen(o => !o); setMegaOpen(false); } }}
+ 460 │ │                 >
+ 461 │ │                   HELP <span className={styles.chevron}>{helpOpen ? '▴' : '▾'}</span>
+ 462 │ │                 </button>
+ 463 │ │                 {helpOpen && (
+ 464 │ │                   <div className={styles.helpMenu}>
+ 465 │ │                     {HELP_LINKS.map(l => (
+ 466 │ │                       <Link key={l.href} href={l.href} className={styles.helpItem} onClick={closeAll}>{l.label}</Link>
+ 467 │ │                     ))}
+ 468 │ │                   </div>
+ 469 │ │                 )}
+ 470 │ │               </div>
+ 471 │ │             </nav>
+ 472 │ │   
+ 473 │ │             <div className={styles.actions}>
+ 474 │ │               <Link href="/login" className={styles.iconBtn} title="Login" aria-label="Login">
+ 475 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 476 │ │                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+ 477 │ │                 </svg>
+ 478 │ │               </Link>
+ 479 │ │               <Link href="/wishlist" className={styles.iconBtn} title="Wishlist" aria-label="Wishlist">
+ 480 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 481 │ │                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+ 482 │ │                 </svg>
+ 483 │ │                 {mounted && wishlistCount > 0 && <span className={styles.cartCount}>{wishlistCount}</span>}
+ 484 │ │               </Link>
+ 485 │ │               <Link href="/cart" className={styles.cartLink} title="Cart" aria-label="Cart">
+ 486 │ │                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 487 │ │                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+ 488 │ │                   <line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
+ 489 │ │                 </svg>
+ 490 │ │                 {mounted && itemCount > 0 && <span className={styles.cartCount}>{itemCount}</span>}
+ 491 │ │               </Link>
+ 492 │ │               <button className={`${styles.menuToggle} ${menuOpen ? styles.open : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+ 493 │ │                 <span></span><span></span><span></span>
+ 494 │ │               </button>
+ 495 │ │             </div>
+ 496 │ │           </div>
+ 497 │ │         </div>
+ 498 │ │   
+ 499 │ │         {/* Desktop mega menu — full-width panel under the bar */}
+ 500 │ │         {!isMobile && megaOpen && (
+ 501 │ │           <div
+ 502 │ │             className={styles.megaWrapper}
+ 503 │ │             onMouseEnter={() => setMegaOpen(true)}
+ 504 │ │             onMouseLeave={() => setMegaOpen(false)}
+ 505 │ │           >
+ 506 │ │             <MegaMenu categories={categories} onClose={closeAll} />
+ 507 │ │           </div>
+ 508 │ │         )}
+ 509 │ │   
+ 510 │ │         {/* Mobile drawer */}
+ 511 │ │         <nav className={`${styles.mobileNav} ${menuOpen ? styles.open : ''}`} aria-label="Mobile">
+ 512 │ │           <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 513 │ │           <Link href="/products" className={styles.navLink} onClick={closeAll}>SHOP</Link>
+ 514 │ │           <div className={styles.mobileCatWrapper}>
+ 515 │ │             <button
+ 516 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 517 │ │               onClick={() => setMobileAccordionOpen(o => !o)}
+ 518 │ │               aria-expanded={mobileAccordionOpen}
+ 519 │ │             >
+ 520 │ │               CATEGORIES <span className={styles.chevron}>{mobileAccordionOpen ? '▴' : '▾'}</span>
+ 521 │ │             </button>
+ 522 │ │             {mobileAccordionOpen && <MobileAccordion categories={categories} onClose={closeAll} />}
+ 523 │ │           </div>
+ 524 │ │           <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 525 │ │           <div className={styles.mobileCatWrapper}>
+ 526 │ │             <button
+ 527 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 528 │ │               onClick={() => setMobileHelpOpen(o => !o)}
+ 529 │ │               aria-expanded={mobileHelpOpen}
+ 530 │ │             >
+ 531 │ │               HELP <span className={styles.chevron}>{mobileHelpOpen ? '▴' : '▾'}</span>
+ 532 │ │             </button>
+ 533 │ │             {mobileHelpOpen && (
+ 534 │ │               <div className={styles.mobileAccordion}>
+ 535 │ │                 {HELP_LINKS.map(l => (
+ 536 │ │                   <Link key={l.href} href={l.href} className={styles.accordionChild} onClick={closeAll}>{l.label}</Link>
+ 537 │ │                 ))}
+ 538 │ │               </div>
+ 539 │ │             )}
+ 540 │ │           </div>
+ 541 │ │         </nav>
+ 542 │ │   
+ 543 │ │         {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │ │       </header>
+ 545 │ ╰─▶   );
+ 546 │     }
+     ╰────
+
+  × Expression expected
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:543:1]
+ 543 │       {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │     </header>
+ 545 │   );
+ 546 │ }
+     · ─
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/Header.tsx
+./src/app/HomeClient.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:34
+[  459472ms] [ERROR] ./src/components/Header.tsx
+Error: 
+  × Return statement is not allowed here
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:395:1]
+ 395 │         return () => document.removeEventListener('mousedown', onClick);
+ 396 │       }, [megaOpen, helpOpen]);
+ 397 │     
+ 398 │ ╭─▶   return (
+ 399 │ │       <header className={`${styles.header} ${menuOpen ? styles.mobileOpen : ''}`}>
+ 400 │ │         {/* Utility tape — dark marquee strip above the main bar */}
+ 401 │ │         <div className={styles.utilityTape} aria-hidden>
+ 402 │ │           <div className={styles.utilityTrack}>
+ 403 │ │             {[...UTILITY_NOTES, ...UTILITY_NOTES, ...UTILITY_NOTES].map((note, i) => (
+ 404 │ │               <span key={i} className={styles.utilityItem}>
+ 405 │ │                 {note}<i>✦</i>
+ 406 │ │               </span>
+ 407 │ │             ))}
+ 408 │ │           </div>
+ 409 │ │         </div>
+ 410 │ │   
+ 411 │ │         <div className={styles.container}>
+ 412 │ │           {/* ── LEFT zone: search + primary nav ── */}
+ 413 │ │           <div className={styles.zoneLeft}>
+ 414 │ │             <button className={styles.iconBtn} onClick={() => setSearchOpen(true)} title="Search" aria-label="Search">
+ 415 │ │               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 416 │ │                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+ 417 │ │               </svg>
+ 418 │ │             </button>
+ 419 │ │             <nav className={styles.navLeft} aria-label="Primary">
+ 420 │ │               <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 421 │ │               <Link href="/products" className={styles.navLink} onClick={closeAll}><ScrambleText /></Link>
+ 422 │ │               <div
+ 423 │ │                 ref={megaRef}
+ 424 │ │                 className={`${styles.catTrigger} ${megaOpen ? styles.catTriggerActive : ''}`}
+ 425 │ │                 onMouseEnter={() => { if (!isMobile) setMegaOpen(true); }}
+ 426 │ │                 onMouseLeave={() => { if (!isMobile) setMegaOpen(false); }}
+ 427 │ │               >
+ 428 │ │                 <button
+ 429 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 430 │ │                   aria-haspopup="true"
+ 431 │ │                   aria-expanded={megaOpen}
+ 432 │ │                   onClick={() => { if (isMobile) { setMegaOpen(o => !o); setHelpOpen(false); } }}
+ 433 │ │                 >
+ 434 │ │                   CATEGORIES <span className={styles.chevron}>{megaOpen ? '▴' : '▾'}</span>
+ 435 │ │                 </button>
+ 436 │ │               </div>
+ 437 │ │             </nav>
+ 438 │ │           </div>
+ 439 │ │   
+ 440 │ │           {/* ── CENTER zone: logo ── */}
+ 441 │ │           <Link href="/" className={styles.logo} onClick={closeAll}>
+ 442 │ │             <img src="/urbanex-logo.png" alt="UrbanEx" className={styles.logoImage} />
+ 443 │ │           </Link>
+ 444 │ │   
+ 445 │ │           {/* ── RIGHT zone: secondary nav + account icons ── */}
+ 446 │ │           <div className={styles.zoneRight}>
+ 447 │ │             <nav className={styles.navRight} aria-label="Secondary">
+ 448 │ │               <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 449 │ │               <div
+ 450 │ │                 ref={helpRef}
+ 451 │ │                 className={`${styles.helpTrigger} ${helpOpen ? styles.catTriggerActive : ''}`}
+ 452 │ │                 onMouseEnter={() => { if (!isMobile) setHelpOpen(true); }}
+ 453 │ │                 onMouseLeave={() => { if (!isMobile) setHelpOpen(false); }}
+ 454 │ │               >
+ 455 │ │                 <button
+ 456 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 457 │ │                   aria-haspopup="true"
+ 458 │ │                   aria-expanded={helpOpen}
+ 459 │ │                   onClick={() => { if (isMobile) { setHelpOpen(o => !o); setMegaOpen(false); } }}
+ 460 │ │                 >
+ 461 │ │                   HELP <span className={styles.chevron}>{helpOpen ? '▴' : '▾'}</span>
+ 462 │ │                 </button>
+ 463 │ │                 {helpOpen && (
+ 464 │ │                   <div className={styles.helpMenu}>
+ 465 │ │                     {HELP_LINKS.map(l => (
+ 466 │ │                       <Link key={l.href} href={l.href} className={styles.helpItem} onClick={closeAll}>{l.label}</Link>
+ 467 │ │                     ))}
+ 468 │ │                   </div>
+ 469 │ │                 )}
+ 470 │ │               </div>
+ 471 │ │             </nav>
+ 472 │ │   
+ 473 │ │             <div className={styles.actions}>
+ 474 │ │               <Link href="/login" className={styles.iconBtn} title="Login" aria-label="Login">
+ 475 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 476 │ │                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+ 477 │ │                 </svg>
+ 478 │ │               </Link>
+ 479 │ │               <Link href="/wishlist" className={styles.iconBtn} title="Wishlist" aria-label="Wishlist">
+ 480 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 481 │ │                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+ 482 │ │                 </svg>
+ 483 │ │                 {mounted && wishlistCount > 0 && <span className={styles.cartCount}>{wishlistCount}</span>}
+ 484 │ │               </Link>
+ 485 │ │               <Link href="/cart" className={styles.cartLink} title="Cart" aria-label="Cart">
+ 486 │ │                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 487 │ │                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+ 488 │ │                   <line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
+ 489 │ │                 </svg>
+ 490 │ │                 {mounted && itemCount > 0 && <span className={styles.cartCount}>{itemCount}</span>}
+ 491 │ │               </Link>
+ 492 │ │               <button className={`${styles.menuToggle} ${menuOpen ? styles.open : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+ 493 │ │                 <span></span><span></span><span></span>
+ 494 │ │               </button>
+ 495 │ │             </div>
+ 496 │ │           </div>
+ 497 │ │         </div>
+ 498 │ │   
+ 499 │ │         {/* Desktop mega menu — full-width panel under the bar */}
+ 500 │ │         {!isMobile && megaOpen && (
+ 501 │ │           <div
+ 502 │ │             className={styles.megaWrapper}
+ 503 │ │             onMouseEnter={() => setMegaOpen(true)}
+ 504 │ │             onMouseLeave={() => setMegaOpen(false)}
+ 505 │ │           >
+ 506 │ │             <MegaMenu categories={categories} onClose={closeAll} />
+ 507 │ │           </div>
+ 508 │ │         )}
+ 509 │ │   
+ 510 │ │         {/* Mobile drawer */}
+ 511 │ │         <nav className={`${styles.mobileNav} ${menuOpen ? styles.open : ''}`} aria-label="Mobile">
+ 512 │ │           <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 513 │ │           <Link href="/products" className={styles.navLink} onClick={closeAll}>SHOP</Link>
+ 514 │ │           <div className={styles.mobileCatWrapper}>
+ 515 │ │             <button
+ 516 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 517 │ │               onClick={() => setMobileAccordionOpen(o => !o)}
+ 518 │ │               aria-expanded={mobileAccordionOpen}
+ 519 │ │             >
+ 520 │ │               CATEGORIES <span className={styles.chevron}>{mobileAccordionOpen ? '▴' : '▾'}</span>
+ 521 │ │             </button>
+ 522 │ │             {mobileAccordionOpen && <MobileAccordion categories={categories} onClose={closeAll} />}
+ 523 │ │           </div>
+ 524 │ │           <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 525 │ │           <div className={styles.mobileCatWrapper}>
+ 526 │ │             <button
+ 527 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 528 │ │               onClick={() => setMobileHelpOpen(o => !o)}
+ 529 │ │               aria-expanded={mobileHelpOpen}
+ 530 │ │             >
+ 531 │ │               HELP <span className={styles.chevron}>{mobileHelpOpen ? '▴' : '▾'}</span>
+ 532 │ │             </button>
+ 533 │ │             {mobileHelpOpen && (
+ 534 │ │               <div className={styles.mobileAccordion}>
+ 535 │ │                 {HELP_LINKS.map(l => (
+ 536 │ │                   <Link key={l.href} href={l.href} className={styles.accordionChild} onClick={closeAll}>{l.label}</Link>
+ 537 │ │                 ))}
+ 538 │ │               </div>
+ 539 │ │             )}
+ 540 │ │           </div>
+ 541 │ │         </nav>
+ 542 │ │   
+ 543 │ │         {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │ │       </header>
+ 545 │ ╰─▶   );
+ 546 │     }
+     ╰────
+
+  × Expression expected
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:543:1]
+ 543 │       {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │     </header>
+ 545 │   );
+ 546 │ }
+     · ─
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/Header.tsx
+./src/app/HomeClient.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:34
+[  460298ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/?_rsc=1xuj0:0
+[  460397ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/?_rsc=1xuj0:0
+[  460611ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/:0
+[  461076ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///./node_modules/react-dom/cjs/react-dom.development.js:29889
+[  461150ms] ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error: 
+  × Return statement is not allowed here
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:395:1]
+ 395 │         return () => document.removeEventListener('mousedown', onClick);
+ 396 │       }, [megaOpen, helpOpen]);
+ 397 │     
+ 398 │ ╭─▶   return (
+ 399 │ │       <header className={`${styles.header} ${menuOpen ? styles.mobileOpen : ''}`}>
+ 400 │ │         {/* Utility tape — dark marquee strip above the main bar */}
+ 401 │ │         <div className={styles.utilityTape} aria-hidden>
+ 402 │ │           <div className={styles.utilityTrack}>
+ 403 │ │             {[...UTILITY_NOTES, ...UTILITY_NOTES, ...UTILITY_NOTES].map((note, i) => (
+ 404 │ │               <span key={i} className={styles.utilityItem}>
+ 405 │ │                 {note}<i>✦</i>
+ 406 │ │               </span>
+ 407 │ │             ))}
+ 408 │ │           </div>
+ 409 │ │         </div>
+ 410 │ │   
+ 411 │ │         <div className={styles.container}>
+ 412 │ │           {/* ── LEFT zone: search + primary nav ── */}
+ 413 │ │           <div className={styles.zoneLeft}>
+ 414 │ │             <button className={styles.iconBtn} onClick={() => setSearchOpen(true)} title="Search" aria-label="Search">
+ 415 │ │               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 416 │ │                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+ 417 │ │               </svg>
+ 418 │ │             </button>
+ 419 │ │             <nav className={styles.navLeft} aria-label="Primary">
+ 420 │ │               <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 421 │ │               <Link href="/products" className={styles.navLink} onClick={closeAll}><ScrambleText /></Link>
+ 422 │ │               <div
+ 423 │ │                 ref={megaRef}
+ 424 │ │                 className={`${styles.catTrigger} ${megaOpen ? styles.catTriggerActive : ''}`}
+ 425 │ │                 onMouseEnter={() => { if (!isMobile) setMegaOpen(true); }}
+ 426 │ │                 onMouseLeave={() => { if (!isMobile) setMegaOpen(false); }}
+ 427 │ │               >
+ 428 │ │                 <button
+ 429 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 430 │ │                   aria-haspopup="true"
+ 431 │ │                   aria-expanded={megaOpen}
+ 432 │ │                   onClick={() => { if (isMobile) { setMegaOpen(o => !o); setHelpOpen(false); } }}
+ 433 │ │                 >
+ 434 │ │                   CATEGORIES <span className={styles.chevron}>{megaOpen ? '▴' : '▾'}</span>
+ 435 │ │                 </button>
+ 436 │ │               </div>
+ 437 │ │             </nav>
+ 438 │ │           </div>
+ 439 │ │   
+ 440 │ │           {/* ── CENTER zone: logo ── */}
+ 441 │ │           <Link href="/" className={styles.logo} onClick={closeAll}>
+ 442 │ │             <img src="/urbanex-logo.png" alt="UrbanEx" className={styles.logoImage} />
+ 443 │ │           </Link>
+ 444 │ │   
+ 445 │ │           {/* ── RIGHT zone: secondary nav + account icons ── */}
+ 446 │ │           <div className={styles.zoneRight}>
+ 447 │ │             <nav className={styles.navRight} aria-label="Secondary">
+ 448 │ │               <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 449 │ │               <div
+ 450 │ │                 ref={helpRef}
+ 451 │ │                 className={`${styles.helpTrigger} ${helpOpen ? styles.catTriggerActive : ''}`}
+ 452 │ │                 onMouseEnter={() => { if (!isMobile) setHelpOpen(true); }}
+ 453 │ │                 onMouseLeave={() => { if (!isMobile) setHelpOpen(false); }}
+ 454 │ │               >
+ 455 │ │                 <button
+ 456 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 457 │ │                   aria-haspopup="true"
+ 458 │ │                   aria-expanded={helpOpen}
+ 459 │ │                   onClick={() => { if (isMobile) { setHelpOpen(o => !o); setMegaOpen(false); } }}
+ 460 │ │                 >
+ 461 │ │                   HELP <span className={styles.chevron}>{helpOpen ? '▴' : '▾'}</span>
+ 462 │ │                 </button>
+ 463 │ │                 {helpOpen && (
+ 464 │ │                   <div className={styles.helpMenu}>
+ 465 │ │                     {HELP_LINKS.map(l => (
+ 466 │ │                       <Link key={l.href} href={l.href} className={styles.helpItem} onClick={closeAll}>{l.label}</Link>
+ 467 │ │                     ))}
+ 468 │ │                   </div>
+ 469 │ │                 )}
+ 470 │ │               </div>
+ 471 │ │             </nav>
+ 472 │ │   
+ 473 │ │             <div className={styles.actions}>
+ 474 │ │               <Link href="/login" className={styles.iconBtn} title="Login" aria-label="Login">
+ 475 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 476 │ │                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+ 477 │ │                 </svg>
+ 478 │ │               </Link>
+ 479 │ │               <Link href="/wishlist" className={styles.iconBtn} title="Wishlist" aria-label="Wishlist">
+ 480 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 481 │ │                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+ 482 │ │                 </svg>
+ 483 │ │                 {mounted && wishlistCount > 0 && <span className={styles.cartCount}>{wishlistCount}</span>}
+ 484 │ │               </Link>
+ 485 │ │               <Link href="/cart" className={styles.cartLink} title="Cart" aria-label="Cart">
+ 486 │ │                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 487 │ │                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+ 488 │ │                   <line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
+ 489 │ │                 </svg>
+ 490 │ │                 {mounted && itemCount > 0 && <span className={styles.cartCount}>{itemCount}</span>}
+ 491 │ │               </Link>
+ 492 │ │               <button className={`${styles.menuToggle} ${menuOpen ? styles.open : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+ 493 │ │                 <span></span><span></span><span></span>
+ 494 │ │               </button>
+ 495 │ │             </div>
+ 496 │ │           </div>
+ 497 │ │         </div>
+ 498 │ │   
+ 499 │ │         {/* Desktop mega menu — full-width panel under the bar */}
+ 500 │ │         {!isMobile && megaOpen && (
+ 501 │ │           <div
+ 502 │ │             className={styles.megaWrapper}
+ 503 │ │             onMouseEnter={() => setMegaOpen(true)}
+ 504 │ │             onMouseLeave={() => setMegaOpen(false)}
+ 505 │ │           >
+ 506 │ │             <MegaMenu categories={categories} onClose={closeAll} />
+ 507 │ │           </div>
+ 508 │ │         )}
+ 509 │ │   
+ 510 │ │         {/* Mobile drawer */}
+ 511 │ │         <nav className={`${styles.mobileNav} ${menuOpen ? styles.open : ''}`} aria-label="Mobile">
+ 512 │ │           <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 513 │ │           <Link href="/products" className={styles.navLink} onClick={closeAll}>SHOP</Link>
+ 514 │ │           <div className={styles.mobileCatWrapper}>
+ 515 │ │             <button
+ 516 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 517 │ │               onClick={() => setMobileAccordionOpen(o => !o)}
+ 518 │ │               aria-expanded={mobileAccordionOpen}
+ 519 │ │             >
+ 520 │ │               CATEGORIES <span className={styles.chevron}>{mobileAccordionOpen ? '▴' : '▾'}</span>
+ 521 │ │             </button>
+ 522 │ │             {mobileAccordionOpen && <MobileAccordion categories={categories} onClose={closeAll} />}
+ 523 │ │           </div>
+ 524 │ │           <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 525 │ │           <div className={styles.mobileCatWrapper}>
+ 526 │ │             <button
+ 527 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 528 │ │               onClick={() => setMobileHelpOpen(o => !o)}
+ 529 │ │               aria-expanded={mobileHelpOpen}
+ 530 │ │             >
+ 531 │ │               HELP <span className={styles.chevron}>{mobileHelpOpen ? '▴' : '▾'}</span>
+ 532 │ │             </button>
+ 533 │ │             {mobileHelpOpen && (
+ 534 │ │               <div className={styles.mobileAccordion}>
+ 535 │ │                 {HELP_LINKS.map(l => (
+ 536 │ │                   <Link key={l.href} href={l.href} className={styles.accordionChild} onClick={closeAll}>{l.label}</Link>
+ 537 │ │                 ))}
+ 538 │ │               </div>
+ 539 │ │             )}
+ 540 │ │           </div>
+ 541 │ │         </nav>
+ 542 │ │   
+ 543 │ │         {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │ │       </header>
+ 545 │ ╰─▶   );
+ 546 │     }
+     ╰────
+
+  × Expression expected
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:543:1]
+ 543 │       {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │     </header>
+ 545 │   );
+ 546 │ }
+     · ─
+     ╰────
+
+
+Caused by:
+    Syntax Error
+    at processResult (file://C:\Users\Matin\claude website ue\frontend\node_modules\next\dist\compiled\webpack\bundle5.js:28:398653)
+    at <unknown> (file://C:\Users\Matin\claude website ue\frontend\node_modules\next\dist\compiled\webpack\bundle5.js:28:400370)
+    at <unknown> (file://C:\Users\Matin\claude website ue\frontend\node_modules\next\dist\compiled\loader-runner\LoaderRunner.js:1:8645)
+    at <unknown> (file://C:\Users\Matin\claude website ue\frontend\node_modules\next\dist\compiled\loader-runner\LoaderRunner.js:1:5019)
+    at r.callback (file://C:\Users\Matin\claude website ue\frontend\node_modules\next\dist\compiled\loader-runner\LoaderRunner.js:1:4039)
+[  461150ms] [LOG] [HMR] connected @ webpack-internal:///./node_modules/next/dist/client/dev/error-overlay/websocket.js:45
+[  461157ms] [ERROR] ./src/components/Header.tsx
+Error: 
+  × Return statement is not allowed here
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:395:1]
+ 395 │         return () => document.removeEventListener('mousedown', onClick);
+ 396 │       }, [megaOpen, helpOpen]);
+ 397 │     
+ 398 │ ╭─▶   return (
+ 399 │ │       <header className={`${styles.header} ${menuOpen ? styles.mobileOpen : ''}`}>
+ 400 │ │         {/* Utility tape — dark marquee strip above the main bar */}
+ 401 │ │         <div className={styles.utilityTape} aria-hidden>
+ 402 │ │           <div className={styles.utilityTrack}>
+ 403 │ │             {[...UTILITY_NOTES, ...UTILITY_NOTES, ...UTILITY_NOTES].map((note, i) => (
+ 404 │ │               <span key={i} className={styles.utilityItem}>
+ 405 │ │                 {note}<i>✦</i>
+ 406 │ │               </span>
+ 407 │ │             ))}
+ 408 │ │           </div>
+ 409 │ │         </div>
+ 410 │ │   
+ 411 │ │         <div className={styles.container}>
+ 412 │ │           {/* ── LEFT zone: search + primary nav ── */}
+ 413 │ │           <div className={styles.zoneLeft}>
+ 414 │ │             <button className={styles.iconBtn} onClick={() => setSearchOpen(true)} title="Search" aria-label="Search">
+ 415 │ │               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 416 │ │                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+ 417 │ │               </svg>
+ 418 │ │             </button>
+ 419 │ │             <nav className={styles.navLeft} aria-label="Primary">
+ 420 │ │               <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 421 │ │               <Link href="/products" className={styles.navLink} onClick={closeAll}><ScrambleText /></Link>
+ 422 │ │               <div
+ 423 │ │                 ref={megaRef}
+ 424 │ │                 className={`${styles.catTrigger} ${megaOpen ? styles.catTriggerActive : ''}`}
+ 425 │ │                 onMouseEnter={() => { if (!isMobile) setMegaOpen(true); }}
+ 426 │ │                 onMouseLeave={() => { if (!isMobile) setMegaOpen(false); }}
+ 427 │ │               >
+ 428 │ │                 <button
+ 429 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 430 │ │                   aria-haspopup="true"
+ 431 │ │                   aria-expanded={megaOpen}
+ 432 │ │                   onClick={() => { if (isMobile) { setMegaOpen(o => !o); setHelpOpen(false); } }}
+ 433 │ │                 >
+ 434 │ │                   CATEGORIES <span className={styles.chevron}>{megaOpen ? '▴' : '▾'}</span>
+ 435 │ │                 </button>
+ 436 │ │               </div>
+ 437 │ │             </nav>
+ 438 │ │           </div>
+ 439 │ │   
+ 440 │ │           {/* ── CENTER zone: logo ── */}
+ 441 │ │           <Link href="/" className={styles.logo} onClick={closeAll}>
+ 442 │ │             <img src="/urbanex-logo.png" alt="UrbanEx" className={styles.logoImage} />
+ 443 │ │           </Link>
+ 444 │ │   
+ 445 │ │           {/* ── RIGHT zone: secondary nav + account icons ── */}
+ 446 │ │           <div className={styles.zoneRight}>
+ 447 │ │             <nav className={styles.navRight} aria-label="Secondary">
+ 448 │ │               <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 449 │ │               <div
+ 450 │ │                 ref={helpRef}
+ 451 │ │                 className={`${styles.helpTrigger} ${helpOpen ? styles.catTriggerActive : ''}`}
+ 452 │ │                 onMouseEnter={() => { if (!isMobile) setHelpOpen(true); }}
+ 453 │ │                 onMouseLeave={() => { if (!isMobile) setHelpOpen(false); }}
+ 454 │ │               >
+ 455 │ │                 <button
+ 456 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 457 │ │                   aria-haspopup="true"
+ 458 │ │                   aria-expanded={helpOpen}
+ 459 │ │                   onClick={() => { if (isMobile) { setHelpOpen(o => !o); setMegaOpen(false); } }}
+ 460 │ │                 >
+ 461 │ │                   HELP <span className={styles.chevron}>{helpOpen ? '▴' : '▾'}</span>
+ 462 │ │                 </button>
+ 463 │ │                 {helpOpen && (
+ 464 │ │                   <div className={styles.helpMenu}>
+ 465 │ │                     {HELP_LINKS.map(l => (
+ 466 │ │                       <Link key={l.href} href={l.href} className={styles.helpItem} onClick={closeAll}>{l.label}</Link>
+ 467 │ │                     ))}
+ 468 │ │                   </div>
+ 469 │ │                 )}
+ 470 │ │               </div>
+ 471 │ │             </nav>
+ 472 │ │   
+ 473 │ │             <div className={styles.actions}>
+ 474 │ │               <Link href="/login" className={styles.iconBtn} title="Login" aria-label="Login">
+ 475 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 476 │ │                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+ 477 │ │                 </svg>
+ 478 │ │               </Link>
+ 479 │ │               <Link href="/wishlist" className={styles.iconBtn} title="Wishlist" aria-label="Wishlist">
+ 480 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 481 │ │                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+ 482 │ │                 </svg>
+ 483 │ │                 {mounted && wishlistCount > 0 && <span className={styles.cartCount}>{wishlistCount}</span>}
+ 484 │ │               </Link>
+ 485 │ │               <Link href="/cart" className={styles.cartLink} title="Cart" aria-label="Cart">
+ 486 │ │                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 487 │ │                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+ 488 │ │                   <line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
+ 489 │ │                 </svg>
+ 490 │ │                 {mounted && itemCount > 0 && <span className={styles.cartCount}>{itemCount}</span>}
+ 491 │ │               </Link>
+ 492 │ │               <button className={`${styles.menuToggle} ${menuOpen ? styles.open : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+ 493 │ │                 <span></span><span></span><span></span>
+ 494 │ │               </button>
+ 495 │ │             </div>
+ 496 │ │           </div>
+ 497 │ │         </div>
+ 498 │ │   
+ 499 │ │         {/* Desktop mega menu — full-width panel under the bar */}
+ 500 │ │         {!isMobile && megaOpen && (
+ 501 │ │           <div
+ 502 │ │             className={styles.megaWrapper}
+ 503 │ │             onMouseEnter={() => setMegaOpen(true)}
+ 504 │ │             onMouseLeave={() => setMegaOpen(false)}
+ 505 │ │           >
+ 506 │ │             <MegaMenu categories={categories} onClose={closeAll} />
+ 507 │ │           </div>
+ 508 │ │         )}
+ 509 │ │   
+ 510 │ │         {/* Mobile drawer */}
+ 511 │ │         <nav className={`${styles.mobileNav} ${menuOpen ? styles.open : ''}`} aria-label="Mobile">
+ 512 │ │           <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 513 │ │           <Link href="/products" className={styles.navLink} onClick={closeAll}>SHOP</Link>
+ 514 │ │           <div className={styles.mobileCatWrapper}>
+ 515 │ │             <button
+ 516 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 517 │ │               onClick={() => setMobileAccordionOpen(o => !o)}
+ 518 │ │               aria-expanded={mobileAccordionOpen}
+ 519 │ │             >
+ 520 │ │               CATEGORIES <span className={styles.chevron}>{mobileAccordionOpen ? '▴' : '▾'}</span>
+ 521 │ │             </button>
+ 522 │ │             {mobileAccordionOpen && <MobileAccordion categories={categories} onClose={closeAll} />}
+ 523 │ │           </div>
+ 524 │ │           <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 525 │ │           <div className={styles.mobileCatWrapper}>
+ 526 │ │             <button
+ 527 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 528 │ │               onClick={() => setMobileHelpOpen(o => !o)}
+ 529 │ │               aria-expanded={mobileHelpOpen}
+ 530 │ │             >
+ 531 │ │               HELP <span className={styles.chevron}>{mobileHelpOpen ? '▴' : '▾'}</span>
+ 532 │ │             </button>
+ 533 │ │             {mobileHelpOpen && (
+ 534 │ │               <div className={styles.mobileAccordion}>
+ 535 │ │                 {HELP_LINKS.map(l => (
+ 536 │ │                   <Link key={l.href} href={l.href} className={styles.accordionChild} onClick={closeAll}>{l.label}</Link>
+ 537 │ │                 ))}
+ 538 │ │               </div>
+ 539 │ │             )}
+ 540 │ │           </div>
+ 541 │ │         </nav>
+ 542 │ │   
+ 543 │ │         {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │ │       </header>
+ 545 │ ╰─▶   );
+ 546 │     }
+     ╰────
+
+  × Expression expected
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:543:1]
+ 543 │       {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │     </header>
+ 545 │   );
+ 546 │ }
+     · ─
+     ╰────
+
+Caused by:
+    Syntax Error @ webpack-internal:///./node_modules/next/dist/compiled/@next/react-dev-overlay/dist/client.js:25
+[  461162ms] [ERROR] ./src/components/Header.tsx
+Error: 
+  × Return statement is not allowed here
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:395:1]
+ 395 │         return () => document.removeEventListener('mousedown', onClick);
+ 396 │       }, [megaOpen, helpOpen]);
+ 397 │     
+ 398 │ ╭─▶   return (
+ 399 │ │       <header className={`${styles.header} ${menuOpen ? styles.mobileOpen : ''}`}>
+ 400 │ │         {/* Utility tape — dark marquee strip above the main bar */}
+ 401 │ │         <div className={styles.utilityTape} aria-hidden>
+ 402 │ │           <div className={styles.utilityTrack}>
+ 403 │ │             {[...UTILITY_NOTES, ...UTILITY_NOTES, ...UTILITY_NOTES].map((note, i) => (
+ 404 │ │               <span key={i} className={styles.utilityItem}>
+ 405 │ │                 {note}<i>✦</i>
+ 406 │ │               </span>
+ 407 │ │             ))}
+ 408 │ │           </div>
+ 409 │ │         </div>
+ 410 │ │   
+ 411 │ │         <div className={styles.container}>
+ 412 │ │           {/* ── LEFT zone: search + primary nav ── */}
+ 413 │ │           <div className={styles.zoneLeft}>
+ 414 │ │             <button className={styles.iconBtn} onClick={() => setSearchOpen(true)} title="Search" aria-label="Search">
+ 415 │ │               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 416 │ │                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+ 417 │ │               </svg>
+ 418 │ │             </button>
+ 419 │ │             <nav className={styles.navLeft} aria-label="Primary">
+ 420 │ │               <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 421 │ │               <Link href="/products" className={styles.navLink} onClick={closeAll}><ScrambleText /></Link>
+ 422 │ │               <div
+ 423 │ │                 ref={megaRef}
+ 424 │ │                 className={`${styles.catTrigger} ${megaOpen ? styles.catTriggerActive : ''}`}
+ 425 │ │                 onMouseEnter={() => { if (!isMobile) setMegaOpen(true); }}
+ 426 │ │                 onMouseLeave={() => { if (!isMobile) setMegaOpen(false); }}
+ 427 │ │               >
+ 428 │ │                 <button
+ 429 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 430 │ │                   aria-haspopup="true"
+ 431 │ │                   aria-expanded={megaOpen}
+ 432 │ │                   onClick={() => { if (isMobile) { setMegaOpen(o => !o); setHelpOpen(false); } }}
+ 433 │ │                 >
+ 434 │ │                   CATEGORIES <span className={styles.chevron}>{megaOpen ? '▴' : '▾'}</span>
+ 435 │ │                 </button>
+ 436 │ │               </div>
+ 437 │ │             </nav>
+ 438 │ │           </div>
+ 439 │ │   
+ 440 │ │           {/* ── CENTER zone: logo ── */}
+ 441 │ │           <Link href="/" className={styles.logo} onClick={closeAll}>
+ 442 │ │             <img src="/urbanex-logo.png" alt="UrbanEx" className={styles.logoImage} />
+ 443 │ │           </Link>
+ 444 │ │   
+ 445 │ │           {/* ── RIGHT zone: secondary nav + account icons ── */}
+ 446 │ │           <div className={styles.zoneRight}>
+ 447 │ │             <nav className={styles.navRight} aria-label="Secondary">
+ 448 │ │               <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 449 │ │               <div
+ 450 │ │                 ref={helpRef}
+ 451 │ │                 className={`${styles.helpTrigger} ${helpOpen ? styles.catTriggerActive : ''}`}
+ 452 │ │                 onMouseEnter={() => { if (!isMobile) setHelpOpen(true); }}
+ 453 │ │                 onMouseLeave={() => { if (!isMobile) setHelpOpen(false); }}
+ 454 │ │               >
+ 455 │ │                 <button
+ 456 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 457 │ │                   aria-haspopup="true"
+ 458 │ │                   aria-expanded={helpOpen}
+ 459 │ │                   onClick={() => { if (isMobile) { setHelpOpen(o => !o); setMegaOpen(false); } }}
+ 460 │ │                 >
+ 461 │ │                   HELP <span className={styles.chevron}>{helpOpen ? '▴' : '▾'}</span>
+ 462 │ │                 </button>
+ 463 │ │                 {helpOpen && (
+ 464 │ │                   <div className={styles.helpMenu}>
+ 465 │ │                     {HELP_LINKS.map(l => (
+ 466 │ │                       <Link key={l.href} href={l.href} className={styles.helpItem} onClick={closeAll}>{l.label}</Link>
+ 467 │ │                     ))}
+ 468 │ │                   </div>
+ 469 │ │                 )}
+ 470 │ │               </div>
+ 471 │ │             </nav>
+ 472 │ │   
+ 473 │ │             <div className={styles.actions}>
+ 474 │ │               <Link href="/login" className={styles.iconBtn} title="Login" aria-label="Login">
+ 475 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 476 │ │                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+ 477 │ │                 </svg>
+ 478 │ │               </Link>
+ 479 │ │               <Link href="/wishlist" className={styles.iconBtn} title="Wishlist" aria-label="Wishlist">
+ 480 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 481 │ │                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+ 482 │ │                 </svg>
+ 483 │ │                 {mounted && wishlistCount > 0 && <span className={styles.cartCount}>{wishlistCount}</span>}
+ 484 │ │               </Link>
+ 485 │ │               <Link href="/cart" className={styles.cartLink} title="Cart" aria-label="Cart">
+ 486 │ │                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 487 │ │                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+ 488 │ │                   <line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
+ 489 │ │                 </svg>
+ 490 │ │                 {mounted && itemCount > 0 && <span className={styles.cartCount}>{itemCount}</span>}
+ 491 │ │               </Link>
+ 492 │ │               <button className={`${styles.menuToggle} ${menuOpen ? styles.open : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+ 493 │ │                 <span></span><span></span><span></span>
+ 494 │ │               </button>
+ 495 │ │             </div>
+ 496 │ │           </div>
+ 497 │ │         </div>
+ 498 │ │   
+ 499 │ │         {/* Desktop mega menu — full-width panel under the bar */}
+ 500 │ │         {!isMobile && megaOpen && (
+ 501 │ │           <div
+ 502 │ │             className={styles.megaWrapper}
+ 503 │ │             onMouseEnter={() => setMegaOpen(true)}
+ 504 │ │             onMouseLeave={() => setMegaOpen(false)}
+ 505 │ │           >
+ 506 │ │             <MegaMenu categories={categories} onClose={closeAll} />
+ 507 │ │           </div>
+ 508 │ │         )}
+ 509 │ │   
+ 510 │ │         {/* Mobile drawer */}
+ 511 │ │         <nav className={`${styles.mobileNav} ${menuOpen ? styles.open : ''}`} aria-label="Mobile">
+ 512 │ │           <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 513 │ │           <Link href="/products" className={styles.navLink} onClick={closeAll}>SHOP</Link>
+ 514 │ │           <div className={styles.mobileCatWrapper}>
+ 515 │ │             <button
+ 516 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 517 │ │               onClick={() => setMobileAccordionOpen(o => !o)}
+ 518 │ │               aria-expanded={mobileAccordionOpen}
+ 519 │ │             >
+ 520 │ │               CATEGORIES <span className={styles.chevron}>{mobileAccordionOpen ? '▴' : '▾'}</span>
+ 521 │ │             </button>
+ 522 │ │             {mobileAccordionOpen && <MobileAccordion categories={categories} onClose={closeAll} />}
+ 523 │ │           </div>
+ 524 │ │           <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 525 │ │           <div className={styles.mobileCatWrapper}>
+ 526 │ │             <button
+ 527 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 528 │ │               onClick={() => setMobileHelpOpen(o => !o)}
+ 529 │ │               aria-expanded={mobileHelpOpen}
+ 530 │ │             >
+ 531 │ │               HELP <span className={styles.chevron}>{mobileHelpOpen ? '▴' : '▾'}</span>
+ 532 │ │             </button>
+ 533 │ │             {mobileHelpOpen && (
+ 534 │ │               <div className={styles.mobileAccordion}>
+ 535 │ │                 {HELP_LINKS.map(l => (
+ 536 │ │                   <Link key={l.href} href={l.href} className={styles.accordionChild} onClick={closeAll}>{l.label}</Link>
+ 537 │ │                 ))}
+ 538 │ │               </div>
+ 539 │ │             )}
+ 540 │ │           </div>
+ 541 │ │         </nav>
+ 542 │ │   
+ 543 │ │         {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │ │       </header>
+ 545 │ ╰─▶   );
+ 546 │     }
+     ╰────
+
+  × Expression expected
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:543:1]
+ 543 │       {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │     </header>
+ 545 │   );
+ 546 │ }
+     · ─
+     ╰────
+
+Caused by:
+    Syntax Error @ webpack-internal:///./node_modules/next/dist/compiled/@next/react-dev-overlay/dist/client.js:25
+[  527318ms] [ERROR] ./src/components/Header.tsx
+Error: 
+  × Return statement is not allowed here
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:395:1]
+ 395 │         return () => document.removeEventListener('mousedown', onClick);
+ 396 │       }, [megaOpen, helpOpen]);
+ 397 │     
+ 398 │ ╭─▶   return (
+ 399 │ │       <header className={`${styles.header} ${menuOpen ? styles.mobileOpen : ''}`}>
+ 400 │ │         {/* Utility tape — dark marquee strip above the main bar */}
+ 401 │ │         <div className={styles.utilityTape} aria-hidden>
+ 402 │ │           <div className={styles.utilityTrack}>
+ 403 │ │             {[...UTILITY_NOTES, ...UTILITY_NOTES, ...UTILITY_NOTES].map((note, i) => (
+ 404 │ │               <span key={i} className={styles.utilityItem}>
+ 405 │ │                 {note}<i>✦</i>
+ 406 │ │               </span>
+ 407 │ │             ))}
+ 408 │ │           </div>
+ 409 │ │         </div>
+ 410 │ │   
+ 411 │ │         <div className={styles.container}>
+ 412 │ │           {/* ── LEFT zone: search + primary nav ── */}
+ 413 │ │           <div className={styles.zoneLeft}>
+ 414 │ │             <button className={styles.iconBtn} onClick={() => setSearchOpen(true)} title="Search" aria-label="Search">
+ 415 │ │               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 416 │ │                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+ 417 │ │               </svg>
+ 418 │ │             </button>
+ 419 │ │             <nav className={styles.navLeft} aria-label="Primary">
+ 420 │ │               <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 421 │ │               <Link href="/products" className={styles.navLink} onClick={closeAll}><ScrambleText /></Link>
+ 422 │ │               <div
+ 423 │ │                 ref={megaRef}
+ 424 │ │                 className={`${styles.catTrigger} ${megaOpen ? styles.catTriggerActive : ''}`}
+ 425 │ │                 onMouseEnter={() => { if (!isMobile) setMegaOpen(true); }}
+ 426 │ │                 onMouseLeave={() => { if (!isMobile) setMegaOpen(false); }}
+ 427 │ │               >
+ 428 │ │                 <button
+ 429 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 430 │ │                   aria-haspopup="true"
+ 431 │ │                   aria-expanded={megaOpen}
+ 432 │ │                   onClick={() => { if (isMobile) { setMegaOpen(o => !o); setHelpOpen(false); } }}
+ 433 │ │                 >
+ 434 │ │                   CATEGORIES <span className={styles.chevron}>{megaOpen ? '▴' : '▾'}</span>
+ 435 │ │                 </button>
+ 436 │ │               </div>
+ 437 │ │             </nav>
+ 438 │ │           </div>
+ 439 │ │   
+ 440 │ │           {/* ── CENTER zone: logo ── */}
+ 441 │ │           <Link href="/" className={styles.logo} onClick={closeAll}>
+ 442 │ │             <img src="/urbanex-logo.png" alt="UrbanEx" className={styles.logoImage} />
+ 443 │ │           </Link>
+ 444 │ │   
+ 445 │ │           {/* ── RIGHT zone: secondary nav + account icons ── */}
+ 446 │ │           <div className={styles.zoneRight}>
+ 447 │ │             <nav className={styles.navRight} aria-label="Secondary">
+ 448 │ │               <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 449 │ │               <div
+ 450 │ │                 ref={helpRef}
+ 451 │ │                 className={`${styles.helpTrigger} ${helpOpen ? styles.catTriggerActive : ''}`}
+ 452 │ │                 onMouseEnter={() => { if (!isMobile) setHelpOpen(true); }}
+ 453 │ │                 onMouseLeave={() => { if (!isMobile) setHelpOpen(false); }}
+ 454 │ │               >
+ 455 │ │                 <button
+ 456 │ │                   className={`${styles.navLink} ${styles.catBtn}`}
+ 457 │ │                   aria-haspopup="true"
+ 458 │ │                   aria-expanded={helpOpen}
+ 459 │ │                   onClick={() => { if (isMobile) { setHelpOpen(o => !o); setMegaOpen(false); } }}
+ 460 │ │                 >
+ 461 │ │                   HELP <span className={styles.chevron}>{helpOpen ? '▴' : '▾'}</span>
+ 462 │ │                 </button>
+ 463 │ │                 {helpOpen && (
+ 464 │ │                   <div className={styles.helpMenu}>
+ 465 │ │                     {HELP_LINKS.map(l => (
+ 466 │ │                       <Link key={l.href} href={l.href} className={styles.helpItem} onClick={closeAll}>{l.label}</Link>
+ 467 │ │                     ))}
+ 468 │ │                   </div>
+ 469 │ │                 )}
+ 470 │ │               </div>
+ 471 │ │             </nav>
+ 472 │ │   
+ 473 │ │             <div className={styles.actions}>
+ 474 │ │               <Link href="/login" className={styles.iconBtn} title="Login" aria-label="Login">
+ 475 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 476 │ │                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+ 477 │ │                 </svg>
+ 478 │ │               </Link>
+ 479 │ │               <Link href="/wishlist" className={styles.iconBtn} title="Wishlist" aria-label="Wishlist">
+ 480 │ │                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 481 │ │                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+ 482 │ │                 </svg>
+ 483 │ │                 {mounted && wishlistCount > 0 && <span className={styles.cartCount}>{wishlistCount}</span>}
+ 484 │ │               </Link>
+ 485 │ │               <Link href="/cart" className={styles.cartLink} title="Cart" aria-label="Cart">
+ 486 │ │                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+ 487 │ │                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+ 488 │ │                   <line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
+ 489 │ │                 </svg>
+ 490 │ │                 {mounted && itemCount > 0 && <span className={styles.cartCount}>{itemCount}</span>}
+ 491 │ │               </Link>
+ 492 │ │               <button className={`${styles.menuToggle} ${menuOpen ? styles.open : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+ 493 │ │                 <span></span><span></span><span></span>
+ 494 │ │               </button>
+ 495 │ │             </div>
+ 496 │ │           </div>
+ 497 │ │         </div>
+ 498 │ │   
+ 499 │ │         {/* Desktop mega menu — full-width panel under the bar */}
+ 500 │ │         {!isMobile && megaOpen && (
+ 501 │ │           <div
+ 502 │ │             className={styles.megaWrapper}
+ 503 │ │             onMouseEnter={() => setMegaOpen(true)}
+ 504 │ │             onMouseLeave={() => setMegaOpen(false)}
+ 505 │ │           >
+ 506 │ │             <MegaMenu categories={categories} onClose={closeAll} />
+ 507 │ │           </div>
+ 508 │ │         )}
+ 509 │ │   
+ 510 │ │         {/* Mobile drawer */}
+ 511 │ │         <nav className={`${styles.mobileNav} ${menuOpen ? styles.open : ''}`} aria-label="Mobile">
+ 512 │ │           <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+ 513 │ │           <Link href="/products" className={styles.navLink} onClick={closeAll}>SHOP</Link>
+ 514 │ │           <div className={styles.mobileCatWrapper}>
+ 515 │ │             <button
+ 516 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 517 │ │               onClick={() => setMobileAccordionOpen(o => !o)}
+ 518 │ │               aria-expanded={mobileAccordionOpen}
+ 519 │ │             >
+ 520 │ │               CATEGORIES <span className={styles.chevron}>{mobileAccordionOpen ? '▴' : '▾'}</span>
+ 521 │ │             </button>
+ 522 │ │             {mobileAccordionOpen && <MobileAccordion categories={categories} onClose={closeAll} />}
+ 523 │ │           </div>
+ 524 │ │           <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+ 525 │ │           <div className={styles.mobileCatWrapper}>
+ 526 │ │             <button
+ 527 │ │               className={`${styles.navLink} ${styles.mobileCatBtn}`}
+ 528 │ │               onClick={() => setMobileHelpOpen(o => !o)}
+ 529 │ │               aria-expanded={mobileHelpOpen}
+ 530 │ │             >
+ 531 │ │               HELP <span className={styles.chevron}>{mobileHelpOpen ? '▴' : '▾'}</span>
+ 532 │ │             </button>
+ 533 │ │             {mobileHelpOpen && (
+ 534 │ │               <div className={styles.mobileAccordion}>
+ 535 │ │                 {HELP_LINKS.map(l => (
+ 536 │ │                   <Link key={l.href} href={l.href} className={styles.accordionChild} onClick={closeAll}>{l.label}</Link>
+ 537 │ │                 ))}
+ 538 │ │               </div>
+ 539 │ │             )}
+ 540 │ │           </div>
+ 541 │ │         </nav>
+ 542 │ │   
+ 543 │ │         {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │ │       </header>
+ 545 │ ╰─▶   );
+ 546 │     }
+     ╰────
+
+  × Expression expected
+     ╭─[C:\Users\Matin\claude website ue\frontend\src\components\Header.tsx:543:1]
+ 543 │       {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+ 544 │     </header>
+ 545 │   );
+ 546 │ }
+     · ─
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/Header.tsx
+./src/app/HomeClient.tsx @ webpack-internal:///./node_modules/next/dist/compiled/@next/react-dev-overlay/dist/client.js:25
+[  527321ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///./node_modules/next/dist/client/dev/error-overlay/hot-dev-client.js:198
+[  529337ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///./node_modules/next/dist/client/dev/error-overlay/hot-dev-client.js:198
+[  531152ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/webpack/e5f9e0bc42c936a0.webpack.hot-update.json:0
+[  531153ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///./node_modules/next/dist/client/dev/error-overlay/hot-dev-client.js:299
+[  540670ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/webpack/e5f9e0bc42c936a0.webpack.hot-update.json:0
+[  540670ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///./node_modules/next/dist/client/dev/error-overlay/hot-dev-client.js:299
+[  548757ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/webpack/e5f9e0bc42c936a0.webpack.hot-update.json:0
+[  548757ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///./node_modules/next/dist/client/dev/error-overlay/hot-dev-client.js:299
+[  553045ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js:32365
+[  555563ms] [LOG] %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit @ https://va.vercel-scripts.com/v1/script.debug.js:0
+[  555564ms] [LOG] %c[Vercel Web Analytics]%c [view] http://localhost:3001/ color: rgb(120, 120, 120) color: inherit {o: http://localhost:3001/, sv: 0.1.3, sdkn: @vercel/analytics/react, sdkv: 1.3.1, ts: 1781865532526} /_vercel/insights/view @ https://va.vercel-scripts.com/v1/script.debug.js:0

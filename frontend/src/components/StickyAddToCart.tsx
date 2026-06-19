@@ -20,6 +20,7 @@ function formatPrice(price: number) {
 export default function StickyAddToCart({ image, name, price, selectedSize, onAdd, triggerSelector = '[data-pdp-actions]' }: Props) {
   const [visible, setVisible] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const barRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const target = document.querySelector(triggerSelector);
@@ -38,8 +39,23 @@ export default function StickyAddToCart({ image, name, price, selectedSize, onAd
     };
   }, [triggerSelector]);
 
+  // Push the floating WhatsApp button above the bar while it's visible so
+  // the two never overlap. Cleared on hide / unmount.
+  useEffect(() => {
+    const root = document.documentElement;
+    const h = barRef.current?.offsetHeight ?? 0;
+    if (visible && h > 0) {
+      root.style.setProperty('--sticky-cart-clearance', `${h + 16}px`);
+    } else {
+      root.style.setProperty('--sticky-cart-clearance', '0px');
+    }
+    return () => {
+      root.style.setProperty('--sticky-cart-clearance', '0px');
+    };
+  }, [visible]);
+
   return (
-    <div className={`${styles.bar} ${visible ? styles.barVisible : ''}`}>
+    <div ref={barRef} className={`${styles.bar} ${visible ? styles.barVisible : ''}`}>
       <div className={styles.thumb}>
         {image && <Image src={image} alt={name} fill sizes="44px" style={{ objectFit: 'cover' }} />}
       </div>

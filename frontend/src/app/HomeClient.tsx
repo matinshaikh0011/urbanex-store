@@ -102,10 +102,6 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
           <div className={styles.slabGrain} aria-hidden />
           <ScrollReveal animation="slideUp" duration={800}>
             <div className={styles.categoryShowcase}>
-              <Link href="/categories" className={styles.exploreAllBtn} data-cursor="view" aria-label="Explore all categories">
-                <span>EXPLORE ALL CATEGORIES</span>
-                <span className={styles.exploreAllArrow} aria-hidden>→</span>
-              </Link>
               <div className={styles.catHeader}>
                 <span className={styles.catEyebrow}>SECTION / 01</span>
                 <h2 className={styles.catTitle}>SHOP BY <span className={styles.accent}>CATEGORY</span></h2>
@@ -188,6 +184,12 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
                 </>
               )}
               </div>
+              <div className={styles.exploreAllWrap}>
+                <Link href="/categories" className={styles.exploreAllBtn} data-cursor="view" aria-label="Explore all categories">
+                  <span>EXPLORE ALL CATEGORIES</span>
+                  <span className={styles.exploreAllArrow} aria-hidden>→</span>
+                </Link>
+              </div>
             </div>
           </ScrollReveal>
         </section>
@@ -221,7 +223,7 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
             <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
               <div className={styles.slabGrain} aria-hidden />
               <ScrollReveal animation="fadeIn">
-                <FeaturedRow icon="👟" title="SNEAKERS" href="/products?category=sneakers" products={featured.sneakers} />
+                <FeaturedRow icon="👟" title="SNEAKERS" href="/products?category=sneakers" products={featured.sneakers} tone="light" />
               </ScrollReveal>
             </section>
 
@@ -230,7 +232,7 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
             <section className={`${styles.slab} ${styles.slabDark} ${styles.featuredSlab}`}>
               <div className={styles.slabGrain} aria-hidden />
               <ScrollReveal animation="fadeIn">
-                <FeaturedRow icon="⌚" title="LUXURY WATCHES" href="/products?category=watches" products={featured.watches} />
+                <FeaturedRow icon="⌚" title="LUXURY WATCHES" href="/products?category=watches" products={featured.watches} tone="dark" />
               </ScrollReveal>
             </section>
 
@@ -239,7 +241,7 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
             <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
               <div className={styles.slabGrain} aria-hidden />
               <ScrollReveal animation="fadeIn">
-                <FeaturedRow icon="🕶️" title="GLASSES" href="/products?category=glasses" products={featured.glasses} />
+                <FeaturedRow icon="🕶️" title="GLASSES" href="/products?category=glasses" products={featured.glasses} tone="light" />
               </ScrollReveal>
             </section>
 
@@ -248,7 +250,7 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
             <section className={`${styles.slab} ${styles.slabDark} ${styles.featuredSlab}`}>
               <div className={styles.slabGrain} aria-hidden />
               <ScrollReveal animation="fadeIn">
-                <FeaturedRow icon="👜" title="HANDBAGS" href="/products?category=handbags" products={featured.handbags} />
+                <FeaturedRow icon="👜" title="HANDBAGS" href="/products?category=handbags" products={featured.handbags} tone="dark" />
               </ScrollReveal>
             </section>
 
@@ -257,7 +259,7 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
             <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
               <div className={styles.slabGrain} aria-hidden />
               <ScrollReveal animation="fadeIn">
-                <FeaturedRow icon="👕" title="CLOTHING" href="/products?category=clothing" products={featured.clothing} />
+                <FeaturedRow icon="👕" title="CLOTHING" href="/products?category=clothing" products={featured.clothing} tone="light" />
               </ScrollReveal>
               <ScrollReveal animation="fadeIn">
                 <div className={styles.featuredViewAll}>

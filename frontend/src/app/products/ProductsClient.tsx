@@ -190,6 +190,15 @@ function ProductsPageContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Lock body scroll while the mobile filter bottom sheet is open
+  useEffect(() => {
+    if (mobileFiltersOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [mobileFiltersOpen]);
+
   return (
     <>
       <GlobalPopup />
@@ -227,8 +236,27 @@ function ProductsPageContent() {
             </span>
           </button>
 
+          {/* Backdrop for the mobile filter bottom sheet */}
+          <div
+            className={`${styles.filterBackdrop} ${mobileFiltersOpen ? styles.open : ''}`}
+            onClick={() => setMobileFiltersOpen(false)}
+            aria-hidden
+          />
+
           {/* Filters Panel */}
           <div className={`${styles.filtersPanel} ${mobileFiltersOpen ? styles.open : ''}`}>
+            {/* Bottom-sheet handle + title (mobile only) */}
+            <div className={styles.sheetHeader}>
+              <span className={styles.sheetGrabber} aria-hidden />
+              <span className={styles.sheetTitle}>FILTERS</span>
+              <button
+                className={styles.sheetClose}
+                onClick={() => setMobileFiltersOpen(false)}
+                aria-label="Close filters"
+              >
+                ✕
+              </button>
+            </div>
             {/* Category Display */}
             <div className={styles.filterGroup}>
               <label className={styles.filterLabel}>CATEGORY</label>
@@ -377,6 +405,14 @@ function ProductsPageContent() {
                 ✕ CLEAR ALL FILTERS
               </button>
             )}
+
+            {/* Sticky apply button (mobile bottom sheet only) */}
+            <button
+              className={styles.applyFilters}
+              onClick={() => setMobileFiltersOpen(false)}
+            >
+              SHOW {filteredProducts.length} {filteredProducts.length === 1 ? 'RESULT' : 'RESULTS'}
+            </button>
           </div>
 
           {/* Products Content */}

@@ -321,6 +321,15 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); }
   h1 { font-size: 36px; }
   h2 { font-size: 28px; }
   h3 { font-size: 20px; }
+
+  /* iOS Safari zooms the page when a focused form control has a font
+     smaller than 16px. Force 16px on every control on mobile to keep
+     checkout/search/sort fields from triggering that jarring zoom. */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
 }
 
 /* ================================================================

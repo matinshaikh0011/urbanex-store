@@ -1,1 +1,6 @@
 .vercel
+
+# Local env files (do not commit real values)
+.env
+.env.local
+.env*.local

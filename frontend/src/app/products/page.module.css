@@ -230,6 +230,11 @@
   isolation: isolate;
 }
 
+/* Bottom-sheet chrome — hidden on desktop, shown only in the mobile sheet */
+.sheetHeader { display: none; }
+.filterBackdrop { display: none; }
+.applyFilters { display: none; }
+
 /* Concrete grain on the slab */
 .filtersPanel::before {
   content: '';
@@ -326,7 +331,7 @@
 
 .slider {
   position: relative;
-  height: 34px;
+  height: 44px;
   display: flex;
   align-items: center;
 }
@@ -355,7 +360,7 @@
   pointer-events: none;
   -webkit-appearance: none;
   appearance: none;
-  height: 34px;
+  height: 44px;
 }
 .sliderInput::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -622,18 +627,135 @@
 
 @media (max-width: 768px) {
   .mobileFilterBtn { display: flex; }
-  .filtersPanel { display: none; padding: 18px; }
-  .filtersPanel.open {
-    display: grid;
-    animation: slideDown 0.3s var(--ease-out);
+
+  /* Backdrop behind the bottom sheet */
+  .filterBackdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 10, 10, 0.5);
+    z-index: 998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
   }
+  .filterBackdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Filters panel becomes a bottom sheet */
+  .filtersPanel {
+    display: grid;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+    margin: 0;
+    max-height: 85vh;
+    overflow-y: auto;
+    border-radius: 18px 18px 0 0;
+    border: none;
+    border-top: 3px solid var(--ux-ink);
+    box-shadow: 0 -8px 24px rgba(10, 10, 10, 0.25);
+    padding: 0 18px calc(18px + env(safe-area-inset-bottom, 0px));
+    transform: translateY(100%);
+    transition: transform 0.32s var(--ease-out);
+    animation: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .filtersPanel.open {
+    transform: translateY(0);
+  }
+
+  /* Sticky sheet header with grabber + close */
+  .sheetHeader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    margin: 0 -18px 8px;
+    padding: 14px 18px 12px;
+    background: var(--ux-bone);
+    border-bottom: 2px solid var(--ux-ink);
+  }
+  .sheetGrabber {
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--ux-chalk);
+  }
+  .sheetTitle {
+    font-family: 'Oswald', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ux-ink);
+  }
+  .sheetClose {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    color: var(--ux-ink);
+    cursor: pointer;
+  }
+
+  /* Sticky apply button at the bottom of the sheet */
+  .applyFilters {
+    display: block;
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin: 8px -18px 0;
+    padding: 16px;
+    background: var(--ux-ink);
+    color: var(--ux-bone);
+    border: none;
+    border-top: 3px solid var(--ux-ink);
+    font-family: 'Oswald', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    min-height: 52px;
+  }
+
   .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .title { font-size: 22px; }
   .header { flex-direction: column; align-items: flex-start; gap: 6px; }
   .pageHero { padding: 42px 16px 36px; }
   .pageHeroTitle { font-size: 30px; letter-spacing: 4px; }
   .pageHeroContent { flex-direction: column; gap: 14px; align-items: flex-start; }
-  .scrollTopBtn { bottom: 20px; right: 20px; width: 44px; height: 44px; }
+  .scrollTopBtn { bottom: 20px; right: 20px; width: 48px; height: 48px; }
+  /* 16px prevents iOS focus-zoom on the sort dropdown */
+  .sortSelect { font-size: 16px; min-height: 44px; }
+  /* 44px tap targets for filter chips + clear button */
+  .categoryTag,
+  .brandBtn {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+  }
+  .clearFilters { min-height: 44px; }
 }
 
 @media (max-width: 480px) {

@@ -1,0 +1,76 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - text: FREE SHIPPING OVER ₹999
+        - generic [ref=e6]: ✦
+      - generic [ref=e7]:
+        - text: 7-DAY EASY RETURNS
+        - generic [ref=e8]: ✦
+      - generic [ref=e9]:
+        - text: COD AVAILABLE
+        - generic [ref=e10]: ✦
+      - generic [ref=e11]:
+        - text: 100% AUTHENTIC
+        - generic [ref=e12]: ✦
+      - generic [ref=e13]:
+        - text: INSTANT WHATSAPP SUPPORT
+        - generic [ref=e14]: ✦
+      - generic [ref=e15]:
+        - text: NEW DROP 2026
+        - generic [ref=e16]: ✦
+      - generic [ref=e17]:
+        - text: FREE SHIPPING OVER ₹999
+        - generic [ref=e18]: ✦
+      - generic [ref=e19]:
+        - text: 7-DAY EASY RETURNS
+        - generic [ref=e20]: ✦
+      - generic [ref=e21]:
+        - text: COD AVAILABLE
+        - generic [ref=e22]: ✦
+      - generic [ref=e23]:
+        - text: 100% AUTHENTIC
+        - generic [ref=e24]: ✦
+      - generic [ref=e25]:
+        - text: INSTANT WHATSAPP SUPPORT
+        - generic [ref=e26]: ✦
+      - generic [ref=e27]:
+        - text: NEW DROP 2026
+        - generic [ref=e28]: ✦
+      - generic [ref=e29]:
+        - text: FREE SHIPPING OVER ₹999
+        - generic [ref=e30]: ✦
+      - generic [ref=e31]:
+        - text: 7-DAY EASY RETURNS
+        - generic [ref=e32]: ✦
+      - generic [ref=e33]:
+        - text: COD AVAILABLE
+        - generic [ref=e34]: ✦
+      - generic [ref=e35]:
+        - text: 100% AUTHENTIC
+        - generic [ref=e36]: ✦
+      - generic [ref=e37]:
+        - text: INSTANT WHATSAPP SUPPORT
+        - generic [ref=e38]: ✦
+      - generic [ref=e39]:
+        - text: NEW DROP 2026
+        - generic [ref=e40]: ✦
+    - generic [ref=e41]:
+      - link "UrbanEx" [ref=e42] [cursor=pointer]:
+        - /url: /
+        - img "UrbanEx" [ref=e43]
+      - generic [ref=e44]:
+        - button "Search" [ref=e45] [cursor=pointer]:
+          - img [ref=e46]
+        - link "Cart" [ref=e49] [cursor=pointer]:
+          - /url: /cart
+          - img [ref=e50]
+        - button "Menu" [ref=e53] [cursor=pointer]
+  - main [ref=e57]:
+    - status "LOADING" [ref=e58]:
+      - generic [ref=e60]: URBANEX URBANEX
+      - generic [ref=e62]: LOADING
+  - link "Chat with us on WhatsApp" [ref=e63] [cursor=pointer]:
+    - /url: https://wa.me/919898285850
+    - generic: Chat with us
+    - img [ref=e65]

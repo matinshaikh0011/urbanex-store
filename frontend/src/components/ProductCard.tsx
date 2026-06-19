@@ -122,6 +122,24 @@ export default function ProductCard({ product, index = 0 }: { product: Product; 
         <div className={styles.priceRow}>
           <span className={styles.price}>{formatPrice(product.price)}</span>
           {product.originalPrice && <span className={styles.originalPrice}>{formatPrice(product.originalPrice)}</span>}
+          {/* Touch devices have no hover. A compact icon add-button sits at
+              the end of the price row — keeps the image fully visible and
+              adds no extra height to the card. Hidden on hover devices. */}
+          <button
+            className={`${styles.touchAdd} ${added ? styles.touchAdded : ''}`}
+            onClick={handleAddToCart}
+            aria-label={added ? 'Added to cart' : 'Add to cart'}
+          >
+            {added ? (
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
     </Link>

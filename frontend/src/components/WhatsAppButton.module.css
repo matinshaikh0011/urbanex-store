@@ -11,12 +11,16 @@
 
 .fab {
   position: fixed;
-  bottom: 24px;
+  /* --sticky-cart-clearance is set by StickyAddToCart on PDPs when its bar
+     is visible, so the FAB rides up above the Add-to-Cart bar instead of
+     overlapping it. Defaults to 0 everywhere else. */
+  bottom: calc(24px + var(--sticky-cart-clearance, 0px));
   right: 24px;
   z-index: 1500;
   display: flex;
   align-items: center;
   gap: 0;
+  transition: bottom 0.25s ease;
 }
 
 .iconWrap {
@@ -75,7 +79,7 @@
 }
 
 @media (max-width: 768px) {
-  .fab { bottom: 18px; right: 18px; }
+  .fab { bottom: calc(18px + var(--sticky-cart-clearance, 0px)); right: 18px; }
   .iconWrap { width: 52px; height: 52px; }
   /* keep tooltip available on tap-hover but it's fine hidden by default */
 }

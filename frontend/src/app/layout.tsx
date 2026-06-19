@@ -1,8 +1,11 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import { Analytics } from '@vercel/analytics/react';
 import { CartProvider } from '@/components/ClientProviders';
 import { WishlistProvider } from '@/components/WishlistProvider';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
+import AnalyticsListener from '@/components/analytics/AnalyticsListener';
 import { SITE_URL, SITE_NAME, SITE_TAGLINE, DEFAULT_OG_IMAGE } from '@/lib/site';
 
 export const metadata: Metadata = {
@@ -91,12 +94,15 @@ export default function RootLayout({
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+        <GoogleAnalytics />
+        <AnalyticsListener />
         <CartProvider>
           <WishlistProvider>
             {children}
             <WhatsAppButton />
           </WishlistProvider>
         </CartProvider>
+        <Analytics />
       </body>
     </html>
   );

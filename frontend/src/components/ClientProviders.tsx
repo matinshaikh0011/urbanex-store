@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { trackAddToCart, toItem } from '@/lib/analytics';
 
 interface CartItem {
   id: number;
@@ -42,6 +43,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items, mounted]);
 
   const addToCart = (item: CartItem) => {
+    // Fire GA4 add_to_cart once per user action. Every add-to-cart path
+    // (PDP, product cards, quick-add, sticky bar) routes through here, so
+    // this is the single source of truth — no duplicate events.
+    trackAddToCart(
+      toItem({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        size: item.size,
+        quantity: item.quantity,
+      })
+    );
+
     setItems(prev => {
       const existing = prev.find(i => i.id === item.id && i.size === item.size);
       if (existing) {

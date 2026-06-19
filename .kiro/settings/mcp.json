@@ -43,7 +43,11 @@
         "browser_take_screenshot",
         "browser_snapshot",
         "browser_evaluate",
-        "browser_navigate"
+        "browser_navigate",
+        "browser_resize",
+        "browser_click",
+        "browser_run_code_unsafe",
+        "browser_console_messages"
       ]
     }
   }

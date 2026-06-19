@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from './ClientProviders';
 import { useWishlist } from './WishlistProvider';
 import styles from './Header.module.css';
+import UrbanPandaPeek from './UrbanPandaPeek';
 
 // ── Category types ──────────────────────────────────────────────
 interface Category {
@@ -182,6 +183,14 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
   );
 }
 
+// ── Help dropdown links ──────────────────────────────────────────
+const HELP_LINKS: { label: string; href: string }[] = [
+  { label: 'Track Order', href: '/track-order' },
+  { label: 'FAQ', href: '/faq' },
+  { label: 'Returns & Exchange', href: '/return-exchange' },
+  { label: 'Contact', href: '/contact' },
+];
+
 // ── Mega Menu ────────────────────────────────────────────────────
 interface MegaMenuProps {
   categories: Category[];
@@ -307,15 +316,17 @@ export default function Header() {
   const { count: wishlistCount } = useWishlist();
   const [menuOpen, setMenuOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [mobileHelpOpen, setMobileHelpOpen] = useState(false);
   const [mobileAccordionOpen, setMobileAccordionOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Hover intent refs — prevent flicker when moving mouse from trigger to panel
-  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Hover intent refs
   const megaRef = useRef<HTMLDivElement>(null);
+  const helpRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -354,35 +365,14 @@ export default function Header() {
   const closeAll = useCallback(() => {
     setMenuOpen(false);
     setMegaOpen(false);
+    setHelpOpen(false);
+    setMobileHelpOpen(false);
     setMobileAccordionOpen(false);
   }, []);
 
-  // Desktop hover handlers with delay to prevent flicker
-  const handleCatMouseEnter = () => {
-    if (isMobile) return;
-    if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
-    setMegaOpen(true);
-  };
-
-  const handleCatMouseLeave = () => {
-    if (isMobile) return;
-    hoverTimeout.current = setTimeout(() => setMegaOpen(false), 150);
-  };
-
-  const handleMegaMouseEnter = () => {
-    if (isMobile) return;
-    if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
-    setMegaOpen(true);
-  };
-
-  const handleMegaMouseLeave = () => {
-    if (isMobile) return;
-    hoverTimeout.current = setTimeout(() => setMegaOpen(false), 150);
-  };
-
   // Close mega on Escape
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setMegaOpen(false); setMenuOpen(false); } };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setMegaOpen(false); setHelpOpen(false); setMenuOpen(false); } };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, []);
@@ -393,10 +383,13 @@ export default function Header() {
       if (megaRef.current && !megaRef.current.contains(e.target as Node)) {
         setMegaOpen(false);
       }
+      if (helpRef.current && !helpRef.current.contains(e.target as Node)) {
+        setHelpOpen(false);
+      }
     };
-    if (megaOpen) document.addEventListener('mousedown', onClick);
+    if (megaOpen || helpOpen) document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
-  }, [megaOpen]);
+  }, [megaOpen, helpOpen]);
 
   return (
     <header className={`${styles.header} ${menuOpen ? styles.mobileOpen : ''}`}>
@@ -412,97 +405,139 @@ export default function Header() {
       </div>
 
       <div className={styles.container}>
-        {/* Logo */}
-        <Link href="/" className={styles.logo} onClick={closeAll}>
-          <img src="/urbanex-logo.png" alt="UrbanEx" className={styles.logoImage} />
-        </Link>
-
-        {/* Desktop nav */}
-        <nav className={`${styles.nav} ${menuOpen ? styles.open : ''}`}>
-          <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
-          <Link href="/products" className={styles.navLink} onClick={closeAll}><ScrambleText /></Link>
-
-          {/* Categories trigger — desktop: hover mega menu, mobile: accordion */}
-          {isMobile ? (
-            // Mobile: tap to toggle accordion inline in the drawer
-            <div className={styles.mobileCatWrapper}>
-              <button
-                className={`${styles.navLink} ${styles.mobileCatBtn}`}
-                onClick={() => setMobileAccordionOpen(o => !o)}
-                aria-expanded={mobileAccordionOpen}
-              >
-                CATEGORIES <span className={styles.chevron}>{mobileAccordionOpen ? '▴' : '▾'}</span>
-              </button>
-              {mobileAccordionOpen && (
-                <MobileAccordion categories={categories} onClose={closeAll} />
-              )}
-            </div>
-          ) : (
-            // Desktop: hover mega menu
+        {/* ── LEFT zone: search + primary nav ── */}
+        <div className={styles.zoneLeft}>
+          <button className={styles.iconBtn} onClick={() => setSearchOpen(true)} title="Search" aria-label="Search">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </button>
+          <nav className={styles.navLeft} aria-label="Primary">
+            <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+            <Link href="/products" className={styles.navLink} onClick={closeAll}><ScrambleText /></Link>
             <div
               ref={megaRef}
               className={`${styles.catTrigger} ${megaOpen ? styles.catTriggerActive : ''}`}
-              onMouseEnter={handleCatMouseEnter}
-              onMouseLeave={handleCatMouseLeave}
+              onMouseEnter={() => { if (!isMobile) setMegaOpen(true); }}
+              onMouseLeave={() => { if (!isMobile) setMegaOpen(false); }}
             >
               <button
                 className={`${styles.navLink} ${styles.catBtn}`}
                 aria-haspopup="true"
                 aria-expanded={megaOpen}
-                onClick={() => setMegaOpen(o => !o)}
+                onClick={() => { if (isMobile) { setMegaOpen(o => !o); setHelpOpen(false); } }}
               >
                 CATEGORIES <span className={styles.chevron}>{megaOpen ? '▴' : '▾'}</span>
               </button>
+            </div>
+          </nav>
+        </div>
 
-              {megaOpen && (
-                <div
-                  className={styles.megaWrapper}
-                  onMouseEnter={handleMegaMouseEnter}
-                  onMouseLeave={handleMegaMouseLeave}
-                >
-                  <MegaMenu categories={categories} onClose={closeAll} />
+        {/* ── CENTER zone: logo + panda easter egg ── */}
+        <div className={styles.logoWrap}>
+          <UrbanPandaPeek />
+          <Link href="/" className={styles.logo} onClick={closeAll}>
+            <img src="/urbanex-logo-transparent.png" alt="UrbanEx" className={styles.logoImage} />
+          </Link>
+        </div>
+
+        {/* ── RIGHT zone: secondary nav + account icons ── */}
+        <div className={styles.zoneRight}>
+          <nav className={styles.navRight} aria-label="Secondary">
+            <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+            <div
+              ref={helpRef}
+              className={`${styles.helpTrigger} ${helpOpen ? styles.catTriggerActive : ''}`}
+              onMouseEnter={() => { if (!isMobile) setHelpOpen(true); }}
+              onMouseLeave={() => { if (!isMobile) setHelpOpen(false); }}
+            >
+              <button
+                className={`${styles.navLink} ${styles.catBtn}`}
+                aria-haspopup="true"
+                aria-expanded={helpOpen}
+                onClick={() => { if (isMobile) { setHelpOpen(o => !o); setMegaOpen(false); } }}
+              >
+                HELP <span className={styles.chevron}>{helpOpen ? '▴' : '▾'}</span>
+              </button>
+              {helpOpen && (
+                <div className={styles.helpMenu}>
+                  {HELP_LINKS.map(l => (
+                    <Link key={l.href} href={l.href} className={styles.helpItem} onClick={closeAll}>{l.label}</Link>
+                  ))}
                 </div>
               )}
             </div>
-          )}
+          </nav>
 
-          <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
-          <Link href="/track-order" className={styles.navLink} onClick={closeAll}>TRACK</Link>
-          <Link href="/faq" className={styles.navLink} onClick={closeAll}>FAQ</Link>
-          <Link href="/return-exchange" className={styles.navLink} onClick={closeAll}>RETURN</Link>
-          <Link href="/contact" className={styles.navLink} onClick={closeAll}>CONTACT</Link>
-        </nav>
-
-        {/* Action icons */}
-        <div className={styles.actions}>
-          <button className={styles.iconBtn} onClick={() => setSearchOpen(true)} title="Search">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-          </button>
-          <Link href="/login" className={styles.iconBtn} title="Login">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-            </svg>
-          </Link>
-          <Link href="/wishlist" className={styles.iconBtn} title="Wishlist">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-            </svg>
-            {mounted && wishlistCount > 0 && <span className={styles.cartCount}>{wishlistCount}</span>}
-          </Link>
-          <Link href="/cart" className={styles.cartLink} title="Cart">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-              <line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
-            </svg>
-            {mounted && itemCount > 0 && <span className={styles.cartCount}>{itemCount}</span>}
-          </Link>
-          <button className={`${styles.menuToggle} ${menuOpen ? styles.open : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
-            <span></span><span></span><span></span>
-          </button>
+          <div className={styles.actions}>
+            <Link href="/login" className={styles.iconBtn} title="Login" aria-label="Login">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+              </svg>
+            </Link>
+            <Link href="/wishlist" className={styles.iconBtn} title="Wishlist" aria-label="Wishlist">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+              {mounted && wishlistCount > 0 && <span className={styles.cartCount}>{wishlistCount}</span>}
+            </Link>
+            <Link href="/cart" className={styles.cartLink} title="Cart" aria-label="Cart">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+              {mounted && itemCount > 0 && <span className={styles.cartCount}>{itemCount}</span>}
+            </Link>
+            <button className={`${styles.menuToggle} ${menuOpen ? styles.open : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+              <span></span><span></span><span></span>
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Desktop mega menu — full-width panel under the bar */}
+      {!isMobile && megaOpen && (
+        <div
+          className={styles.megaWrapper}
+          onMouseEnter={() => setMegaOpen(true)}
+          onMouseLeave={() => setMegaOpen(false)}
+        >
+          <MegaMenu categories={categories} onClose={closeAll} />
+        </div>
+      )}
+
+      {/* Mobile drawer */}
+      <nav className={`${styles.mobileNav} ${menuOpen ? styles.open : ''}`} aria-label="Mobile">
+        <Link href="/" className={styles.navLink} onClick={closeAll}>HOME</Link>
+        <Link href="/products" className={styles.navLink} onClick={closeAll}>SHOP</Link>
+        <div className={styles.mobileCatWrapper}>
+          <button
+            className={`${styles.navLink} ${styles.mobileCatBtn}`}
+            onClick={() => setMobileAccordionOpen(o => !o)}
+            aria-expanded={mobileAccordionOpen}
+          >
+            CATEGORIES <span className={styles.chevron}>{mobileAccordionOpen ? '▴' : '▾'}</span>
+          </button>
+          {mobileAccordionOpen && <MobileAccordion categories={categories} onClose={closeAll} />}
+        </div>
+        <Link href="/about" className={styles.navLink} onClick={closeAll}>ABOUT</Link>
+        <div className={styles.mobileCatWrapper}>
+          <button
+            className={`${styles.navLink} ${styles.mobileCatBtn}`}
+            onClick={() => setMobileHelpOpen(o => !o)}
+            aria-expanded={mobileHelpOpen}
+          >
+            HELP <span className={styles.chevron}>{mobileHelpOpen ? '▴' : '▾'}</span>
+          </button>
+          {mobileHelpOpen && (
+            <div className={styles.mobileAccordion}>
+              {HELP_LINKS.map(l => (
+                <Link key={l.href} href={l.href} className={styles.accordionChild} onClick={closeAll}>{l.label}</Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </nav>
 
       {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
     </header>

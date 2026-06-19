@@ -672,17 +672,31 @@
   font-size: 14px;
   color: var(--ux-ink);
 }
-.dots { display: flex; gap: 8px; }
+.dots { display: flex; gap: 8px; align-items: center; }
 .dot {
+  position: relative;
+  width: 28px; height: 44px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+/* The visible dot is painted by the pseudo-element, so the button box
+   itself stays a comfortable 44px-tall tap target (no overlap with
+   neighbours at gap:8px) while the dot still looks small. */
+.dot::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 9px; height: 9px;
   border-radius: 50%;
   background: var(--ux-cement-deep);
   border: 2px solid var(--ux-ink);
-  cursor: pointer;
-  padding: 0;
   transition: all 0.3s var(--ease-spring);
 }
-.dotActive { background: var(--ux-ink); width: 26px; border-radius: 5px; }
+.dotActive::before { background: var(--ux-ink); width: 26px; border-radius: 5px; }
 
 /* Scroll cue */
 .scrollCue {
@@ -800,7 +814,7 @@
 @media (max-width: 480px) {
   .content { padding: 62px 14px 46px; gap: 26px; }
 
-  .badge { font-size: 11px; letter-spacing: 1px; padding: 7px 12px; margin-bottom: 18px; }
+  .badge { font-size: 12px; letter-spacing: 1px; padding: 7px 12px; margin-bottom: 18px; }
   .titleTop { font-size: clamp(38px, 14vw, 58px); }
   .titleBottom { font-size: 16px; letter-spacing: 1px; }
   .lede { font-size: 13.5px; }
@@ -810,11 +824,11 @@
   .ctaRow { flex-direction: column; gap: 12px; width: 100%; }
   .ctaPrimary, .ctaSecondary { width: 100%; justify-content: center; padding: 15px 18px; font-size: 16px; }
 
-  .trustRow { gap: 6px 14px; font-size: 11px; }
+  .trustRow { gap: 6px 14px; font-size: 12px; }
 
   .statBlock { padding: 14px 6px; }
   .statNum { font-size: 24px; }
-  .statLabel { font-size: 10px; letter-spacing: 2px; }
+  .statLabel { font-size: 11px; letter-spacing: 1.5px; }
 
   .showcase { max-width: 100%; padding: 14px; }
   .stage { height: 230px; }

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { api, useToast, fmtINR as fmt, fmtDate, slugify } from '../../lib/admin/api';
+import ImageCropModal from './ImageCropModal';
 import styles from './page.module.css';
 
 // â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -585,6 +586,9 @@ function ProductForm({ brands, initial, onSave, onClose }: { brands: Brand[]; in
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  // Crop modal: index of the image being cropped (null = closed)
+  const [cropIdx, setCropIdx] = useState<number | null>(null);
+  const [cropBusy, setCropBusy] = useState(false);
 
   const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }));
 
@@ -632,6 +636,38 @@ function ProductForm({ brands, initial, onSave, onClose }: { brands: Brand[]; in
     }
   };
 
+  // Upload a cropped Blob to Cloudinary, return the secure_url (or null on failure)
+  const uploadBlob = async (blob: Blob): Promise<string | null> => {
+    const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const preset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+    if (!cloud || !preset) { alert('Cloudinary not configured — cannot save crop.'); return null; }
+    const fd = new FormData();
+    fd.append('file', blob);
+    fd.append('upload_preset', preset);
+    const r = await fetch(`https://api.cloudinary.com/v1_1/${cloud}/image/upload`, { method: 'POST', body: fd });
+    const d = await r.json();
+    return d.secure_url || null;
+  };
+
+  // Crop modal applied → upload cropped blob, replace the image at cropIdx
+  const handleCropApply = async (blob: Blob) => {
+    if (cropIdx === null) return;
+    setCropBusy(true);
+    try {
+      const url = await uploadBlob(blob);
+      if (url) {
+        setForm(f => ({ ...f, images: f.images.map((img, j) => (j === cropIdx ? url : img)) }));
+        setCropIdx(null);
+      } else {
+        alert('Crop upload failed. Check the Cloudinary unsigned preset.');
+      }
+    } catch {
+      alert('Crop upload failed: network error.');
+    } finally {
+      setCropBusy(false);
+    }
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true);
     const sizes = sizeOptions ? form.sizes : { oneSize: ['One Size'] };
@@ -673,16 +709,25 @@ function ProductForm({ brands, initial, onSave, onClose }: { brands: Brand[]; in
 
           <div className={`${styles.formGroup} ${styles.fullWidth}`}>
             <label>Images</label>
-            <div className={styles.imageUploadArea} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); Array.from(e.dataTransfer.files).forEach(f => uploadToCloudinary(f)); }}>
-              <p>{uploading ? 'Uploading…' : 'Drag & drop images here, or'}</p>
+            <div className={styles.imageUploadArea} onClick={e => (e.currentTarget.querySelector('input[type=file]') as HTMLInputElement)?.click()} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); Array.from(e.dataTransfer.files).forEach(f => uploadToCloudinary(f)); }}>
+              <p>{uploading ? 'Uploading…' : 'Drag & drop images here, or click to browse'}</p>
               <input type="file" accept="image/*" multiple onChange={e => Array.from(e.target.files || []).forEach(f => uploadToCloudinary(f))} className={styles.fileInput} />
             </div>
             <div className={styles.urlRow}>
               <input placeholder="Or paste image URL" value={form.imageUrl} onChange={e => set('imageUrl', e.target.value)} />
               <button type="button" className={styles.btnSmall} onClick={addImageUrl}>+ Add URL</button>
             </div>
-            <div className={styles.imagePreviews}>{form.images.map((img, i) => <div key={i} className={styles.imgThumb}><img src={img} alt="" /><button type="button" onClick={() => set('images', form.images.filter((_, j) => j !== i))}>Ã—</button></div>)}</div>
+            <div className={styles.imagePreviews}>{form.images.map((img, i) => <div key={i} className={styles.imgThumb}><img src={img} alt="" /><button type="button" className={styles.cropBtn} title="Resize / pad" onClick={() => setCropIdx(i)}>⤢</button><button type="button" onClick={() => set('images', form.images.filter((_, j) => j !== i))}>Ã—</button></div>)}</div>
           </div>
+
+          {cropIdx !== null && form.images[cropIdx] && (
+            <ImageCropModal
+              src={form.images[cropIdx]}
+              busy={cropBusy}
+              onCancel={() => setCropIdx(null)}
+              onApply={handleCropApply}
+            />
+          )}
 
           <div className={styles.formGroup}><label className={styles.toggleLabel}><input type="checkbox" checked={form.isFeatured} onChange={e => set('isFeatured', e.target.checked)} /> Featured</label></div>
           <div className={styles.formGroup}><label className={styles.toggleLabel}><input type="checkbox" checked={form.inStock} onChange={e => set('inStock', e.target.checked)} /> In Stock</label></div>
@@ -1302,8 +1347,8 @@ function CategoryForm({ categories, initial, onSave, onClose }: {
           </div>
           <div className={`${styles.formGroup} ${styles.fullWidth}`}>
             <label>Image (Upload or URL)</label>
-            <div className={styles.imageUploadArea} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files?.[0]) uploadToCloudinary(e.dataTransfer.files[0]); }}>
-              <p>{uploading ? 'Uploading...' : 'Drag & drop image here, or'}</p>
+            <div className={styles.imageUploadArea} onClick={e => (e.currentTarget.querySelector('input[type=file]') as HTMLInputElement)?.click()} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files?.[0]) uploadToCloudinary(e.dataTransfer.files[0]); }}>
+              <p>{uploading ? 'Uploading...' : 'Drag & drop image here, or click to browse'}</p>
               <input type="file" accept="image/*" onChange={e => { if (e.target.files?.[0]) uploadToCloudinary(e.target.files[0]); }} className={styles.fileInput} />
             </div>
             <input value={form.image || ''} onChange={e => set('image', e.target.value)} placeholder="Or paste image https://..." style={{ marginTop: 8 }} />
@@ -1972,8 +2017,8 @@ function HeroSlideForm({ initial, onClose, onSave }: { initial: Partial<HeroSlid
 
           <div className={`${styles.formGroup} ${styles.fullWidth}`}>
             <label>Image (Upload or URL) - Recommended size: 900x900px</label>
-            <div className={styles.imageUploadArea} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files?.[0]) uploadToCloudinary(e.dataTransfer.files[0]); }}>
-              <p>{uploading ? 'Uploading...' : 'Drag & drop image here, or'}</p>
+            <div className={styles.imageUploadArea} onClick={e => (e.currentTarget.querySelector('input[type=file]') as HTMLInputElement)?.click()} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files?.[0]) uploadToCloudinary(e.dataTransfer.files[0]); }}>
+              <p>{uploading ? 'Uploading...' : 'Drag & drop image here, or click to browse'}</p>
               <input type="file" accept="image/*" onChange={e => { if (e.target.files?.[0]) uploadToCloudinary(e.target.files[0]); }} className={styles.fileInput} />
             </div>
             <input value={form.image || ''} onChange={e => set('image', e.target.value)} placeholder="Or paste image https://..." style={{ marginTop: 8 }} required />

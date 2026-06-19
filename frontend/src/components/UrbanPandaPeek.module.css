@@ -1,0 +1,45 @@
+/* ================================================================
+   URBAN PANDA PEEK — clip window directly above the wordmark.
+   .root  = 30px tall, overflow:hidden → the "wall top".
+   .inner = panda head, translated vertically by GSAP.
+   Logo sits in front (z-index 2); panda behind (z-index 1).
+   ================================================================ */
+
+.root {
+  position: absolute;
+  /* Offset toward the A/N area (~58% from left of logo) */
+  left: 58%;
+  /* Sit above the logo top; tall enough for a clearly visible peek */
+  bottom: calc(100% - 6px);
+  transform: translateX(-50%);
+
+  width: 64px;
+  height: 44px;         /* reveal strip — tall enough that the nose crests the wall at peak */
+  overflow: hidden;     /* the wall — clips nose/mouth/chin ALWAYS */
+  pointer-events: none;
+  z-index: 5;
+  padding: 0 4px;
+  box-sizing: content-box;
+}
+
+/* Inner: the full panda art. GSAP owns the transform entirely.
+   Do NOT set a CSS `transform` here. GSAP reads an existing
+   translateY as a base `y` (px) and then ADDS yPercent on top,
+   which double-offsets the element (e.g. 100% + 100% = 200%) and
+   parks the panda permanently out of view — the root cause of the
+   intermittent "frozen / never appears" bug.
+   Hide the first paint with opacity instead; the effect sets
+   opacity:1 together with yPercent:100 (already hidden) on mount. */
+.inner {
+  will-change: transform;
+  opacity: 0;
+}
+
+.mark {
+  display: block;
+  width: 58px;
+  height: auto;
+}
+
+/* ── No CSS animations — GSAP drives everything.
+   But keep the gaze/blink classes as GSAP targets them via SVG selectors. ── */

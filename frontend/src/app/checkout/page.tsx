@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import QRCode from 'qrcode';
 import Header from '@/components/Header';
 import GlobalPopup from '@/components/GlobalPopup';
+import { trackBeginCheckout, toItem } from '@/lib/analytics';
 import styles from './page.module.css';
 
 // ── UPI payment config ──
@@ -498,6 +499,18 @@ function CartCheckoutForm({ items }: { items: CartItem[] }) {
   const total = subtotal - (discountAmount || 0);
   const payAmount = paymentMethod === 'prepaid' ? total : ADVANCE_AMOUNT;
 
+  // GA4 begin_checkout — once, when the cart checkout screen mounts with items.
+  const beganCheckout = useRef(false);
+  useEffect(() => {
+    if (beganCheckout.current || items.length === 0) return;
+    beganCheckout.current = true;
+    trackBeginCheckout(
+      items.map(i => toItem({ id: i.id, name: i.name, price: i.price, size: i.size, quantity: i.quantity })),
+      subtotal
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -696,6 +709,17 @@ function SingleProductCheckout({ slug, size }: { slug: string; size: string }) {
       .then(data => { setProduct(data); setLoading(false); })
       .catch(() => { router.replace('/products'); });
   }, [slug, router]);
+
+  // GA4 begin_checkout — once, after the product for single-item checkout loads.
+  const beganCheckout = useRef(false);
+  useEffect(() => {
+    if (beganCheckout.current || !product || !product.id) return;
+    beganCheckout.current = true;
+    trackBeginCheckout(
+      [toItem({ id: product.id, name: product.name, price: product.price, brand: product.brand, category: product.category, size, quantity: 1 })],
+      product.price
+    );
+  }, [product, size]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

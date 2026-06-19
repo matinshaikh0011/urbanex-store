@@ -1,0 +1,82 @@
+/* ================================================================
+   URBAN PANDA — streetwear mascot, peeks from behind the wordmark.
+   B&W, thick ink outlines, sticker-art. All motion is CSS, toggled
+   by the .idle / .active root class + data-look / data-blink / data-smirk.
+   ================================================================ */
+
+.root {
+  --ink: #0a0a0a;
+  --bone: #f4f2ed;
+  position: absolute;
+  left: 50%;
+  bottom: 0;            /* sits on the logo baseline; parent positions it */
+  width: 64px;
+  height: 58px;
+  pointer-events: none;
+  z-index: 1;           /* BEHIND the logo (logo z-index higher) */
+  /* Idle: only ear tips + crown peek above the baseline */
+  transform: translate(-50%, 64%);
+  transition: transform 0.6s cubic-bezier(0.34, 1.3, 0.5, 1);
+  will-change: transform;
+}
+
+/* Active: rise up so eyes + smirk clear the logo baseline */
+.active {
+  transform: translate(-50%, 6%);
+}
+
+.svg { width: 100%; height: 100%; display: block; overflow: visible; }
+
+/* ── Ink fills / strokes — thick graffiti outline ── */
+.ink { fill: var(--ink); }
+.head {
+  fill: var(--bone);
+  stroke: var(--ink);
+  stroke-width: 5;
+}
+.earInner { fill: var(--bone); opacity: 0.001; } /* subtle; near-invisible notch */
+
+.patches .ink { stroke: var(--ink); stroke-width: 1; }
+
+/* ── Eyes ── */
+.white { fill: var(--bone); }
+.pupils {
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.pupil { fill: var(--ink); }
+.spark { fill: var(--bone); }
+
+/* Look direction shifts pupils (small, confident glances) */
+.root[data-look='left']  .pupils { transform: translateX(-3.2px); }
+.root[data-look='right'] .pupils { transform: translateX(3.2px); }
+.root[data-look='center'] .pupils { transform: translateX(0); }
+
+/* ── Blink — eyelids snap down then up ── */
+.lid {
+  fill: var(--bone);
+  height: 0;
+  transform-box: fill-box;
+  transition: height 0.08s ease;
+}
+.root[data-blink='1'] .lid { height: 20px; }
+
+/* ── Mouth: neutral by default, smirk on cue ── */
+.mouthNeutral, .mouthSmirk {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+.mouthSmirk { opacity: 0; transition: opacity 0.18s ease; }
+.mouthNeutral { opacity: 1; transition: opacity 0.18s ease; }
+.root[data-smirk='1'] .mouthSmirk { opacity: 1; }
+.root[data-smirk='1'] .mouthNeutral { opacity: 0; }
+
+/* Nose */
+.nose { fill: var(--ink); }
+
+/* ── Reduced motion: lock to idle, no transitions ── */
+@media (prefers-reduced-motion: reduce) {
+  .root, .pupils, .lid, .mouthSmirk, .mouthNeutral { transition: none !important; }
+  .active { transform: translate(-50%, 64%); } /* never rises */
+}

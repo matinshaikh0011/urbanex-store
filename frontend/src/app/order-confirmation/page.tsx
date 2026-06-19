@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { trackPurchase, toItem } from '@/lib/analytics';
 import styles from './page.module.css';
 
 interface OrderItem {
@@ -35,6 +36,38 @@ export default function OrderConfirmationPage() {
 
     if (storedOrderId) {
       setOrderId(storedOrderId);
+
+      // GA4 purchase — fire once per order id. Guard against reloads of the
+      // confirmation page double-counting the same purchase.
+      const reportedKey = `ga_purchase_sent_${storedOrderId}`;
+      if (!sessionStorage.getItem(reportedKey)) {
+        const amount = storedTotal ? parseInt(storedTotal) : 0;
+        let purchaseItems: ReturnType<typeof toItem>[] = [];
+        try {
+          const raw = sessionStorage.getItem('orderItems');
+          if (raw) {
+            const parsed = JSON.parse(raw) as OrderItem[];
+            purchaseItems = parsed.map((i) =>
+              toItem({ id: i.id, name: i.name, price: i.price, size: i.size, quantity: i.quantity })
+            );
+          }
+        } catch { /* ignore */ }
+        // Single-product checkout stores name/total but not orderItems.
+        if (purchaseItems.length === 0) {
+          const pName = sessionStorage.getItem('orderProduct');
+          purchaseItems = [
+            toItem({
+              id: storedOrderId,
+              name: pName || 'Order',
+              price: amount,
+              size: sessionStorage.getItem('orderSize') || undefined,
+              quantity: 1,
+            }),
+          ];
+        }
+        trackPurchase(storedOrderId, purchaseItems, amount);
+        sessionStorage.setItem(reportedKey, '1');
+      }
 
       // Build the rich WhatsApp order notification
       let customer = { name: '', phone: '', address: '', product: 'Order placed', size: '-', amountPaid: '' as string | number };
