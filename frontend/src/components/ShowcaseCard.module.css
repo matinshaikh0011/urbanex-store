@@ -35,12 +35,18 @@
   --sc-shadow: rgba(0, 0, 0, 0.45);
 }
 
-/* ---- Scroll reveal ---- */
+/* ---- Scroll reveal — "Rise & Settle" (Option 1) ----
+   Product + caption fade in while lifting from below with a gentle
+   settle. Per-card stagger via --sc-reveal-delay (set inline). The
+   grounding contact shadow is handled separately below so it arrives
+   a beat later — that delayed shadow is what stops the product from
+   reading as "floating". */
 .reveal {
   opacity: 0;
-  transform: translateY(26px);
+  transform: translateY(38px);
   transition: opacity 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    transform 0.85s cubic-bezier(0.22, 1.08, 0.36, 1);
+  transition-delay: var(--sc-reveal-delay, 0ms);
   will-change: opacity, transform;
 }
 .reveal.revealed {
@@ -67,9 +73,10 @@
 }
 
 .image {
-  /* contain = never crop the product; tuned for cutout assets */
+  /* contain = never crop the product; tuned for cutout assets.
+     padding 7% → product box ≈86% of card (was 72% at 14%): ~20% larger. */
   object-fit: contain;
-  padding: 14%;
+  padding: 7%;
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
 }
 
@@ -87,17 +94,30 @@
   border-radius: 50%;
   background: radial-gradient(ellipse at center, var(--sc-shadow), rgba(10, 10, 10, 0) 72%);
   filter: blur(4px);
-  opacity: 0.5;
-  transform: scaleX(0.82);
-  transition: opacity 0.45s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Hidden until the product has settled — see .revealed rule below */
+  opacity: 0;
+  transform: scaleX(0.55);
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
   z-index: 0;
+}
+
+/* Shadow draws in AFTER the product lands (reveal delay + settle time),
+   so the product visibly grounds onto the slab instead of floating. */
+.reveal.revealed .stage::after {
+  opacity: 0.5;
+  transform: scaleX(0.82);
+  transition-delay: calc(var(--sc-reveal-delay, 0ms) + 0.42s);
 }
 
 /* ================================================================
    VARIANT: FLOAT (primary) — transparent; product lifts + shadow spreads
    ================================================================ */
-.float:hover .stage::after { opacity: 1; transform: scaleX(1); }
+.float:hover .stage::after {
+  opacity: 1;
+  transform: scaleX(1);
+  transition-delay: 0s; /* hover responds immediately, no reveal lag */
+}
 .float:hover .image { transform: translateY(-8px) scale(1.045); }
 
 /* ================================================================

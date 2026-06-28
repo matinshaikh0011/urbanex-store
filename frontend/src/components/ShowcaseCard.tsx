@@ -131,6 +131,7 @@ export default function ShowcaseCard({
       href={`/products/${product.slug}`}
       className={`${styles.card} ${styles[variant]} ${styles.reveal} ${revealed ? styles.revealed : ''}`}
       data-tone={tone}
+      style={{ '--sc-reveal-delay': `${(index % 5) * 90}ms` } as React.CSSProperties}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       data-cursor="view"
