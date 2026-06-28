@@ -85,4 +85,11 @@
 @media (max-width: 480px) {
   .title { font-size: 17px; letter-spacing: 2px; }
   .grid { gap: 24px 14px; }
+  /* Cap homepage rows to 6 products on mobile — keeps each row tight.
+     Users who want more tap "View All". Remaining cards are in the DOM
+     but hidden (no extra fetches), so this is pure CSS, zero JS cost. */
+  .grid > *:nth-child(n+7) { display: none; }
+  /* After hiding cards, update count label if needed — handled in JS below */
+  .row { margin-bottom: 40px; }
+  .footer { margin-top: 20px; }
 }

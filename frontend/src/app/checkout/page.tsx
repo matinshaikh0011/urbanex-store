@@ -196,40 +196,51 @@ function PaymentModal({
             <>
               <p className={styles.modalInstruction}>
                 {paymentMethod === 'cod'
-                  ? 'Scan the QR and pay the ₹300 advance to reserve your order. Balance is collected on delivery.'
+                  ? 'Scan the QR and pay the ₹300 advance to reserve your order. Balance on delivery.'
                   : 'Scan the QR and pay the full amount for priority shipping.'}
               </p>
 
-              {/* Timer */}
+              {/* Compact timer pill */}
               <div className={`${styles.timer} ${timeUp ? styles.timerUp : ''}`}>
-                <span className={styles.timerLabel}>{timeUp ? 'TIME EXPIRED' : 'COMPLETE PAYMENT WITHIN'}</span>
+                <span className={styles.timerLabel}>{timeUp ? 'TIME EXPIRED' : 'PAY WITHIN'}</span>
                 <span className={styles.timerClock}>{timeUp ? '00:00' : `${mm}:${ss}`}</span>
               </div>
 
-              <div className={styles.qrWrap}>
-                {qrDataUrl ? (
-                  <img src={qrDataUrl} alt={`UPI QR for ${formatINR(payAmount)}`} className={styles.qrImage} />
-                ) : (
-                  <div className={`${styles.qrImage} ${styles.qrLoading}`}>Generating QR…</div>
-                )}
-                <span className={styles.qrAmount}>PAY {formatINR(payAmount)}</span>
-              </div>
+              {/* Two-column: QR on the left, pay details on the right */}
+              <div className={styles.payGrid}>
+                <div className={styles.qrCol}>
+                  <div className={styles.qrWrap}>
+                    {qrDataUrl ? (
+                      <img src={qrDataUrl} alt={`UPI QR for ${formatINR(payAmount)}`} className={styles.qrImage} />
+                    ) : (
+                      <div className={`${styles.qrImage} ${styles.qrLoading}`}>Generating…</div>
+                    )}
+                  </div>
+                  <span className={styles.qrScanHint}>Scan with any UPI app</span>
+                </div>
 
-              <div className={styles.upiMeta}>
-                <div className={styles.upiMetaRow}>
-                  <span className={styles.upiMetaLabel}>UPI ID</span>
-                  <span className={styles.upiMetaValue}>{UPI_VPA}</span>
+                <div className={styles.payInfo}>
+                  <div className={styles.payAmountBlock}>
+                    <span className={styles.payAmountLabel}>AMOUNT</span>
+                    <span className={styles.payAmountValue}>{formatINR(payAmount)}</span>
+                  </div>
+                  <div className={styles.upiMeta}>
+                    <div className={styles.upiMetaRow}>
+                      <span className={styles.upiMetaLabel}>UPI ID</span>
+                      <span className={styles.upiMetaValue}>{UPI_VPA}</span>
+                    </div>
+                    <div className={styles.upiMetaRow}>
+                      <span className={styles.upiMetaLabel}>NAME</span>
+                      <span className={styles.upiMetaValue}>{UPI_NAME}</span>
+                    </div>
+                  </div>
+                  <div className={styles.upiApps}>
+                    <span className={`${styles.upiApp} ${styles.gpay}`}>GPay</span>
+                    <span className={`${styles.upiApp} ${styles.phonepe}`}>PhonePe</span>
+                    <span className={`${styles.upiApp} ${styles.paytm}`}>Paytm</span>
+                    <span className={`${styles.upiApp} ${styles.bhim}`}>BHIM</span>
+                  </div>
                 </div>
-                <div className={styles.upiMetaRow}>
-                  <span className={styles.upiMetaLabel}>NAME</span>
-                  <span className={styles.upiMetaValue}>{UPI_NAME}</span>
-                </div>
-              </div>
-              <div className={styles.upiApps}>
-                <span className={`${styles.upiApp} ${styles.gpay}`}>GPay</span>
-                <span className={`${styles.upiApp} ${styles.phonepe}`}>PhonePe</span>
-                <span className={`${styles.upiApp} ${styles.paytm}`}>Paytm</span>
-                <span className={`${styles.upiApp} ${styles.bhim}`}>BHIM</span>
               </div>
 
               {timeUp && (

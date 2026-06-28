@@ -6,7 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/components/ClientProviders';
 import Header from '@/components/Header';
-import GlobalPopup from '@/components/GlobalPopup';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import ProductReviews from '@/components/ProductReviews';
 import Loader from '@/components/Loader';
@@ -16,6 +15,7 @@ import StickyAddToCart from '@/components/StickyAddToCart';
 import ProductFaqAccordion from '@/components/ProductFaqAccordion';
 import NeedHelpWhatsApp from '@/components/NeedHelpWhatsApp';
 import UrbanExVerified from '@/components/UrbanExVerified';
+import PdpStoreNotice from '@/components/PdpStoreNotice';
 import { addRecentlyViewed } from '@/lib/recentlyViewed';
 import { trackViewItem, toItem } from '@/lib/analytics';
 import styles from './page.module.css';
@@ -130,7 +130,6 @@ export default function ProductDetailClient({ params }: { params: { slug: string
   if (loading) {
     return (
       <>
-        <GlobalPopup />
         <Header />
         <main className={styles.main}>
           <Loader label="LOADING" />
@@ -142,7 +141,6 @@ export default function ProductDetailClient({ params }: { params: { slug: string
   if (!product) {
     return (
       <>
-        <GlobalPopup />
         <Header />
         <main className={styles.main}>
           <div className={styles.notFound}>Product not found</div>
@@ -178,7 +176,6 @@ export default function ProductDetailClient({ params }: { params: { slug: string
 
   return (
     <>
-      <GlobalPopup />
       <Header />
 
       {/* Size Guide Modal */}
@@ -321,6 +318,8 @@ export default function ProductDetailClient({ params }: { params: { slug: string
               </div>
               {selectedSize && <p className={styles.selectedSize}>Size {selectedSize} selected</p>}
             </div>
+
+            <PdpStoreNotice />
 
             <div className={styles.actions} data-pdp-actions>
               <button className={`${styles.addToCartBtn} ${addedToCart ? styles.added : ''}`} onClick={handleAddToCart} disabled={!selectedSize}>

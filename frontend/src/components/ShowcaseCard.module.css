@@ -74,9 +74,11 @@
 
 .image {
   /* contain = never crop the product; tuned for cutout assets.
-     padding 7% → product box ≈86% of card (was 72% at 14%): ~20% larger. */
+     padding 2% → product box ≈96% of card. Combined with the taller
+     stage below this gives sneakers/landscape products ~25% more
+     visual size than the previous 7% padding. */
   object-fit: contain;
-  padding: 7%;
+  padding: 2%;
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
 }
 

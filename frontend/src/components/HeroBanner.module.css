@@ -310,7 +310,7 @@
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 96px 60px 70px;
+  padding: 52px 60px 64px;
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
   gap: 50px;
@@ -754,9 +754,10 @@
     background-repeat: no-repeat;
     background-position: center;
   }
-  /* Left content gets the light top half; right showcase gets the dark bottom half */
-  .right { order: 2; }
-  .left  { order: 1; }
+  /* Left content gets the light top half; right showcase gets the dark bottom half.
+     Order is overridden at ≤768px to put the image first on phones. */
+  .right { order: 1; }
+  .left  { order: 2; }
   .showcase { max-width: 400px; }
   /* Dark side accents flip on this slab */
   .glyphX, .glyphCircle { display: none; }
@@ -766,9 +767,42 @@
 @media (max-width: 768px) {
   .hero { min-height: auto; align-items: stretch; }
   .content {
-    padding: 70px 20px 54px;
-    gap: 30px;
+    padding: 44px 16px 28px;
+    gap: 16px;
   }
+
+  /* Product image FIRST on mobile — user sees product before text */
+  .right { order: -1; }
+  .left  { order: 1; }
+
+  /* ── TEXT VISIBILITY FIX ──
+     On mobile the diptych stacks: light cement TOP, dark asphalt BOTTOM.
+     The product image (right, order:-1) lands on the light top half — correct.
+     The text/CTA block (left, order:1) lands on the dark bottom half.
+     All text was var(--ux-ink) = near-black, invisible on dark asphalt.
+     Flip every text element to bone/chalk for the bottom dark half. */
+  .left { color: var(--ux-bone); }
+  .title, .titleTop, .titleBottom, .letter { color: var(--ux-bone); }
+  /* Single clean ink shadow on the dark half — the previous double
+     ink+bone shadow created messy ghosting against the dark asphalt. */
+  .letter { text-shadow: 2px 3px 0 var(--ux-ink); }
+  .lede { color: rgba(244,242,237,0.75); }
+  .titleUnderline { background: var(--ux-bone); }
+  /* Cycle word stays ink-on-bone — already high contrast */
+  .cycleWord { color: var(--ux-ink); background: var(--ux-bone); }
+  /* CTAs: primary becomes bone/ink, secondary becomes bone outline */
+  .ctaPrimary { background: var(--ux-bone); color: var(--ux-ink); border-color: var(--ux-bone); box-shadow: 5px 5px 0 var(--ux-ink); }
+  /* Keep primary text INK on tap/hover — base hover flips it to bone which
+     would be bone-on-bone (invisible) now that the bg is bone on mobile. */
+  .ctaPrimary:hover, .ctaPrimary:active { color: var(--ux-ink); box-shadow: 1px 1px 0 var(--ux-ink); }
+  .ctaSecondary { color: var(--ux-bone); border-color: var(--ux-bone); box-shadow: 5px 5px 0 var(--ux-bone); }
+  .ctaSecondary:hover, .ctaSecondary:active { background: var(--ux-bone); color: var(--ux-ink); }
+  /* Badge: bone text on ink bg — stays readable */
+  .badge { background: var(--ux-bone); color: var(--ux-ink); border-color: var(--ux-ink); box-shadow: 3px 3px 0 var(--ux-ink); }
+  .badgeDot { background: var(--ux-ink); }
+  /* Trust row: light text */
+  .trustRow { color: rgba(244,242,237,0.7); }
+  /* Stats row: already ink bg, no change needed */
 
   .titleTop {
     flex-wrap: nowrap;
@@ -776,20 +810,27 @@
     letter-spacing: -1px;
     justify-content: center;
   }
-  .title { margin-bottom: 18px; }
+  .title { margin-bottom: 12px; }
   .titleBottom { font-size: clamp(17px, 5vw, 24px); letter-spacing: 2px; }
-  .titleUnderline { height: 4px; margin-top: 12px; }
+  .titleUnderline { height: 4px; margin-top: 10px; }
 
-  .lede { font-size: 14px; margin-bottom: 18px; }
-  .specRow { gap: 10px; margin-bottom: 24px; }
+  .lede { font-size: 14px; margin-bottom: 12px; }
 
-  .showcase { max-width: 340px; padding: 16px; }
-  .stage { height: 280px; }
-  .cornerSticker { width: 54px; height: 54px; font-size: 11px; top: -14px; right: -6px; }
-  .showcaseTag { left: 16px; }
+  /* Spec row hidden on mobile — noise, no value at this size */
+  .specRow { display: none; }
+  .showcase { max-width: 100%; padding: 12px; }
+  .stage { height: 210px; }
+  .cornerSticker { width: 48px; height: 48px; font-size: 10px; top: -12px; right: -4px; }
+  .showcaseTag { left: 14px; font-size: 11px; }
 
-  .trustRow { justify-content: center; gap: 8px 16px; margin-bottom: 24px; }
+  /* Trust row: tighter single line */
+  .trustRow { justify-content: center; gap: 6px 12px; margin-bottom: 12px; font-size: 11px; }
+
+  /* Stats: compact strip */
   .statsRow { max-width: 100%; width: 100%; }
+  .statBlock { padding: 10px 6px; }
+  .statNum { font-size: 20px; }
+  .statLabel { font-size: 10px; letter-spacing: 1px; }
 
   .scrollCue { display: none; }
 
@@ -812,27 +853,35 @@
 }
 
 @media (max-width: 480px) {
-  .content { padding: 62px 14px 46px; gap: 26px; }
+  .content { padding: 28px 14px 20px; gap: 14px; }
 
-  .badge { font-size: 12px; letter-spacing: 1px; padding: 7px 12px; margin-bottom: 18px; }
+  .badge { font-size: 11px; letter-spacing: 1px; padding: 6px 10px; margin-bottom: 10px; }
   .titleTop { font-size: clamp(38px, 14vw, 58px); }
-  .titleBottom { font-size: 16px; letter-spacing: 1px; }
-  .lede { font-size: 13.5px; }
+  .titleBottom { font-size: 15px; letter-spacing: 1px; }
+  .lede { font-size: 13px; margin-bottom: 10px; }
 
   .specText { display: none; }
 
-  .ctaRow { flex-direction: column; gap: 12px; width: 100%; }
-  .ctaPrimary, .ctaSecondary { width: 100%; justify-content: center; padding: 15px 18px; font-size: 16px; }
+  .ctaRow { flex-direction: column; gap: 10px; width: 100%; margin-bottom: 10px; }
+  .ctaPrimary, .ctaSecondary { width: 100%; justify-content: center; padding: 12px 18px; font-size: 15px; }
 
-  .trustRow { gap: 6px 14px; font-size: 12px; }
+  .trustRow { gap: 4px 10px; font-size: 11px; margin-bottom: 8px; }
 
-  .statBlock { padding: 14px 6px; }
-  .statNum { font-size: 24px; }
-  .statLabel { font-size: 11px; letter-spacing: 1.5px; }
+  .statsRow { box-shadow: 3px 3px 0 var(--ux-chalk); }
+  .statBlock { padding: 8px 4px; }
+  .statNum { font-size: 18px; margin-bottom: 3px; }
+  .statLabel { font-size: 9px; letter-spacing: 1px; }
 
-  .showcase { max-width: 100%; padding: 14px; }
-  .stage { height: 230px; }
-  .cornerSticker { width: 48px; height: 48px; font-size: 10px; top: -12px; right: -4px; }
+  /* On short phones (< 780px viewport), hide stats — CTA is the priority.
+     Stats are visible after a minimal scroll. */
+  @media (max-height: 780px) {
+    .statsRow { display: none; }
+  }
+
+  .showcase { max-width: 100%; padding: 10px; }
+  .stage { height: 190px; }
+  .cornerSticker { width: 44px; height: 44px; font-size: 10px; top: -10px; right: -2px; }
+  .showcaseFoot { margin-top: 10px; }
 }
 
 /* ════════════════════════════════════════════════════════════════

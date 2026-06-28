@@ -327,6 +327,26 @@
   margin: 0 auto;
 }
 
+/* When a dark category slab follows a dark product slab, the two merge
+   into one black block. This adds a clear seam: a bone top edge + a
+   little breathing room so "Find Your Lane" reads as its own section. */
+.categorySlab {
+  border-top: 3px solid var(--ux-bone);
+  box-shadow: inset 0 14px 30px rgba(0,0,0,0.45);
+}
+.categorySlab .categoryShowcase {
+  padding-top: 60px;
+}
+/* A short centered lime/bone tick above the eyebrow as a deliberate marker */
+.categorySlab .catHeader::before {
+  content: '';
+  display: block;
+  width: 46px;
+  height: 4px;
+  background: var(--ux-bone);
+  margin: 0 auto 20px;
+}
+
 /* ---- Explore-all categories button (centered below the grid) ---- */
 .exploreAllWrap {
   display: flex;

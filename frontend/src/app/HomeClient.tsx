@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Script from 'next/script';
 import Header from '@/components/Header';
-import GlobalPopup from '@/components/GlobalPopup';
 import BrandCarousel from '@/components/BrandCarousel';
 import ScrollReveal from '@/components/ScrollReveal';
 import HeroBanner from '@/components/HeroBanner';
@@ -74,19 +73,12 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
 
   return (
     <>
-      <GlobalPopup />
       <Header />
       <main className={styles.main}>
         {/* HERO */}
         <HeroBanner initialSlides={heroSlides} />
 
-        {/* TRUSTED BY CUSTOMERS — quick stat proof below hero */}
-        <TrustedByCustomers />
-
-        {/* Crack divider into marquee */}
-        <div className={styles.crackDivider} aria-hidden />
-
-        {/* Marquee — dark asphalt */}
+        {/* ── 2. MARQUEE — immediate pulse after hero ── */}
         <div className={styles.marqueeSection}>
           <div className={styles.marqueeTrack}>
             {['SNEAKERS', 'WATCHES', 'GLASSES', 'HANDBAGS', 'CLOTHING', 'PREMIUM EDITION', 'PREMIUM DROPS', 'FRESH KICKS', 'SNEAKERS', 'WATCHES', 'GLASSES', 'HANDBAGS', 'CLOTHING', 'PREMIUM EDITION', 'PREMIUM DROPS', 'FRESH KICKS'].map((item, i) => (
@@ -97,19 +89,46 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
           </div>
         </div>
 
-        {/* SLAB: dark asphalt — categories as wheatpaste posters */}
-        <section className={`${styles.slab} ${styles.slabDark}`}>
+        {/* ── 3. SNEAKERS — first products within ~850px of page start ── */}
+        {featured.sneakers.length > 0 && (
+          <>
+            <div className={styles.crackDivider} aria-hidden />
+            <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
+              <div className={styles.slabGrain} aria-hidden />
+              <ScrollReveal animation="fadeIn">
+                <FeaturedRow icon="👟" title="SNEAKERS" href="/products?category=sneakers" products={featured.sneakers} tone="light" />
+              </ScrollReveal>
+            </section>
+          </>
+        )}
+
+        {/* ── 4. WATCHES ── */}
+        {featured.watches.length > 0 && (
+          <>
+            <div className={styles.crackDivider} aria-hidden />
+            <section className={`${styles.slab} ${styles.slabDark} ${styles.featuredSlab}`}>
+              <div className={styles.slabGrain} aria-hidden />
+              <ScrollReveal animation="fadeIn">
+                <FeaturedRow icon="⌚" title="LUXURY WATCHES" href="/products?category=watches" products={featured.watches} tone="dark" />
+              </ScrollReveal>
+            </section>
+          </>
+        )}
+        {/* ── 5. CATEGORY GRID — navigation after user sees products.
+            A dark category slab follows the dark watches slab, so add an
+            explicit divider + extra top separation to stop them blending. ── */}
+        <div className={styles.crackDivider} aria-hidden />
+        <section className={`${styles.slab} ${styles.slabDark} ${styles.categorySlab}`}>
           <div className={styles.slabGrain} aria-hidden />
           <ScrollReveal animation="slideUp" duration={800}>
             <div className={styles.categoryShowcase}>
               <div className={styles.catHeader}>
-                <span className={styles.catEyebrow}>SECTION / 01</span>
-                <h2 className={styles.catTitle}>SHOP BY <span className={styles.accent}>CATEGORY</span></h2>
-                <span className={styles.catSubtag}>— pick your lane —</span>
+                <span className={styles.catEyebrow}>SHOP BY CATEGORY</span>
+                <h2 className={styles.catTitle}>FIND YOUR <span className={styles.accent}>LANE</span></h2>
               </div>
               <div className={styles.catGrid}>
               {featuredCategories.length > 0 ? (
-                featuredCategories.slice(0, 8).map((cat) => (
+                featuredCategories.slice(0, 6).map((cat) => (
                   <Link key={cat.id} href={`/products?category=${cat.slug}`} className={styles.catCard} data-cursor="view">
                     <div className={styles.catImgWrap}>
                       <img
@@ -186,7 +205,7 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
               </div>
               <div className={styles.exploreAllWrap}>
                 <Link href="/categories" className={styles.exploreAllBtn} data-cursor="view" aria-label="Explore all categories">
-                  <span>EXPLORE ALL CATEGORIES</span>
+                  <span>ALL CATEGORIES</span>
                   <span className={styles.exploreAllArrow} aria-hidden>→</span>
                 </Link>
               </div>
@@ -196,47 +215,9 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
         <div className={styles.crackDivider} aria-hidden />
 
         {/* SLAB: light cement — brand carousel */}
-        <section className={`${styles.slab} ${styles.slabLight}`}>
-          <div className={styles.slabGrain} aria-hidden />
-          <BrandCarousel brands={brands} />
-        </section>
-        <div className={styles.crackDivider} aria-hidden />
-
-        {/* SLAB: dark asphalt — Featured Drops header */}
-        <section className={`${styles.slab} ${styles.slabDark}`}>
-          <div className={styles.slabGrain} aria-hidden />
-          <ScrollReveal animation="slideUp">
-            <div className={styles.featuredHeader}>
-              <span className={styles.featuredEyebrow}>SECTION / 02</span>
-              <h2 className={styles.sectionTitle}>
-                <span className={styles.titleAccent}>FEATURED</span> DROPS
-              </h2>
-              <p className={styles.sectionSubtitle}>The hottest releases in every category</p>
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {hasAnyFeatured ? (
+        {/* ── 6. GLASSES, HANDBAGS, CLOTHING ── */}
+        {featured.glasses.length > 0 && (
           <>
-            {/* Sneakers — light */}
-            <div className={styles.crackDivider} aria-hidden />
-            <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
-              <div className={styles.slabGrain} aria-hidden />
-              <ScrollReveal animation="fadeIn">
-                <FeaturedRow icon="👟" title="SNEAKERS" href="/products?category=sneakers" products={featured.sneakers} tone="light" />
-              </ScrollReveal>
-            </section>
-
-            {/* Watches — dark */}
-            <div className={styles.crackDivider} aria-hidden />
-            <section className={`${styles.slab} ${styles.slabDark} ${styles.featuredSlab}`}>
-              <div className={styles.slabGrain} aria-hidden />
-              <ScrollReveal animation="fadeIn">
-                <FeaturedRow icon="⌚" title="LUXURY WATCHES" href="/products?category=watches" products={featured.watches} tone="dark" />
-              </ScrollReveal>
-            </section>
-
-            {/* Glasses — light */}
             <div className={styles.crackDivider} aria-hidden />
             <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
               <div className={styles.slabGrain} aria-hidden />
@@ -244,8 +225,10 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
                 <FeaturedRow icon="🕶️" title="GLASSES" href="/products?category=glasses" products={featured.glasses} tone="light" />
               </ScrollReveal>
             </section>
-
-            {/* Handbags — dark */}
+          </>
+        )}
+        {featured.handbags.length > 0 && (
+          <>
             <div className={styles.crackDivider} aria-hidden />
             <section className={`${styles.slab} ${styles.slabDark} ${styles.featuredSlab}`}>
               <div className={styles.slabGrain} aria-hidden />
@@ -253,24 +236,20 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
                 <FeaturedRow icon="👜" title="HANDBAGS" href="/products?category=handbags" products={featured.handbags} tone="dark" />
               </ScrollReveal>
             </section>
-
-            {/* Clothing — light */}
+          </>
+        )}
+        {featured.clothing.length > 0 && (
+          <>
             <div className={styles.crackDivider} aria-hidden />
             <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
               <div className={styles.slabGrain} aria-hidden />
               <ScrollReveal animation="fadeIn">
                 <FeaturedRow icon="👕" title="CLOTHING" href="/products?category=clothing" products={featured.clothing} tone="light" />
               </ScrollReveal>
-              <ScrollReveal animation="fadeIn">
-                <div className={styles.featuredViewAll}>
-                  <Link href="/products" className={styles.featuredViewAllBtn} data-cursor="cop">
-                    VIEW ALL PRODUCTS →
-                  </Link>
-                </div>
-              </ScrollReveal>
             </section>
           </>
-        ) : (
+        )}
+        {!hasAnyFeatured && (
           <section className={`${styles.slab} ${styles.slabLight} ${styles.featuredSlab}`}>
             <div className={styles.slabGrain} aria-hidden />
             <ScrollReveal animation="scaleIn">
@@ -278,16 +257,35 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
                 <span className={styles.comingSoonIcon}>🛍️</span>
                 <h3>FRESH DROPS COMING SOON</h3>
                 <p>We&apos;re stocking up on the hottest releases. Check back shortly or browse our full collection.</p>
-                <Link href="/products" className={styles.featuredViewAllBtn} data-cursor="cop">
-                  BROWSE ALL PRODUCTS →
-                </Link>
+                <Link href="/products" className={styles.featuredViewAllBtn} data-cursor="cop">BROWSE ALL PRODUCTS →</Link>
               </div>
             </ScrollReveal>
           </section>
         )}
+        {hasAnyFeatured && (
+          <>
+            <div className={styles.crackDivider} aria-hidden />
+            <section className={`${styles.slab} ${styles.slabDark}`}>
+              <div className={styles.slabGrain} aria-hidden />
+              <div className={styles.featuredViewAll}>
+                <Link href="/products" className={styles.featuredViewAllBtn} data-cursor="cop">VIEW ALL PRODUCTS →</Link>
+              </div>
+            </section>
+          </>
+        )}
 
-        {/* WHY SHOP URBANEX — single consolidated trust block (6 cards),
-            placed after the product drops so merchandise leads. */}
+        {/* ── 7. TRUSTED BY CUSTOMERS — after product exposure ── */}
+        <div className={styles.crackDivider} aria-hidden />
+        <TrustedByCustomers />
+
+        {/* ── 8. BRAND CAROUSEL ── */}
+        <div className={styles.crackDivider} aria-hidden />
+        <section className={`${styles.slab} ${styles.slabLight}`}>
+          <div className={styles.slabGrain} aria-hidden />
+          <BrandCarousel brands={brands} />
+        </section>
+
+        {/* ── 9. WHY SHOP URBANEX ── */}
         <div className={styles.crackDivider} aria-hidden />
         <WhyShopUrbanEx />
 
@@ -312,7 +310,7 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
             <div className={styles.slabGrain} aria-hidden />
             <ScrollReveal animation="slideUp">
               <div className={styles.ctaTextWrap}>
-                <span className={styles.ctaEyebrow}>SECTION / 03</span>
+                <span className={styles.ctaEyebrow}>DON&apos;T WAIT</span>
                 <h2 className={styles.ctaTitle}>READY TO <span className={styles.highlight}>COP?</span></h2>
                 <p className={styles.ctaText}>Browse our curated collection of the hottest streetwear drops.</p>
               </div>
@@ -338,8 +336,8 @@ export default function HomeClient({ brands, categories, featured, heroSlides }:
           <div className={styles.instagram}>
             <ScrollReveal animation="slideUp">
               <div className={styles.instaHeader}>
-                <span className={styles.featuredEyebrow}>SECTION / 04</span>
-                <h2 className={styles.sectionTitle}>FOLLOW US ON <span className={styles.titleAccent}>INSTAGRAM</span></h2>
+                <span className={styles.featuredEyebrow}>FOLLOW THE CULTURE</span>
+                <h2 className={styles.sectionTitle}>WE&apos;RE ON <span className={styles.titleAccent}>INSTAGRAM</span></h2>
                 <a href="https://www.instagram.com/urbanex.store/" target="_blank" rel="noopener noreferrer" className={styles.instaHandle}>@urbanex.store</a>
               </div>
             </ScrollReveal>

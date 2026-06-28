@@ -305,14 +305,8 @@ export default function HeroBanner({ initialSlides }: { initialSlides?: any[] })
         </div>
       </div>
 
-      {/* Top ticker tape — now flush under the header (no gap) */}
-      <div className={styles.tape} aria-hidden>
-        <div className={styles.tapeTrack}>
-          {[...TICKER, ...TICKER, ...TICKER].map((w, i) => (
-            <span key={i} className={styles.tapeItem}>{w}<i>✦</i></span>
-          ))}
-        </div>
-      </div>
+      {/* Top ticker tape — REMOVED from hero (the header already has the
+          utility tape; a second scrolling band here duplicates it) */}
 
       {/* ════════ CONTENT ════════ */}
       <div className={styles.content}>
